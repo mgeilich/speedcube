@@ -1,0 +1,157 @@
+Scrambled State:
+u: [CubeColor.blue, CubeColor.red, CubeColor.red, CubeColor.orange, CubeColor.white, CubeColor.blue, CubeColor.green, CubeColor.orange, CubeColor.red]
+d: [CubeColor.orange, CubeColor.green, CubeColor.white, CubeColor.green, CubeColor.yellow, CubeColor.yellow, CubeColor.blue, CubeColor.orange, CubeColor.yellow]
+r: [CubeColor.blue, CubeColor.red, CubeColor.blue, CubeColor.blue, CubeColor.red, CubeColor.blue, CubeColor.orange, CubeColor.orange, CubeColor.green]
+l: [CubeColor.orange, CubeColor.green, CubeColor.red, CubeColor.green, CubeColor.orange, CubeColor.white, CubeColor.orange, CubeColor.white, CubeColor.green]
+f: [CubeColor.white, CubeColor.white, CubeColor.yellow, CubeColor.red, CubeColor.green, CubeColor.yellow, CubeColor.yellow, CubeColor.red, CubeColor.green]
+b: [CubeColor.white, CubeColor.yellow, CubeColor.yellow, CubeColor.white, CubeColor.blue, CubeColor.yellow, CubeColor.red, CubeColor.blue, CubeColor.white]
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+  Stage 6 Loop 1: correct=2, pivot=CubeFace.b
+    Moves: [D, L, D', R', D, L', D', R]
+  Stage 6 Loop 2: correct=2, pivot=CubeFace.r
+    Moves: [D, F, D', B', D, F', D', B]
+  Stage 6 Loop 3: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 4: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 5: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 6: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 7: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 8: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 9: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 10: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 11: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 12: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 13: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 14: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 15: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 16: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 17: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 18: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 19: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 20: correct=2, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+
+Steps:
+--- White Cross: Moving white-green edge to bottom ---
+Moves: [L, B]
+u: [CubeColor.blue, CubeColor.blue, CubeColor.green, CubeColor.yellow, CubeColor.white, CubeColor.blue, CubeColor.yellow, CubeColor.orange, CubeColor.red]
+d: [CubeColor.white, CubeColor.green, CubeColor.white, CubeColor.red, CubeColor.yellow, CubeColor.yellow, CubeColor.orange, CubeColor.white, CubeColor.green]
+r: [CubeColor.blue, CubeColor.red, CubeColor.yellow, CubeColor.blue, CubeColor.red, CubeColor.orange, CubeColor.orange, CubeColor.orange, CubeColor.yellow]
+l: [CubeColor.red, CubeColor.green, CubeColor.orange, CubeColor.red, CubeColor.orange, CubeColor.green, CubeColor.white, CubeColor.white, CubeColor.red]
+f: [CubeColor.blue, CubeColor.white, CubeColor.yellow, CubeColor.orange, CubeColor.green, CubeColor.yellow, CubeColor.green, CubeColor.red, CubeColor.green]
+b: [CubeColor.red, CubeColor.white, CubeColor.white, CubeColor.blue, CubeColor.blue, CubeColor.yellow, CubeColor.orange, CubeColor.green, CubeColor.blue]
+--- White Cross: Moving white-red edge to bottom ---
+Moves: [L, D, B]
+u: [CubeColor.yellow, CubeColor.orange, CubeColor.green, CubeColor.yellow, CubeColor.white, CubeColor.blue, CubeColor.white, CubeColor.orange, CubeColor.red]
+d: [CubeColor.green, CubeColor.orange, CubeColor.blue, CubeColor.white, CubeColor.yellow, CubeColor.green, CubeColor.white, CubeColor.white, CubeColor.orange]
+r: [CubeColor.blue, CubeColor.red, CubeColor.white, CubeColor.blue, CubeColor.red, CubeColor.yellow, CubeColor.yellow, CubeColor.red, CubeColor.green]
+l: [CubeColor.green, CubeColor.red, CubeColor.red, CubeColor.blue, CubeColor.orange, CubeColor.green, CubeColor.blue, CubeColor.green, CubeColor.white]
+f: [CubeColor.blue, CubeColor.white, CubeColor.yellow, CubeColor.yellow, CubeColor.green, CubeColor.yellow, CubeColor.red, CubeColor.green, CubeColor.orange]
+b: [CubeColor.orange, CubeColor.blue, CubeColor.red, CubeColor.orange, CubeColor.blue, CubeColor.white, CubeColor.yellow, CubeColor.red, CubeColor.orange]
+--- White Cross: Moving white-blue edge to bottom ---
+Moves: [D, D, L']
+u: [CubeColor.blue, CubeColor.orange, CubeColor.green, CubeColor.yellow, CubeColor.white, CubeColor.blue, CubeColor.yellow, CubeColor.orange, CubeColor.red]
+d: [CubeColor.orange, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.yellow, CubeColor.white, CubeColor.red, CubeColor.orange, CubeColor.green]
+r: [CubeColor.blue, CubeColor.red, CubeColor.white, CubeColor.blue, CubeColor.red, CubeColor.yellow, CubeColor.blue, CubeColor.green, CubeColor.white]
+l: [CubeColor.red, CubeColor.green, CubeColor.green, CubeColor.red, CubeColor.orange, CubeColor.red, CubeColor.green, CubeColor.blue, CubeColor.yellow]
+f: [CubeColor.orange, CubeColor.white, CubeColor.yellow, CubeColor.green, CubeColor.green, CubeColor.yellow, CubeColor.blue, CubeColor.red, CubeColor.orange]
+b: [CubeColor.orange, CubeColor.blue, CubeColor.white, CubeColor.orange, CubeColor.blue, CubeColor.yellow, CubeColor.red, CubeColor.green, CubeColor.yellow]
+--- White Cross: Moving white-orange edge to bottom ---
+Moves: [F, D, R']
+u: [CubeColor.blue, CubeColor.orange, CubeColor.red, CubeColor.yellow, CubeColor.white, CubeColor.orange, CubeColor.yellow, CubeColor.red, CubeColor.orange]
+d: [CubeColor.red, CubeColor.white, CubeColor.orange, CubeColor.orange, CubeColor.yellow, CubeColor.white, CubeColor.green, CubeColor.white, CubeColor.white]
+r: [CubeColor.white, CubeColor.yellow, CubeColor.yellow, CubeColor.red, CubeColor.red, CubeColor.yellow, CubeColor.yellow, CubeColor.orange, CubeColor.orange]
+l: [CubeColor.red, CubeColor.green, CubeColor.orange, CubeColor.red, CubeColor.orange, CubeColor.white, CubeColor.red, CubeColor.green, CubeColor.yellow]
+f: [CubeColor.blue, CubeColor.green, CubeColor.green, CubeColor.red, CubeColor.green, CubeColor.blue, CubeColor.green, CubeColor.blue, CubeColor.green]
+b: [CubeColor.blue, CubeColor.blue, CubeColor.white, CubeColor.blue, CubeColor.blue, CubeColor.yellow, CubeColor.blue, CubeColor.green, CubeColor.white]
+--- White Cross: Moving white-green edge to top ---
+Moves: [D2, F2]
+u: [CubeColor.blue, CubeColor.orange, CubeColor.red, CubeColor.yellow, CubeColor.white, CubeColor.orange, CubeColor.green, CubeColor.white, CubeColor.white]
+d: [CubeColor.orange, CubeColor.red, CubeColor.yellow, CubeColor.white, CubeColor.yellow, CubeColor.orange, CubeColor.orange, CubeColor.white, CubeColor.red]
+r: [CubeColor.orange, CubeColor.yellow, CubeColor.yellow, CubeColor.white, CubeColor.red, CubeColor.yellow, CubeColor.orange, CubeColor.green, CubeColor.yellow]
+l: [CubeColor.red, CubeColor.green, CubeColor.red, CubeColor.red, CubeColor.orange, CubeColor.red, CubeColor.yellow, CubeColor.orange, CubeColor.white]
+f: [CubeColor.white, CubeColor.green, CubeColor.blue, CubeColor.blue, CubeColor.green, CubeColor.red, CubeColor.green, CubeColor.green, CubeColor.blue]
+b: [CubeColor.blue, CubeColor.blue, CubeColor.white, CubeColor.blue, CubeColor.blue, CubeColor.yellow, CubeColor.green, CubeColor.blue, CubeColor.green]
+--- White Cross: Moving white-red edge to top ---
+Moves: [F, D, R2]
+u: [CubeColor.blue, CubeColor.orange, CubeColor.orange, CubeColor.yellow, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.red, CubeColor.orange]
+d: [CubeColor.orange, CubeColor.white, CubeColor.red, CubeColor.white, CubeColor.yellow, CubeColor.orange, CubeColor.red, CubeColor.orange, CubeColor.red]
+r: [CubeColor.blue, CubeColor.red, CubeColor.blue, CubeColor.yellow, CubeColor.red, CubeColor.white, CubeColor.yellow, CubeColor.yellow, CubeColor.green]
+l: [CubeColor.red, CubeColor.green, CubeColor.orange, CubeColor.red, CubeColor.orange, CubeColor.red, CubeColor.green, CubeColor.blue, CubeColor.green]
+f: [CubeColor.green, CubeColor.blue, CubeColor.white, CubeColor.green, CubeColor.green, CubeColor.blue, CubeColor.yellow, CubeColor.orange, CubeColor.blue]
+b: [CubeColor.yellow, CubeColor.blue, CubeColor.white, CubeColor.green, CubeColor.blue, CubeColor.yellow, CubeColor.white, CubeColor.green, CubeColor.yellow]
+--- White Cross: Moving white-blue edge to top ---
+Moves: [D', B2]
+u: [CubeColor.red, CubeColor.white, CubeColor.orange, CubeColor.yellow, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.red, CubeColor.orange]
+d: [CubeColor.red, CubeColor.orange, CubeColor.red, CubeColor.white, CubeColor.yellow, CubeColor.orange, CubeColor.orange, CubeColor.orange, CubeColor.blue]
+r: [CubeColor.blue, CubeColor.red, CubeColor.yellow, CubeColor.yellow, CubeColor.red, CubeColor.red, CubeColor.white, CubeColor.green, CubeColor.red]
+l: [CubeColor.yellow, CubeColor.green, CubeColor.orange, CubeColor.white, CubeColor.orange, CubeColor.red, CubeColor.blue, CubeColor.orange, CubeColor.blue]
+f: [CubeColor.green, CubeColor.blue, CubeColor.white, CubeColor.green, CubeColor.green, CubeColor.blue, CubeColor.yellow, CubeColor.yellow, CubeColor.green]
+b: [CubeColor.green, CubeColor.blue, CubeColor.green, CubeColor.yellow, CubeColor.blue, CubeColor.green, CubeColor.white, CubeColor.blue, CubeColor.yellow]
+--- White Cross: Moving white-orange edge to top ---
+Moves: [L2]
+u: [CubeColor.red, CubeColor.white, CubeColor.orange, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.orange, CubeColor.red, CubeColor.orange]
+d: [CubeColor.red, CubeColor.orange, CubeColor.red, CubeColor.yellow, CubeColor.yellow, CubeColor.orange, CubeColor.white, CubeColor.orange, CubeColor.blue]
+r: [CubeColor.blue, CubeColor.red, CubeColor.yellow, CubeColor.yellow, CubeColor.red, CubeColor.red, CubeColor.white, CubeColor.green, CubeColor.red]
+l: [CubeColor.blue, CubeColor.orange, CubeColor.blue, CubeColor.red, CubeColor.orange, CubeColor.white, CubeColor.orange, CubeColor.green, CubeColor.yellow]
+f: [CubeColor.yellow, CubeColor.blue, CubeColor.white, CubeColor.green, CubeColor.green, CubeColor.blue, CubeColor.green, CubeColor.yellow, CubeColor.green]
+b: [CubeColor.green, CubeColor.blue, CubeColor.yellow, CubeColor.yellow, CubeColor.blue, CubeColor.green, CubeColor.white, CubeColor.blue, CubeColor.green]
+Checking Cross on face u:
+  Edges: CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.red
+
+CROSS FAILED!

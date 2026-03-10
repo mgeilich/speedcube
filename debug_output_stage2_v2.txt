@@ -1,0 +1,207 @@
+Scrambled State:
+u: [CubeColor.white, CubeColor.red, CubeColor.white, CubeColor.blue, CubeColor.white, CubeColor.green, CubeColor.white, CubeColor.orange, CubeColor.green]
+d: [CubeColor.yellow, CubeColor.yellow, CubeColor.yellow, CubeColor.green, CubeColor.yellow, CubeColor.white, CubeColor.yellow, CubeColor.white, CubeColor.green]
+r: [CubeColor.yellow, CubeColor.orange, CubeColor.green, CubeColor.white, CubeColor.red, CubeColor.green, CubeColor.blue, CubeColor.blue, CubeColor.orange]
+l: [CubeColor.blue, CubeColor.yellow, CubeColor.blue, CubeColor.yellow, CubeColor.orange, CubeColor.yellow, CubeColor.orange, CubeColor.red, CubeColor.green]
+f: [CubeColor.orange, CubeColor.blue, CubeColor.orange, CubeColor.red, CubeColor.green, CubeColor.orange, CubeColor.red, CubeColor.green, CubeColor.red]
+b: [CubeColor.red, CubeColor.blue, CubeColor.red, CubeColor.white, CubeColor.blue, CubeColor.orange, CubeColor.white, CubeColor.red, CubeColor.blue]
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D', ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D, ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D', ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D, ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D', ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D, ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D', ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D, ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D', ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D, ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D', ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D, ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D', ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D, ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D', ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D, ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D', ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D, ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D', ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D, ok=false
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.l
+    Moves: [D', B', D, F, D', B, D, F']
+  Stage 6 Loop 2: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 3: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 4: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 5: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 6: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 7: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 8: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 9: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 10: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 11: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 12: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 13: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 14: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 15: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 16: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 17: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 18: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 19: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+  Stage 6 Loop 20: correct=0, pivot=null
+    Moves: [D', R, D, L', D', R', D, L]
+
+Step-by-Step Analysis:
+--- White Cross: Moving white-green edge to bottom ---
+Moves: [D, R]
+--- White Cross: Moving white-orange edge to bottom ---
+Moves: [R, D, B']
+--- White Cross: Moving white-green edge to bottom ---
+Moves: [R']
+--- White Cross: Moving white-green edge to top ---
+Moves: [D', F2]
+--- White Cross: Moving white-red edge to top ---
+Moves: [D2, R2]
+--- White Cross: Moving white-blue edge to top ---
+Moves: [D2, B2]
+--- White Cross: Moving white-orange edge to top ---
+Moves: [D2, L2]
+--- First Layer: Flip the cube over so the white cross is on the bottom. ---
+Moves: []
+  White face (u): [CubeColor.orange, CubeColor.white, CubeColor.green, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.red]
+  Corners: 0:CubeColor.orange, 2:CubeColor.green, 6:CubeColor.white, 8:CubeColor.red
+--- First Layer: Inserting the white-blue-red corner ---
+Moves: [F, D', F', D, R, D', R', D, R, D', R', D, R, D', R', D, R, D', R', D, R, D', R', D, R, D', R', D, R, D', R', D, R, D', R', D, R, D', R', D, R, D', R', D, R, D', R', D, R, D', R', D, R, D', R', D, R, D', R', D, R, D', R', D]
+  White face (u): [CubeColor.orange, CubeColor.white, CubeColor.blue, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.red]
+  Corners: 0:CubeColor.orange, 2:CubeColor.blue, 6:CubeColor.white, 8:CubeColor.red
+--- First Layer: Inserting the white-red-green corner ---
+Moves: [D', F, D', F', D, F, D', F', D, F, D', F', D, F, D', F', D, F, D', F', D, F, D', F', D, F, D', F', D, F, D', F', D, F, D', F', D, F, D', F', D, F, D', F', D, F, D', F', D, F, D', F', D, F, D', F', D, F, D', F', D]
+  White face (u): [CubeColor.orange, CubeColor.white, CubeColor.blue, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.green]
+  Corners: 0:CubeColor.orange, 2:CubeColor.blue, 6:CubeColor.white, 8:CubeColor.green
+--- First Layer: Inserting the white-green-orange corner ---
+Moves: [D', D', D', L', D', L, D, L', D', L, D, L', D', L, D, L', D', L, D, L', D', L, D, L', D', L, D, L', D', L, D, L', D', L, D, L', D', L, D, L', D', L, D, L', D', L, D, L', D', L, D, L', D', L, D, L', D', L, D, L', D', L, D]
+  White face (u): [CubeColor.red, CubeColor.white, CubeColor.blue, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.green]
+  Corners: 0:CubeColor.red, 2:CubeColor.blue, 6:CubeColor.white, 8:CubeColor.green
+--- First Layer: Inserting the white-orange-blue corner ---
+Moves: [L', D', L, D, L', D', L, D, D', D', D', D', D', D', D', D', D', D', D', D', D', D', D', D', D', D', D', D', D', D', D', D', D', B', D', B, D, B', D', B, D, B', D', B, D, B', D', B, D, B', D', B, D, B', D', B, D, B', D', B, D, B', D', B, D, B', D', B, D, B', D', B, D, B', D', B, D, B', D', B, D, B', D', B, D, B', D', B, D, B', D', B, D]
+  White face (u): [CubeColor.blue, CubeColor.white, CubeColor.green, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.green]
+  Corners: 0:CubeColor.blue, 2:CubeColor.green, 6:CubeColor.white, 8:CubeColor.green
+--- Second Layer: Inserting the blue-red edge into middle layer ---
+Moves: [D', F, D, F', D, R', D', R]
+--- Second Layer: Inserting the red-green edge into middle layer ---
+Moves: [D2, D, R, D', R', D', F, D, F']
+--- Second Layer: Inserting the green-orange edge into middle layer ---
+Moves: [D', F, D, F', D, R', D', R]
+--- Second Layer: Inserting the orange-blue edge into middle layer ---
+Moves: [D', R, D, R', D, B, D', B']
+--- Align Yellow Edges: Cycling edges to find matching centers ---
+Moves: [R, D', R', D', R, D2, R', D']
+--- Align Yellow Edges: Cycling edges to match side centers ---
+Moves: [R, D', R', D', R, D2, R']
+--- Align Yellow Edges: Cycling edges to find matching centers ---
+Moves: [R, D', R', D', R, D2, R', D']
+--- Align Yellow Edges: Cycling edges to match side centers ---
+Moves: [R, D', R', D', R, D2, R']
+--- Align Yellow Edges: Cycling edges to find matching centers ---
+Moves: [R, D', R', D', R, D2, R', D']
+--- Align Yellow Edges: Cycling edges to match side centers ---
+Moves: [R, D', R', D', R, D2, R']
+--- Align Yellow Edges: Cycling edges to find matching centers ---
+Moves: [R, D', R', D', R, D2, R', D']
+--- Align Yellow Edges: Cycling edges to match side centers ---
+Moves: [R, D', R', D', R, D2, R']
+--- Align Yellow Edges: Cycling edges to find matching centers ---
+Moves: [R, D', R', D', R, D2, R', D']
+--- Align Yellow Edges: Cycling edges to match side centers ---
+Moves: [R, D', R', D', R, D2, R']
+--- Yellow Corners: Cycling corners while keeping one fixed ---
+Moves: [D', B', D, F, D', B, D, F']
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Cycling corners to find correct slots ---
+Moves: [D', R, D, L', D', R', D, L]
+--- Yellow Corners: Orienting corner to finish yellow face ---
+Moves: [R', U, R, U', R', U, R, U', R', U, R, U', R', U, R, U', R', U, R, U']
+--- Yellow Corners: Advancing to next corner ---
+Moves: [D']
+--- Yellow Corners: Orienting corner to finish yellow face ---
+Moves: [R', U, R, U', R', U, R, U', R', U, R, U', R', U, R, U']
+--- Yellow Corners: Advancing to next corner ---
+Moves: [D']
+--- Yellow Corners: Orienting corner to finish yellow face ---
+Moves: [R', U, R, U', R', U, R, U']
+--- Yellow Corners: Advancing to next corner ---
+Moves: [D']
+--- Yellow Corners: Orienting corner to finish yellow face ---
+Moves: [R', U, R, U', R', U, R, U', R', U, R, U', R', U, R, U', R', U, R, U', R', U, R, U', R', U, R, U', R', U, R, U', R', U, R, U', R', U, R, U']
+
+STAGE 2 FAILED!

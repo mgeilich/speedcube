@@ -1,0 +1,284 @@
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 5 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 9 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 9 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 13 moves.
+DEBUG: Edge (blue, red) trapped at (CubeFace.r, CubeFace.b). Popping.
+DEBUG: Aligning (blue, red) to FRONT (CubeFace.b) - 3 turns.
+DEBUG: Aligning (red, green) to FRONT (CubeFace.r) - 0 turns.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 2 turns.
+DEBUG: Edge (orange, blue) trapped at (CubeFace.f, CubeFace.r). Popping.
+DEBUG: Aligning (orange, blue) to FRONT (CubeFace.l) - 2 turns.
+Test 0: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 5 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 21 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 12 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 16 moves.
+DEBUG: Edge (blue, red) trapped at (CubeFace.r, CubeFace.b). Popping.
+DEBUG: Aligning (blue, red) to FRONT (CubeFace.b) - 3 turns.
+DEBUG: Edge (red, green) trapped at (CubeFace.b, CubeFace.l). Popping.
+DEBUG: Aligning (red, green) to RIGHT (CubeFace.f) - 3 turns.
+DEBUG: Aligning (green, orange) to RIGHT (CubeFace.l) - 3 turns.
+DEBUG: Aligning (orange, blue) to FRONT (CubeFace.l) - 3 turns.
+Test 1: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 25 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 9 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 9 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 16 moves.
+DEBUG: Aligning (blue, red) to FRONT (CubeFace.b) - 1 turns.
+DEBUG: Edge (red, green) trapped at (CubeFace.f, CubeFace.r). Popping.
+DEBUG: Aligning (red, green) to FRONT (CubeFace.r) - 2 turns.
+DEBUG: Edge (green, orange) trapped at (CubeFace.r, CubeFace.b). Popping.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 3 turns.
+DEBUG: Aligning (orange, blue) to RIGHT (CubeFace.b) - 1 turns.
+Test 2: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 21 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 16 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 8 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 5 moves.
+DEBUG: Edge (blue, red) trapped at (CubeFace.f, CubeFace.r). Popping.
+DEBUG: Aligning (blue, red) to FRONT (CubeFace.b) - 2 turns.
+DEBUG: Aligning (red, green) to RIGHT (CubeFace.f) - 1 turns.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 3 turns.
+DEBUG: Aligning (orange, blue) to RIGHT (CubeFace.b) - 1 turns.
+Test 3: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 13 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 17 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 already solved.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 5 moves.
+DEBUG: Edge (blue, red) trapped at (CubeFace.r, CubeFace.b). Popping.
+DEBUG: Aligning (blue, red) to FRONT (CubeFace.b) - 3 turns.
+DEBUG: Edge (red, green) trapped at (CubeFace.b, CubeFace.l). Popping.
+DEBUG: Aligning (red, green) to RIGHT (CubeFace.f) - 3 turns.
+DEBUG: Edge (green, orange) trapped at (CubeFace.f, CubeFace.r). Popping.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 2 turns.
+DEBUG: Aligning (orange, blue) to FRONT (CubeFace.l) - 0 turns.
+Test 4: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 9 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 13 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 21 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 13 moves.
+DEBUG: Edge (red, green) trapped at (CubeFace.r, CubeFace.b). Popping.
+DEBUG: Aligning (red, green) to RIGHT (CubeFace.f) - 2 turns.
+DEBUG: Edge (green, orange) trapped at (CubeFace.f, CubeFace.r). Popping.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 2 turns.
+DEBUG: Aligning (orange, blue) to RIGHT (CubeFace.b) - 3 turns.
+Test 5: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 12 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 9 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 4 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 5 moves.
+DEBUG: Edge (blue, red) trapped at (CubeFace.b, CubeFace.l). Popping.
+DEBUG: Aligning (blue, red) to FRONT (CubeFace.b) - 0 turns.
+DEBUG: Aligning (red, green) to FRONT (CubeFace.r) - 1 turns.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 1 turns.
+DEBUG: Aligning (orange, blue) to RIGHT (CubeFace.b) - 0 turns.
+Test 6: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 8 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 25 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 9 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 16 moves.
+DEBUG: Edge (blue, red) trapped at (CubeFace.l, CubeFace.f). Popping.
+DEBUG: Aligning (blue, red) to FRONT (CubeFace.b) - 1 turns.
+DEBUG: Edge (red, green) trapped at (CubeFace.f, CubeFace.r). Popping.
+DEBUG: Aligning (red, green) to FRONT (CubeFace.r) - 2 turns.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 3 turns.
+DEBUG: Aligning (orange, blue) to FRONT (CubeFace.l) - 3 turns.
+Test 7: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 9 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 21 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 5 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 5 moves.
+DEBUG: Edge (blue, red) trapped at (CubeFace.l, CubeFace.f). Popping.
+DEBUG: Aligning (blue, red) to FRONT (CubeFace.b) - 1 turns.
+DEBUG: Aligning (red, green) to FRONT (CubeFace.r) - 1 turns.
+DEBUG: Aligning (orange, blue) to FRONT (CubeFace.l) - 1 turns.
+Test 8: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 8 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 20 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 13 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 13 moves.
+DEBUG: Aligning (blue, red) to FRONT (CubeFace.b) - 2 turns.
+DEBUG: Edge (red, green) trapped at (CubeFace.b, CubeFace.l). Popping.
+DEBUG: Aligning (red, green) to FRONT (CubeFace.r) - 0 turns.
+Test 9: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 21 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 20 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 12 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 12 moves.
+DEBUG: Aligning (blue, red) to RIGHT (CubeFace.r) - 3 turns.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 2 turns.
+DEBUG: Aligning (orange, blue) to RIGHT (CubeFace.b) - 0 turns.
+Test 10: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 20 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 9 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 12 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 8 moves.
+DEBUG: Edge (blue, red) trapped at (CubeFace.r, CubeFace.b). Popping.
+DEBUG: Aligning (blue, red) to FRONT (CubeFace.b) - 3 turns.
+DEBUG: Edge (red, green) trapped at (CubeFace.r, CubeFace.b). Popping.
+DEBUG: Aligning (red, green) to RIGHT (CubeFace.f) - 2 turns.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 3 turns.
+DEBUG: Aligning (orange, blue) to FRONT (CubeFace.l) - 1 turns.
+Test 11: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 21 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 13 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 already solved.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 13 moves.
+DEBUG: Aligning (red, green) to FRONT (CubeFace.r) - 1 turns.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 1 turns.
+DEBUG: Edge (orange, blue) trapped at (CubeFace.f, CubeFace.r). Popping.
+DEBUG: Aligning (orange, blue) to FRONT (CubeFace.l) - 2 turns.
+Test 12: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 25 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 13 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 21 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 13 moves.
+DEBUG: Edge (blue, red) trapped at (CubeFace.l, CubeFace.f). Popping.
+DEBUG: Aligning (blue, red) to FRONT (CubeFace.b) - 1 turns.
+DEBUG: Edge (red, green) trapped at (CubeFace.b, CubeFace.l). Popping.
+DEBUG: Aligning (red, green) to FRONT (CubeFace.r) - 0 turns.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 3 turns.
+Test 13: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 8 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 9 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 21 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 21 moves.
+DEBUG: Aligning (blue, red) to RIGHT (CubeFace.r) - 1 turns.
+DEBUG: Aligning (red, green) to RIGHT (CubeFace.f) - 3 turns.
+DEBUG: Aligning (green, orange) to RIGHT (CubeFace.l) - 1 turns.
+DEBUG: Aligning (orange, blue) to RIGHT (CubeFace.b) - 3 turns.
+Test 14: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 13 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 21 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 21 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 13 moves.
+DEBUG: Edge (blue, red) trapped at (CubeFace.r, CubeFace.b). Popping.
+DEBUG: Aligning (blue, red) to FRONT (CubeFace.b) - 3 turns.
+DEBUG: Edge (red, green) trapped at (CubeFace.b, CubeFace.l). Popping.
+DEBUG: Aligning (red, green) to FRONT (CubeFace.r) - 0 turns.
+DEBUG: Aligning (green, orange) to RIGHT (CubeFace.l) - 0 turns.
+DEBUG: Aligning (orange, blue) to FRONT (CubeFace.l) - 2 turns.
+Test 15: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 13 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 21 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 4 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 already solved.
+DEBUG: Edge (blue, red) trapped at (CubeFace.b, CubeFace.l). Popping.
+DEBUG: Aligning (blue, red) to FRONT (CubeFace.b) - 0 turns.
+DEBUG: Aligning (red, green) to RIGHT (CubeFace.f) - 1 turns.
+DEBUG: Edge (green, orange) trapped at (CubeFace.f, CubeFace.r). Popping.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 2 turns.
+DEBUG: Aligning (orange, blue) to RIGHT (CubeFace.b) - 3 turns.
+Test 16: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 25 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 13 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 9 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 20 moves.
+DEBUG: Aligning (red, green) to RIGHT (CubeFace.f) - 3 turns.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 0 turns.
+DEBUG: Aligning (orange, blue) to FRONT (CubeFace.l) - 0 turns.
+Test 17: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 16 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 9 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 13 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 13 moves.
+DEBUG: Edge (blue, red) trapped at (CubeFace.b, CubeFace.l). Popping.
+DEBUG: Aligning (blue, red) to RIGHT (CubeFace.r) - 3 turns.
+DEBUG: Aligning (red, green) to FRONT (CubeFace.r) - 0 turns.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 3 turns.
+DEBUG: Aligning (orange, blue) to RIGHT (CubeFace.b) - 3 turns.
+Test 18: Cross: PASS, First Layer: PASS, Second Layer: PASS
+DEBUG: Stage 2 Slot 0 - Logical Front remapped to CubeFace.b, Right to CubeFace.r. Target: blue-red corner.
+DEBUG: Slot 0 solved with 5 moves.
+DEBUG: Stage 2 Slot 1 - Logical Front remapped to CubeFace.r, Right to CubeFace.f. Target: red-green corner.
+DEBUG: Slot 1 solved with 25 moves.
+DEBUG: Stage 2 Slot 2 - Logical Front remapped to CubeFace.f, Right to CubeFace.l. Target: green-orange corner.
+DEBUG: Slot 2 solved with 21 moves.
+DEBUG: Stage 2 Slot 3 - Logical Front remapped to CubeFace.l, Right to CubeFace.b. Target: orange-blue corner.
+DEBUG: Slot 3 solved with 5 moves.
+DEBUG: Aligning (blue, red) to RIGHT (CubeFace.r) - 3 turns.
+DEBUG: Aligning (red, green) to RIGHT (CubeFace.f) - 3 turns.
+DEBUG: Aligning (green, orange) to FRONT (CubeFace.f) - 3 turns.
+DEBUG: Aligning (orange, blue) to FRONT (CubeFace.l) - 2 turns.
+Test 19: Cross: PASS, First Layer: PASS, Second Layer: PASS
+
+=== Summary: 20 tests ===
+White Cross: 20 / 20
+First Layer: 20 / 20
+Second Layer: 20 / 20

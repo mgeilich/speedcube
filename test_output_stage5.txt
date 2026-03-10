@@ -1,0 +1,282 @@
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.b
+    Moves: [D, L, D', R', D, L', D', R]
+  Stage 6 Loop 2: correct=1, pivot=CubeFace.b
+    Moves: [D, L, D', R', D, L', D', R]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 0: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=0, pivot=null
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 2: correct=1, pivot=CubeFace.r
+    Moves: [D, F, D', B', D, F', D', B]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 1: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.l
+    Moves: [D, B, D', F', D, B', D', F]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 2: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 3: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 4: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.b
+    Moves: [D, L, D', R', D, L', D', R]
+  Stage 6 Loop 2: correct=1, pivot=CubeFace.b
+    Moves: [D, L, D', R', D, L', D', R]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 5: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=0, pivot=null
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 2: correct=1, pivot=CubeFace.b
+    Moves: [D, L, D', R', D, L', D', R]
+  Stage 6 Loop 3: correct=1, pivot=CubeFace.b
+    Moves: [D, L, D', R', D, L', D', R]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 6: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.r
+    Moves: [D, F, D', B', D, F', D', B]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 7: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.r
+    Moves: [D, F, D', B', D, F', D', B]
+  Stage 6 Loop 2: correct=1, pivot=CubeFace.r
+    Moves: [D, F, D', B', D, F', D', B]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 8: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.l
+    Moves: [D, B, D', F', D, B', D', F]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 9: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.r
+    Moves: [D, F, D', B', D, F', D', B]
+  Stage 6 Loop 2: correct=1, pivot=CubeFace.r
+    Moves: [D, F, D', B', D, F', D', B]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 10: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.b
+    Moves: [D, L, D', R', D, L', D', R]
+  Stage 6 Loop 2: correct=1, pivot=CubeFace.b
+    Moves: [D, L, D', R', D, L', D', R]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 11: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.r
+    Moves: [D, F, D', B', D, F', D', B]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 12: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 13: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.r
+    Moves: [D, F, D', B', D, F', D', B]
+  Stage 6 Loop 2: correct=1, pivot=CubeFace.r
+    Moves: [D, F, D', B', D, F', D', B]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 14: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.r
+    Moves: [D, F, D', B', D, F', D', B]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 15: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 16: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+  Stage 6 Loop 1: correct=0, pivot=null
+    Moves: [D, R, D', L', D, R', D', L]
+  Stage 6 Loop 2: correct=1, pivot=CubeFace.r
+    Moves: [D, F, D', B', D, F', D', B]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 17: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.l
+    Moves: [D, B, D', F', D, B', D', F]
+  Stage 6 Loop 2: correct=1, pivot=CubeFace.l
+    Moves: [D, B, D', F', D, B', D', F]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 18: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=false
+    Stage 5 check: turns=2, move=D2, ok=false
+    Stage 5 check: turns=3, move=D', ok=false
+    Stage 5 check: turns=0, move=, ok=false
+    Stage 5 check: turns=1, move=D, ok=true
+  Stage 6 Loop 1: correct=1, pivot=CubeFace.f
+    Moves: [D, R, D', L', D, R', D', L]
+    DEBUG Edge: CubeFace.f index 7 is CubeColor.red, center is CubeColor.green
+    DEBUG Edge: CubeFace.r index 7 is CubeColor.blue, center is CubeColor.red
+    DEBUG Edge: CubeFace.b index 7 is CubeColor.orange, center is CubeColor.blue
+    DEBUG Edge: CubeFace.l index 7 is CubeColor.green, center is CubeColor.orange
+Test 19: Cross: PASS, F1: PASS, F2: PASS, Y-Cross: PASS, Y-Edges: FAIL, Y-Corners: PASS
+
+=== Summary: 20 tests ===
+White Cross: 20 / 20
+First Layer: 20 / 20
+Second Layer: 20 / 20
+Yellow Cross: 20 / 20
+Yellow Corners: 20 / 20

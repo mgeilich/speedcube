@@ -1,0 +1,29 @@
+Test 0: Cross: PASS, First Layer: PASS
+Test 1: Cross: PASS, First Layer: PASS
+Test 2: Cross: PASS, First Layer: PASS
+Test 3: Cross: PASS, First Layer: PASS
+Test 4: Cross: PASS, First Layer: PASS
+Test 5: Cross: PASS, First Layer: PASS
+Test 6: Cross: PASS, First Layer: PASS
+Test 7: Cross: PASS, First Layer: PASS
+Test 8: Cross: PASS, First Layer: PASS
+Test 9: Cross: FAIL, First Layer: FAIL
+  Scramble: L D' L F' R L' B' U F' B D B F D' R' L F' D U' D'
+  Moves: B' L F' L F R' D2 F2 F D R2 B2 D2 L2 L D L' D' D2 R D R' D' R D R' D' R D R' D' R D R' D' R D R' D' B D B' D' D2 F D F' D' F D F' D' F D F' D' D L D L' D' L D L' D' L D L' D' L D L' D' L D L' D' D2 B D B' D' B D B' D' B D B' D' D2 D' B' D B D R D' R' D2 D F D' F' D' R' D R D L D' L' D' F' D F D2 D' L' D L D B D' B' B D B' D B D2 B' D B D B' D B D2 B' D B D B' D B D2 B' D B D B' D B D2 B' D B D B' D B D2 B' D B D B' D B D2 B' D B D B' D B D2 B' D B D B' D B D2 B' D B D B' D B D2 B' D B D B' D B D2 B' D D R D' L' D R' D' L D R D' L' D R' D' L D R D' L' D R' D' L D R D' L' D R' D' L D R D' L' D R' D' L D R D' L' D R' D' L D R D' L' D R' D' L D R D' L' D R' D' L D R D' L' D R' D' L D R D' L' D R' D' L D R D' L' D R' D' L D R D' L' D R' D' L D R D' L' D R' D' L D R D' L' D R' D' L D R D' L' D R' D' L R' U' R U R' U' R U D D R' U' R U R' U' R U R' U' R U R' U' R U D
+    U (Top) stickers: [CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.orange, CubeColor.white]
+    Sides row 1: F:CubeColor.yellow, R:CubeColor.red, B:CubeColor.blue, L:CubeColor.orange
+    Sides centers: F:CubeColor.green, R:CubeColor.red, B:CubeColor.blue, L:CubeColor.orange
+Test 10: Cross: PASS, First Layer: PASS
+Test 11: Cross: PASS, First Layer: PASS
+Test 12: Cross: PASS, First Layer: PASS
+Test 13: Cross: PASS, First Layer: PASS
+Test 14: Cross: PASS, First Layer: PASS
+Test 15: Cross: PASS, First Layer: PASS
+Test 16: Cross: PASS, First Layer: PASS
+Test 17: Cross: PASS, First Layer: PASS
+Test 18: Cross: PASS, First Layer: PASS
+Test 19: Cross: PASS, First Layer: PASS
+
+=== Summary: 20 tests ===
+White Cross: 19 / 20
+First Layer: 19 / 20

@@ -1,0 +1,6 @@
+Initial State Solved: false
+Stage: Daisy
+Stage: Cross
+Stage: White Corners
+Stage: Middle Layer
+Stage: Last Layer

@@ -1,0 +1,27 @@
+Test 0: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 1: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 2: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 3: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 4: Cross: FAIL, First Layer: FAIL, Second Layer: FAIL, Yellow Cross: FAIL
+  Scramble: R' U B' D F B' R B' R D F B U D' R U' B' U D' L'
+Test 5: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 6: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 7: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 8: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 9: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 10: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 11: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 12: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 13: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 14: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 15: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 16: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 17: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 18: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+Test 19: Cross: PASS, First Layer: PASS, Second Layer: PASS, Yellow Cross: PASS
+
+=== Summary: 20 tests ===
+White Cross: 19 / 20
+First Layer: 19 / 20
+Second Layer: 19 / 20
+Yellow Cross: 19 / 20

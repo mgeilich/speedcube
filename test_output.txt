@@ -1,0 +1,129 @@
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 0: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 1: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 2: Cross: FAIL, First Layer: FAIL
+  Scramble: B' D' L' B' L B U' D R' U L B' F L B U F L' D' B
+  Moves: L2 F L D F' F D R' L' D F2 D2 R2 L D F' D2 B2 L2 D R D R' D' R D R' D' R D R' D' D2 F D F' D' D2 L D L' D' L D L' D' L D L' D' L D L' D' L D L' D' D B D B' D' B D B' D' B D B' D' B D B' D' B D B' D'
+    U (Top) stickers: [CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.green, CubeColor.white]
+    Sides row 1: F:CubeColor.red, R:CubeColor.red, B:CubeColor.blue, L:CubeColor.orange
+    Sides centers: F:CubeColor.green, R:CubeColor.red, B:CubeColor.blue, L:CubeColor.orange
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 3: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 4: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 5: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 6: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 7: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.blue, CubeFace.l:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 8: Cross: PASS, First Layer: FAIL
+  Scramble: R L' F L R' U F' L' R L' U B R B' L D L' B' F D
+  Moves: R B' D B' F D D L D D F D F2 D2 R2 D2 B2 D2 L2 R D R' D' D2 F D F' D' D2 L D L' D' D2 B D B' D' B D B' D' B D B' D' B D B' D' B D B' D'
+    U (Top) stickers: [CubeColor.white, CubeColor.white, CubeColor.red, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white]
+    Sides row 1: F:CubeColor.green, R:CubeColor.red, B:CubeColor.blue, L:CubeColor.orange
+    Sides centers: F:CubeColor.green, R:CubeColor.red, B:CubeColor.blue, L:CubeColor.orange
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 9: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 10: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 11: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.blue, CubeFace.f:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.green, CubeFace.r:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 12: Cross: PASS, First Layer: FAIL
+  Scramble: U' D' B D' L' D L D' F' D' L' U' D' B' U' B' F' U B L
+  Moves: B' R F L2 R' D2 F2 D2 R2 D2 B2 D2 L2 L D L' D' D F D F' D' B D B' D' B D B' D' B D B' D'
+    U (Top) stickers: [CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.green, CubeColor.white, CubeColor.white]
+    Sides row 1: F:CubeColor.green, R:CubeColor.red, B:CubeColor.blue, L:CubeColor.orange
+    Sides centers: F:CubeColor.green, R:CubeColor.red, B:CubeColor.blue, L:CubeColor.orange
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 13: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 14: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.blue, CubeFace.f:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 15: Cross: PASS, First Layer: FAIL
+  Scramble: U F' D R L U R' U' F' R U L B L' B' R' F' L' D B
+  Moves: R' F L D R' D2 F2 D2 R2 B2 D2 L2 F D F' D' F D F' D' F D F' D' F D F' D' F D F' D' L D L' D' D B D B' D' B D B' D' B D B' D' B D B' D' B D B' D'
+    U (Top) stickers: [CubeColor.white, CubeColor.white, CubeColor.yellow, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white]
+    Sides row 1: F:CubeColor.green, R:CubeColor.red, B:CubeColor.blue, L:CubeColor.orange
+    Sides centers: F:CubeColor.green, R:CubeColor.red, B:CubeColor.blue, L:CubeColor.orange
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 16: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 17: Cross: PASS, First Layer: PASS
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.red, CubeFace.b:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 18: Cross: PASS, First Layer: FAIL
+  Scramble: F U' R' B' R' U F' B' R D R U' D B U' L F D U' B
+  Moves: D F' B F2 R2 D2 B2 D2 L2 D R D R' D' R D R' D' R D R' D' R D R' D' R D R' D' F D F' D' D2 L D L' D' D2 B D B' D'
+    U (Top) stickers: [CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.white, CubeColor.red]
+    Sides row 1: F:CubeColor.green, R:CubeColor.red, B:CubeColor.blue, L:CubeColor.orange
+    Sides centers: F:CubeColor.green, R:CubeColor.red, B:CubeColor.blue, L:CubeColor.orange
+DEBUG: Corner Check (CubeFace.u:2=CubeColor.white, CubeFace.b:0=CubeColor.blue, CubeFace.r:2=CubeColor.red) vs (CubeColor.white, CubeColor.blue, CubeColor.red) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:8=CubeColor.white, CubeFace.r:0=CubeColor.red, CubeFace.f:2=CubeColor.green) vs (CubeColor.white, CubeColor.red, CubeColor.green) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:6=CubeColor.white, CubeFace.f:0=CubeColor.green, CubeFace.l:2=CubeColor.orange) vs (CubeColor.white, CubeColor.green, CubeColor.orange) -> SOLVED
+DEBUG: Corner Check (CubeFace.u:0=CubeColor.white, CubeFace.l:0=CubeColor.orange, CubeFace.b:2=CubeColor.blue) vs (CubeColor.white, CubeColor.orange, CubeColor.blue) -> SOLVED
+Test 19: Cross: PASS, First Layer: PASS
+
+=== Summary: 20 tests ===
+White Cross: 19 / 20
+First Layer: 15 / 20
