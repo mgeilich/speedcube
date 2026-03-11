@@ -1,6 +1,6 @@
 # SpeedCube AR
 
-A premium AR-powered solution for speedcubing enthusiasts.
+A premium AR-powered solution for speedcubing enthusiasts. Scan, solve, and learn with Augmented Reality.
 
 ## Getting Started
 

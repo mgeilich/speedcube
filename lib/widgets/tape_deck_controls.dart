@@ -31,8 +31,9 @@ class TapeDeckControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isShort = MediaQuery.of(context).size.height < 750;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: EdgeInsets.symmetric(vertical: isShort ? 8 : 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

@@ -603,7 +603,7 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
           Container(
             width: 40,
             height: 4,
-            margin: const EdgeInsets.only(top: 12, bottom: 8),
+            margin: const EdgeInsets.only(top: 8, bottom: 4),
             decoration: BoxDecoration(
               color: Colors.white24,
               borderRadius: BorderRadius.circular(2),
@@ -612,7 +612,7 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
 
           // Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
             child: Row(
               children: [
                 _badge(
@@ -640,7 +640,7 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
 
           // 3D Cube (drag to rotate)
           Expanded(
-            flex: 5,
+            flex: 3,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: GestureDetector(
@@ -676,70 +676,83 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
             ),
           ),
 
-          // Algorithm move badges
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            child: Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              alignment: WrapAlignment.center,
-              children: moves.asMap().entries.map((e) {
-                final isActive = _highlightedMove == e.key;
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: isActive
-                        ? const Color(0xFF6366F1).withValues(alpha: 0.85)
-                        : const Color(0xFF6366F1).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: isActive
-                          ? const Color(0xFF6366F1)
-                          : const Color(0xFF6366F1).withValues(alpha: 0.3),
-                      width: isActive ? 2 : 1,
+          // Algorithm area (scrollable if needed)
+          Expanded(
+            flex: 2,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Column(
+                children: [
+                  // Algorithm move badges
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+                    child: Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      alignment: WrapAlignment.center,
+                      children: moves.asMap().entries.map((e) {
+                        final isActive = _highlightedMove == e.key;
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: isActive
+                                ? const Color(0xFF6366F1).withValues(alpha: 0.85)
+                                : const Color(0xFF6366F1).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: isActive
+                                  ? const Color(0xFF6366F1)
+                                  : const Color(0xFF6366F1)
+                                      .withValues(alpha: 0.3),
+                              width: isActive ? 2 : 1,
+                            ),
+                            boxShadow: isActive
+                                ? [
+                                    BoxShadow(
+                                      color: const Color(0xFF6366F1)
+                                          .withValues(alpha: 0.4),
+                                      blurRadius: 6,
+                                    )
+                                  ]
+                                : null,
+                          ),
+                          child: Text(
+                            e.value.toString(),
+                            style: TextStyle(
+                              color: isActive
+                                  ? Colors.white
+                                  : const Color(0xFF818CF8),
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'monospace',
+                              fontSize: 12,
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
-                    boxShadow: isActive
-                        ? [
-                            BoxShadow(
-                              color: const Color(0xFF6366F1)
-                                  .withValues(alpha: 0.4),
-                              blurRadius: 6,
-                            )
-                          ]
-                        : null,
                   ),
-                  child: Text(
-                    e.value.toString(),
-                    style: TextStyle(
-                      color: isActive ? Colors.white : const Color(0xFF818CF8),
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'monospace',
-                      fontSize: 12,
+                  const SizedBox(height: 8),
+                  // Description
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Text(
+                      widget.algCase.description,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          color: Colors.white38, fontSize: 12, height: 1.4),
                     ),
                   ),
-                );
-              }).toList(),
+                ],
+              ),
             ),
           ),
-
-          // Description
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Text(
-              widget.algCase.description,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  color: Colors.white38, fontSize: 12, height: 1.4),
-            ),
-          ),
-
-          const SizedBox(height: 12),
 
           // Action buttons
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
             child: Row(
               children: [
                 Expanded(

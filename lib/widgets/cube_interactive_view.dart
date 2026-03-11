@@ -39,8 +39,10 @@ class CubeInteractiveView extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
 
-        SizedBox(
-          height: 320,
+        ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height < 750 ? 280 : 320,
+          ),
           child: LayoutBuilder(
             builder: (context, constraints) {
               return GestureDetector(

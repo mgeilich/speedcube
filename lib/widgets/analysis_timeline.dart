@@ -48,9 +48,10 @@ class _AnalysisTimelineState extends State<AnalysisTimeline> {
 
   @override
   Widget build(BuildContext context) {
+    final isShort = MediaQuery.of(context).size.height < 750;
     return Container(
-      height: 80,
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      height: isShort ? 70 : 80,
+      padding: EdgeInsets.symmetric(vertical: isShort ? 8 : 12),
       decoration: BoxDecoration(
         color: const Color(0xFF0F0F1A).withValues(alpha: 0.95),
         border: Border(

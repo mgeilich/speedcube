@@ -70,68 +70,70 @@ class SolveControls extends StatelessWidget {
           children: [
             Column(
               children: [
-                const SizedBox(height: 12),
-                // Progress scrubber
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.history,
-                          color: Colors.white54, size: 20),
-                      Expanded(
-                        child: SliderTheme(
-                          data: SliderTheme.of(context).copyWith(
-                            trackHeight: 2,
-                            thumbShape: const RoundSliderThumbShape(
-                                enabledThumbRadius: 6),
-                            overlayShape: const RoundSliderOverlayShape(
-                                overlayRadius: 14),
-                            activeTrackColor: SolveTheme.getStageColor(
-                                analysisController.stageName),
-                            inactiveTrackColor: Colors.white10,
-                            thumbColor: SolveTheme.getStageColor(
-                                analysisController.stageName),
-                          ),
-                          child: Slider(
-                            value: moveIndex.toDouble(),
-                            min: solutionStartIndex.toDouble(),
-                            max: moveHistory.length.toDouble(),
-                            divisions:
-                                (moveHistory.length - solutionStartIndex) > 0
-                                    ? moveHistory.length - solutionStartIndex
-                                    : 1,
-                            onChangeStart: (_) => onSeekStart(),
-                            onChanged: (value) {
-                              HapticService.selection();
-                              final target = (value - solutionStartIndex)
-                                  .round()
-                                  .clamp(0,
-                                      moveHistory.length - solutionStartIndex);
-                              onSeek(target);
-                            },
-                            onChangeEnd: (value) {
-                              final target = (value - solutionStartIndex)
-                                  .round()
-                                  .clamp(0,
-                                      moveHistory.length - solutionStartIndex);
-                              onSeek(target, immediate: true);
-                            },
+                if (MediaQuery.of(context).size.height >= 700) ...[
+                  const SizedBox(height: 12),
+                  // Progress scrubber
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.history,
+                            color: Colors.white54, size: 20),
+                        Expanded(
+                          child: SliderTheme(
+                            data: SliderTheme.of(context).copyWith(
+                              trackHeight: 2,
+                              thumbShape: const RoundSliderThumbShape(
+                                  enabledThumbRadius: 6),
+                              overlayShape: const RoundSliderOverlayShape(
+                                  overlayRadius: 14),
+                              activeTrackColor: SolveTheme.getStageColor(
+                                  analysisController.stageName),
+                              inactiveTrackColor: Colors.white10,
+                              thumbColor: SolveTheme.getStageColor(
+                                  analysisController.stageName),
+                            ),
+                            child: Slider(
+                              value: moveIndex.toDouble(),
+                              min: solutionStartIndex.toDouble(),
+                              max: moveHistory.length.toDouble(),
+                              divisions:
+                                  (moveHistory.length - solutionStartIndex) > 0
+                                      ? moveHistory.length - solutionStartIndex
+                                      : 1,
+                              onChangeStart: (_) => onSeekStart(),
+                              onChanged: (value) {
+                                HapticService.selection();
+                                final target = (value - solutionStartIndex)
+                                    .round()
+                                    .clamp(0,
+                                        moveHistory.length - solutionStartIndex);
+                                onSeek(target);
+                              },
+                              onChangeEnd: (value) {
+                                final target = (value - solutionStartIndex)
+                                    .round()
+                                    .clamp(0,
+                                        moveHistory.length - solutionStartIndex);
+                                onSeek(target, immediate: true);
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                      Text(
-                        '${moveIndex - solutionStartIndex}/${moveHistory.length - solutionStartIndex}',
-                        style: const TextStyle(
-                          color: Colors.white54,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'monospace',
+                        Text(
+                          '${moveIndex - solutionStartIndex}/${moveHistory.length - solutionStartIndex}',
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'monospace',
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
+                  const SizedBox(height: 12),
+                ],
 
                 // Tape Deck Controls
                 TapeDeckControls(

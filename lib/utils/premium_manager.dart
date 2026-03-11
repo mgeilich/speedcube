@@ -60,6 +60,13 @@ class PremiumManager extends ChangeNotifier {
 
   /// Start the purchase flow.
   Future<void> buyPremium() async {
+    // Debug override for simulator screenshots
+    if (kDebugMode) {
+      debugPrint('DEBUG: Instantly unlocking premium for simulator testing.');
+      await _unlockPremium();
+      return;
+    }
+
     if (_products.isEmpty) await loadProducts();
     if (_products.isEmpty) return;
 

@@ -16,38 +16,42 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isShort = MediaQuery.of(context).size.height < 750;
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: isShort ? 8 : 12),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
               ),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.view_in_ar, color: Colors.white, size: 24),
-          ),
-          const SizedBox(width: 12),
-          const Text(
-            "SpeedCube AR",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
+            child: const Icon(Icons.view_in_ar, color: Colors.white, size: 20),
           ),
           const SizedBox(width: 8),
+          const Flexible(
+            child: Text(
+              "SpeedCube AR",
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
           const Spacer(),
           // Scan button
           Stack(
             children: [
               IconButton(
+                visualDensity: VisualDensity.compact,
                 icon: const Icon(Icons.camera_alt,
-                    color: Colors.white70, size: 26),
+                    color: Colors.white70, size: 24),
                 onPressed: () {
                   if (!kIsWeb && !PremiumManager().isPremium) {
                     showModalBottomSheet(
@@ -81,18 +85,18 @@ class HomeHeader extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(width: 4),
           // Learn button
           IconButton(
-            icon: const Icon(Icons.school, color: Colors.white70, size: 26),
+            visualDensity: VisualDensity.compact,
+            icon: const Icon(Icons.school, color: Colors.white70, size: 24),
             onPressed: onLearnPressed,
             tooltip: 'Learn Mode',
           ),
-          const SizedBox(width: 4),
           // Algorithm Library button
           IconButton(
+            visualDensity: VisualDensity.compact,
             icon: const Icon(Icons.menu_book_rounded,
-                color: Colors.white70, size: 26),
+                color: Colors.white70, size: 24),
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
