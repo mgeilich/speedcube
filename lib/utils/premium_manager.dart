@@ -16,7 +16,7 @@ class PremiumManager extends ChangeNotifier {
   bool _isAvailable = false;
 
   static const String _kPremiumKey = 'premium_unlocked';
-  static const String _kSubscriptionId = 'speedcube_pro_yearly';
+  static const String _kSubscriptionId = 'speedcube_pro_unlock';
 
   /// Whether the user has unlocked premium features.
   bool get isPremium => _isPremium;

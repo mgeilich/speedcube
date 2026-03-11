@@ -81,6 +81,8 @@ class HomeController extends ChangeNotifier {
       onPauseRequest: () {
         _analysisController.setPlayingInternal(false);
         _animationController.clearQueue();
+        _moveDirectionQueue.clear();
+        _guideSeekTarget = null;
       },
       onNextRequest: handleAnalysisNext,
       onPreviousRequest: handleAnalysisPrevious,
@@ -258,12 +260,12 @@ class HomeController extends ChangeNotifier {
                     !_analysisController.isRewinding &&
                     _analysisController.hasNext) {
                   handleAnalysisNext();
-                } else if (_showingSolution &&
-                    _analysisController.isPlaying &&
-                    !_analysisController.isRewinding) {
+                } else {
                   _analysisController.setPlayingInternal(false);
                 }
               });
+            } else {
+              _analysisController.setPlayingInternal(false);
             }
           }
         }
@@ -401,6 +403,7 @@ class HomeController extends ChangeNotifier {
       if (index > currentIndex) {
         handleAnalysisNext(overrideDuration: const Duration(milliseconds: 150));
       } else {
+        _analysisController.setRewindingInternal(true);
         handleAnalysisPrevious(
             overrideDuration: const Duration(milliseconds: 150));
       }

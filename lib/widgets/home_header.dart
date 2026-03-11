@@ -33,77 +33,87 @@ class HomeHeader extends StatelessWidget {
             child: const Icon(Icons.view_in_ar, color: Colors.white, size: 20),
           ),
           const SizedBox(width: 8),
-          const Flexible(
-            child: Text(
-              "SpeedCube AR",
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+          const Text(
+            "SpeedCube AR",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
           ),
           const Spacer(),
-          // Scan button
-          Stack(
+          Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
+              // Scan button
+              Stack(
+                children: [
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: const Icon(Icons.camera_alt,
+                        color: Colors.white70, size: 24),
+                    onPressed: () {
+                      if (!kIsWeb && !PremiumManager().isPremium) {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          isScrollControlled: true,
+                          builder: (context) => const PremiumUpsellSheet(),
+                        );
+                        return;
+                      }
+                      onScanPressed();
+                    },
+                    tooltip: 'Scan Cube',
+                  ),
+                  if (!kIsWeb && !PremiumManager().isPremium)
+                    Positioned(
+                      right: -2,
+                      bottom: -2,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF0F0F1A),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.lock,
+                          color: Color(0xFFF59E0B),
+                          size: 10,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(width: 2),
+              // Learn button
               IconButton(
                 visualDensity: VisualDensity.compact,
-                icon: const Icon(Icons.camera_alt,
-                    color: Colors.white70, size: 24),
-                onPressed: () {
-                  if (!kIsWeb && !PremiumManager().isPremium) {
-                    showModalBottomSheet(
-                      context: context,
-                      backgroundColor: Colors.transparent,
-                      isScrollControlled: true,
-                      builder: (context) => const PremiumUpsellSheet(),
-                    );
-                    return;
-                  }
-                  onScanPressed();
-                },
-                tooltip: 'Scan Cube',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(Icons.school, color: Colors.white70, size: 24),
+                onPressed: onLearnPressed,
+                tooltip: 'Learn Mode',
               ),
-              if (!kIsWeb && !PremiumManager().isPremium)
-                Positioned(
-                  right: 4,
-                  bottom: 4,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF0F0F1A),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.lock,
-                      color: Color(0xFFF59E0B),
-                      size: 10,
-                    ),
+              const SizedBox(width: 2),
+              // Algorithm Library button
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(Icons.menu_book_rounded,
+                    color: Colors.white70, size: 24),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AlgLibraryScreen(),
                   ),
                 ),
-            ],
-          ),
-          // Learn button
-          IconButton(
-            visualDensity: VisualDensity.compact,
-            icon: const Icon(Icons.school, color: Colors.white70, size: 24),
-            onPressed: onLearnPressed,
-            tooltip: 'Learn Mode',
-          ),
-          // Algorithm Library button
-          IconButton(
-            visualDensity: VisualDensity.compact,
-            icon: const Icon(Icons.menu_book_rounded,
-                color: Colors.white70, size: 24),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const AlgLibraryScreen(),
+                tooltip: 'Algorithm Library',
               ),
-            ),
-            tooltip: 'Algorithm Library',
+            ],
           ),
         ],
       ),

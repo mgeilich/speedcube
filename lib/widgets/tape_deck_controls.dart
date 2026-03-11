@@ -39,7 +39,7 @@ class TapeDeckControls extends StatelessWidget {
         children: [
           _buildControlButton(
             icon: Icons.first_page,
-            onPressed: isPlaying ? null : (hasPrevious ? onJumpToStart : null),
+            onPressed: hasPrevious ? onJumpToStart : null,
             tooltip: "Jump to Start",
           ),
           const SizedBox(width: 8),
@@ -68,7 +68,7 @@ class TapeDeckControls extends StatelessWidget {
           const SizedBox(width: 8),
           _buildControlButton(
             icon: Icons.last_page,
-            onPressed: isPlaying ? null : (hasNext ? onJumpToEnd : null),
+            onPressed: hasNext ? onJumpToEnd : null,
             tooltip: "Jump to End",
           ),
         ],

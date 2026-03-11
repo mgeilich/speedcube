@@ -149,7 +149,7 @@ class SolveControls extends StatelessWidget {
                   onFastForward: () => analysisController.play(fast: true),
                   onJumpToStart: () => onSeek(0, immediate: true),
                   onJumpToEnd: () =>
-                      onSeek(moveHistory.length, immediate: true),
+                      onSeek(analysisController.solution.length, immediate: true),
                   activeColor:
                       SolveTheme.getStageColor(analysisController.stageName),
                 ),
