@@ -9,6 +9,7 @@ import 'widgets/home_header.dart';
 import 'widgets/cube_interactive_view.dart';
 import 'widgets/solve_controls.dart';
 import 'widgets/introduction_sheet.dart';
+import 'widgets/settings_sheet.dart';
 
 import 'widgets/ar_scan_screen.dart';
 import 'utils/premium_manager.dart';
@@ -18,8 +19,9 @@ import 'dart:async';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   initLogging();
-  await PremiumManager().init();
+  await PremiumManager().initPrefs();
   runApp(const SpeedCubeApp());
+  PremiumManager().initIAP(); // Asynchronous, non-blocking
 }
 
 class SpeedCubeApp extends StatelessWidget {
@@ -165,6 +167,7 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
             HomeHeader(
               onScanPressed: _startScan,
               onLearnPressed: () => _showLearnMenu(),
+              onSettingsPressed: _showSettings,
             ),
             CubeInteractiveView(
               cubeState: _homeController.cubeState,
@@ -227,6 +230,15 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
     ).then((_) {
       // Logic for when intro is closed
     });
+  }
+
+  void _showSettings() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const SettingsSheet(),
+    );
   }
 
   void _showLearnMenu({int initialStepIndex = -1}) {

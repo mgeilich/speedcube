@@ -1,8 +1,101 @@
 import 'package:flutter/material.dart';
 import '../utils/premium_manager.dart';
 
-class PremiumUpsellSheet extends StatelessWidget {
+class PremiumUpsellSheet extends StatefulWidget {
   const PremiumUpsellSheet({super.key});
+
+  @override
+  State<PremiumUpsellSheet> createState() => _PremiumUpsellSheetState();
+}
+
+class _PremiumUpsellSheetState extends State<PremiumUpsellSheet> {
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    PremiumManager().addListener(_onPremiumStatusChanged);
+  }
+
+  @override
+  void dispose() {
+    PremiumManager().removeListener(_onPremiumStatusChanged);
+    super.dispose();
+  }
+
+  void _onPremiumStatusChanged() {
+    final manager = PremiumManager();
+    if (manager.isPremium && mounted) {
+      Navigator.pop(context);
+    } else if (manager.lastError != null && mounted) {
+      setState(() {
+        _errorMessage = manager.lastError;
+        _isLoading = false; // Stop loading if error from stream
+      });
+      manager.clearError();
+    }
+  }
+
+  Future<void> _handleUnlock() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null; // Clear previous errors
+    });
+
+    try {
+      await PremiumManager().buyPremium();
+      // Note: We don't pop immediately because the native IAP sheet 
+      // may take time to appear or complete.
+    } catch (e) {
+      if (mounted) {
+        String message = e.toString();
+        if (message.startsWith('Exception: ')) {
+          message = message.substring(11);
+        }
+        
+        setState(() {
+          _errorMessage = message;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleRestore() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await PremiumManager().restorePurchases();
+      if (mounted) {
+        if (!PremiumManager().isPremium) {
+          setState(() {
+            _errorMessage = "No previous purchases found to restore.";
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = "Failed to restore: ${e.toString()}";
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,14 +188,39 @@ class PremiumUpsellSheet extends StatelessWidget {
 
               const SizedBox(height: 40),
 
+              // Error Message Section
+              if (_errorMessage != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _errorMessage!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+
               // Buy Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    await PremiumManager().buyPremium();
-                    if (context.mounted) Navigator.pop(context);
-                  },
+                  onPressed: _isLoading ? null : _handleUnlock,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6366F1),
                     foregroundColor: Colors.white,
@@ -112,18 +230,37 @@ class PremiumUpsellSheet extends StatelessWidget {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    'Unlock All Features',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'Unlock All Features',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
                 ),
               ),
               const SizedBox(height: 12),
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: _isLoading ? null : () => Navigator.pop(context),
                 child: Text(
                   'Maybe Later',
                   style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                ),
+              ),
+              TextButton(
+                onPressed: _isLoading ? null : _handleRestore,
+                child: Text(
+                  'Restore Purchases',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    decoration: TextDecoration.underline,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),

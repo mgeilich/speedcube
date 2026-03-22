@@ -7,11 +7,13 @@ import 'alg_library_screen.dart';
 class HomeHeader extends StatelessWidget {
   final VoidCallback onScanPressed;
   final VoidCallback onLearnPressed;
+  final VoidCallback onSettingsPressed;
 
   const HomeHeader({
     super.key,
     required this.onScanPressed,
     required this.onLearnPressed,
+    required this.onSettingsPressed,
   });
 
   @override
@@ -112,6 +114,16 @@ class HomeHeader extends StatelessWidget {
                   ),
                 ),
                 tooltip: 'Algorithm Library',
+              ),
+              const SizedBox(width: 2),
+              // Settings button
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(Icons.settings, color: Colors.white70, size: 24),
+                onPressed: onSettingsPressed,
+                tooltip: 'Settings',
               ),
             ],
           ),

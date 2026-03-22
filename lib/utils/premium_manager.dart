@@ -16,23 +16,34 @@ class PremiumManager extends ChangeNotifier {
   bool _isAvailable = false;
 
   static const String _kPremiumKey = 'premium_unlocked';
-  static const String _kSubscriptionId = 'speedcube_pro_unlock';
+  static const String _kSubscriptionId = 'SpeedCube_AR_Pro_Unlock';
 
   /// Whether the user has unlocked premium features.
   bool get isPremium => _isPremium;
-  
+
   /// The list of available products from the store.
   List<ProductDetails> get products => _products;
 
   /// Whether the store is available.
   bool get isAvailable => _isAvailable;
 
-  /// Initialize IAP and load purchase history.
-  Future<void> init() async {
+  String? _lastError;
+  String? get lastError => _lastError;
+
+  void clearError() {
+    _lastError = null;
+    notifyListeners();
+  }
+
+  /// Initialize fast local preferences synchronously (blocks app start briefly).
+  Future<void> initPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     _isPremium = prefs.getBool(_kPremiumKey) ?? false;
     notifyListeners();
+  }
 
+  /// Initialize IAP and load purchase history asynchronously (does not block app start).
+  Future<void> initIAP() async {
     _isAvailable = await _iap.isAvailable();
     if (_isAvailable) {
       // Listen to purchase updates
@@ -41,7 +52,7 @@ class PremiumManager extends ChangeNotifier {
         onDone: () => _subscription.cancel(),
         onError: (error) => debugPrint('IAP Error: $error'),
       );
-      
+
       // Load products
       await loadProducts();
     }
@@ -61,22 +72,31 @@ class PremiumManager extends ChangeNotifier {
   /// Start the purchase flow.
   Future<void> buyPremium() async {
     // Debug override for simulator screenshots
-    if (kDebugMode) {
-      debugPrint('DEBUG: Instantly unlocking premium for simulator testing.');
-      await _unlockPremium();
-      return;
-    }
+    // if (kDebugMode) {
+    //   debugPrint('DEBUG: Instantly unlocking premium for simulator testing.');
+    //   await _unlockPremium();
+    //   return;
+    // }
 
     if (_products.isEmpty) await loadProducts();
-    if (_products.isEmpty) return;
+    if (_products.isEmpty) {
+      throw Exception(
+          'In-App Purchases are currently unavailable. Please check your connection or try again later.');
+    }
 
-    final productDetails = _products.firstWhere(
-      (p) => p.id == _kSubscriptionId,
-      orElse: () => _products.first,
-    );
+    ProductDetails productDetails;
+    try {
+      productDetails = _products.firstWhere((p) => p.id == _kSubscriptionId);
+    } catch (_) {
+      productDetails = _products.first;
+    }
 
-    final PurchaseParam purchaseParam = PurchaseParam(productDetails: productDetails);
-    await _iap.buyNonConsumable(purchaseParam: purchaseParam);
+    final PurchaseParam purchaseParam =
+        PurchaseParam(productDetails: productDetails);
+    final success = await _iap.buyNonConsumable(purchaseParam: purchaseParam);
+    if (!success) {
+      throw Exception('Failed to start the purchase flow.');
+    }
   }
 
   /// Restore previous purchases.
@@ -86,11 +106,14 @@ class PremiumManager extends ChangeNotifier {
 
   void _onPurchaseUpdate(List<PurchaseDetails> purchaseDetailsList) {
     for (var purchase in purchaseDetailsList) {
-      if (purchase.status == PurchaseStatus.purchased ||
+      if (purchase.status == PurchaseStatus.error) {
+        _lastError = purchase.error?.message ?? 'An error occurred during purchase.';
+        notifyListeners();
+      } else if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {
         _unlockPremium();
       }
-      
+
       if (purchase.pendingCompletePurchase) {
         _iap.completePurchase(purchase);
       }
