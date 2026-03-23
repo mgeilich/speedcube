@@ -39,6 +39,12 @@ class PremiumManager extends ChangeNotifier {
   Future<void> initPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     _isPremium = prefs.getBool(_kPremiumKey) ?? false;
+    
+    // Auto-unlock premium in debug mode for testing
+    if (kDebugMode && !_isPremium) {
+      _unlockPremium();
+    }
+    
     notifyListeners();
   }
 

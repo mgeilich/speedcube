@@ -1,6 +1,9 @@
 import 'package:logging/logging.dart';
 import '../models/cube_state.dart';
 import '../models/cube_move.dart';
+import '../models/alg_library.dart';
+
+part 'cfop_solver.dart';
 
 /// A single step in the LBL solution, with stage label and description.
 class LblStep {
@@ -293,6 +296,20 @@ class LblSolver {
   // ─────────────────────────────────────────────────────────────────────────
   // STAGE 1: WHITE CROSS
   // ─────────────────────────────────────────────────────────────────────────
+
+  static bool isCrossSolved(CubeState s, Perspective p) {
+    if (s.getFace(p.u)[4] != s.getFace(p.u)[7]) return false;
+    if (s.getFace(p.u)[4] != s.getFace(p.u)[5]) return false;
+    if (s.getFace(p.u)[4] != s.getFace(p.u)[1]) return false;
+    if (s.getFace(p.u)[4] != s.getFace(p.u)[3]) return false;
+
+    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.f, p)) return false;
+    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.r, p)) return false;
+    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.b, p)) return false;
+    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.l, p)) return false;
+
+    return true;
+  }
 
   static List<LblStep> _whiteCross(CubeState s, Perspective p) {
     final steps = <LblStep>[];
@@ -1011,12 +1028,21 @@ class LblSolver {
       }
 
       if (i < 3) {
-        final uMove = [_remap(CubeMove(CubeFace.u, 1), p)];
-        steps.add(LblStep(
-            stageName: 'Yellow Corners',
-            moves: uMove,
-            description: 'Advancing to next corner'));
-        currentS = currentS.applyMoves(uMove);
+        // Only advance if there's at least one more unsolved corner ahead
+        bool remainsUnsolved = false;
+        for (int k = i + 1; k < 4; k++) {
+            final testRot = [_remap(CubeMove(CubeFace.u, k - i), p)];
+            if (currentS.applyMoves(testRot).getFace(pu)[idx] != yellow) { remainsUnsolved = true; break; }
+        }
+        
+        if (remainsUnsolved) {
+            final uMove = [_remap(CubeMove(CubeFace.u, 1), p)];
+            steps.add(LblStep(
+                stageName: 'Yellow Corners',
+                moves: uMove,
+                description: 'Advancing to next corner'));
+            currentS = currentS.applyMoves(uMove);
+        }
       }
     }
 
@@ -1214,7 +1240,7 @@ class LblSolver {
       }
     }
 
-    return currentSteps;
+    return currentSteps.where((s) => s.moves.isNotEmpty).toList();
   }
 
   /// Optimizes a sequence of moves by combining consecutive turns on the same face.

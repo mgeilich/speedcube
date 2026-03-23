@@ -2,6 +2,7 @@ import '../models/cube_state.dart';
 import '../models/cube_move.dart';
 import '../solver/kociemba_search.dart';
 import '../solver/lbl_solver.dart';
+import '../controllers/home_controller.dart'; // For SolveMethod
 
 class SolveResult {
   final List<CubeMove> moves;
@@ -22,10 +23,10 @@ class SolveResult {
 class SolverService {
   static Future<SolveResult> solve({
     required CubeState state,
-    bool useLBL = false,
+    SolveMethod method = SolveMethod.kociemba,
   }) async {
-    if (useLBL) {
-      final result = LblSolver.solve(state);
+    if (method == SolveMethod.lbl || method == SolveMethod.cfop) {
+      final result = method == SolveMethod.lbl ? LblSolver.solve(state) : CfopSolver.solve(state);
       if (result != null) {
         final List<CubeMove> moves = result.allMoves;
         final List<String?> stageNames = [];

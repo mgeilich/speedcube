@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import '../models/cube_state.dart';
 import '../models/cube_move.dart';
 import '../controllers/analysis_controller.dart';
@@ -570,37 +571,21 @@ class SolveControls extends StatelessWidget {
             isAnimating: isAnimating,
           ),
           const SizedBox(height: 16),
-          _buildButton(
-            icon: Icons.auto_fix_high,
-            label: isPremium ? 'Solve Kociemba' : 'Solve',
-            onPressed: isAnimating
-                ? null
-                : () => onSolve(method: SolveMethod.kociemba),
-            color: const Color(0xFF6366F1),
-            width: 280,
-          ),
-          const SizedBox(height: 12),
-          _buildButton(
-            icon: Icons.layers,
-            label: 'Solve Layer-by-Layer',
-            onPressed: isAnimating
-                ? null
-                : () {
-                    if (isPremium) {
-                      onSolve(method: SolveMethod.lbl);
-                    } else {
-                      showModalBottomSheet(
-                        context: context,
-                        backgroundColor: Colors.transparent,
-                        isScrollControlled: true,
-                        builder: (_) => const PremiumUpsellSheet(),
-                      );
-                    }
-                  },
-            color: const Color(0xFF6366F1),
-            width: 280,
-            isPremiumGated: !isPremium,
-          ),
+          if (isPremium)
+            PremiumSolverSelector(
+              isAnimating: isAnimating,
+              onSolve: onSolve,
+            )
+          else
+            _buildButton(
+              icon: Icons.auto_fix_high,
+              label: 'Solve',
+              onPressed: isAnimating
+                  ? null
+                  : () => onSolve(method: SolveMethod.kociemba),
+              color: const Color(0xFF6366F1),
+              width: 280,
+            ),
         ],
       );
     }
@@ -679,6 +664,143 @@ class SolveControls extends StatelessWidget {
                 ),
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PremiumSolverSelector extends StatefulWidget {
+  final bool isAnimating;
+  final Function({SolveMethod method, bool showExplanations}) onSolve;
+
+  const PremiumSolverSelector({
+    super.key,
+    required this.isAnimating,
+    required this.onSolve,
+  });
+
+  @override
+  State<PremiumSolverSelector> createState() => _PremiumSolverSelectorState();
+}
+
+class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
+  SolveMethod _selectedMethod = SolveMethod.kociemba;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 320,
+          child: CupertinoSlidingSegmentedControl<SolveMethod>(
+            groupValue: _selectedMethod,
+            children: const {
+              SolveMethod.kociemba: Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Text('Kociemba', style: TextStyle(color: Colors.white, fontSize: 13)),
+              ),
+              SolveMethod.lbl: Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Text('LBL', style: TextStyle(color: Colors.white, fontSize: 13)),
+              ),
+              SolveMethod.cfop: Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Text('CFOP Beta', style: TextStyle(color: Colors.white, fontSize: 13)),
+              ),
+            },
+            backgroundColor: Colors.white12,
+            thumbColor: const Color(0xFF6366F1).withValues(alpha: 0.8),
+            onValueChanged: (method) {
+              if (method != null) {
+                HapticService.selection();
+                setState(() => _selectedMethod = method);
+              }
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildSolveButton(
+          icon: Icons.auto_fix_high,
+          label: _solveButtonLabel(_selectedMethod),
+          onPressed: widget.isAnimating ? null : () => widget.onSolve(method: _selectedMethod),
+          color: const Color(0xFF6366F1),
+          width: 280,
+        ),
+      ],
+    );
+  }
+
+  String _solveButtonLabel(SolveMethod method) {
+    switch (method) {
+      case SolveMethod.kociemba:
+        return 'Solve Kociemba';
+      case SolveMethod.lbl:
+        return 'Solve Layer-by-Layer';
+      case SolveMethod.cfop:
+        return 'Solve CFOP (Beta)';
+    }
+  }
+
+  Widget _buildSolveButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback? onPressed,
+    required Color color,
+    double? width,
+  }) {
+    final isDisabled = onPressed == null;
+    final buttonColor = isDisabled ? color.withValues(alpha: 0.3) : color;
+
+    return GestureDetector(
+      onTap: onPressed != null
+          ? () {
+              HapticService.impactMedium();
+              onPressed();
+            }
+          : null,
+      child: Container(
+        width: width,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: isDisabled
+              ? null
+              : LinearGradient(
+                  colors: [buttonColor, buttonColor.withValues(alpha: 0.8)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+          color: isDisabled ? buttonColor : null,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: isDisabled
+              ? null
+              : [
+                  BoxShadow(
+                    color: buttonColor.withValues(alpha: 0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                ),
+              ),
+            ),
           ],
         ),
       ),

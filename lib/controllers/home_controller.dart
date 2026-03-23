@@ -9,7 +9,7 @@ import '../utils/premium_manager.dart';
 import '../utils/haptic_service.dart';
 import '../services/solver_service.dart';
 
-enum SolveMethod { kociemba, lbl }
+enum SolveMethod { kociemba, lbl, cfop }
 
 class HomeController extends ChangeNotifier {
   final TickerProvider vsync;
@@ -440,7 +440,7 @@ class HomeController extends ChangeNotifier {
   }) async {
     if (_animationController.isAnimating) return;
 
-    if (method == SolveMethod.lbl &&
+    if ((method == SolveMethod.lbl || method == SolveMethod.cfop) &&
         !PremiumManager().canAccessFeature('lbl_solver')) {
       return;
     }
@@ -470,7 +470,7 @@ class HomeController extends ChangeNotifier {
 
     final solveResult = await SolverService.solve(
       state: solveState,
-      useLBL: method == SolveMethod.lbl,
+      method: method,
     );
 
     if (solveResult.moves.isNotEmpty) {

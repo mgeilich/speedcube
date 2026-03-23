@@ -18,11 +18,11 @@ class SolveTheme {
         s.contains('white layer') ||
         s.contains('start')) {
       return Colors.white;
-    } else if (s.contains('second layer') || s.contains('middle layer')) {
+    } else if (s.contains('second layer') || s.contains('middle layer') || s.contains('f2l')) {
       return secondaryBlue;
-    } else if (s.contains('yellow cross') || s.contains('yellow edges')) {
+    } else if (s.contains('yellow cross') || s.contains('yellow edges') || s.contains('oll')) {
       return yellowGold;
-    } else if (s.contains('yellow corners')) {
+    } else if (s.contains('yellow corners') || s.contains('pll')) {
       return amber;
     }
 
