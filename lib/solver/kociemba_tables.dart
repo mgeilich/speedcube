@@ -1,7 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
-import 'kociemba_tables_data.dart';
 
 class KociembaTableData {
   final List<List<int>> twistMove;
@@ -65,13 +64,17 @@ class KociembaTables {
 
   static Future<void> _doInit() async {
     try {
-      // Use compute to run the heavy decoding in a background isolate (Web Worker on web)
-      _data = await compute(_decodeTables, kociembaTablesBase64);
+      final ByteData data =
+          await rootBundle.load('assets/kociemba_tables.bin');
+      final Uint8List binary = data.buffer.asUint8List();
+
+      // Use compute to run the heavy decoding in a background isolate
+      _data = await compute(_decodeTables, binary);
       _log.info('KociembaTables initialized in background');
       _initialized = true;
       _verifyPruning();
     } catch (e, stack) {
-      _log.severe('Failed to load static data', e, stack);
+      _log.severe('Failed to load asset tables', e, stack);
     }
   }
 
@@ -108,8 +111,7 @@ class KociembaTables {
 }
 
 /// Heavy decoding logic moved out of class for compute() compatibility
-KociembaTableData _decodeTables(String base64Data) {
-  final Uint8List binary = base64Decode(base64Data);
+KociembaTableData _decodeTables(Uint8List binary) {
   final reader = _ByteReader(binary);
 
   List<List<int>> readMoveTable(int rows, int cols) {
