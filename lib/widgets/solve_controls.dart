@@ -157,7 +157,7 @@ class SolveControls extends StatelessWidget {
                 const SizedBox(height: 12),
 
                 // Analysis buttons (timeline) - GATED
-                if (showExplanations && PremiumManager().isPremium) ...[
+                if ((showExplanations || isDemo) && PremiumManager().isPremium) ...[
                   AnalysisTimeline(
                     controller: analysisController,
                   ),
@@ -167,7 +167,7 @@ class SolveControls extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Move Explanation Area
-                if (!isDemo && showExplanations)
+                if (showExplanations)
                   Expanded(
                     child: AnimatedBuilder(
                       animation: analysisController,

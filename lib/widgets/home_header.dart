@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import '../utils/premium_manager.dart';
 import 'premium_upsell_sheet.dart';
-import 'alg_library_screen.dart';
 
 class HomeHeader extends StatelessWidget {
   final VoidCallback onScanPressed;
@@ -98,22 +97,6 @@ class HomeHeader extends StatelessWidget {
                 icon: const Icon(Icons.school, color: Colors.white70, size: 24),
                 onPressed: onLearnPressed,
                 tooltip: 'Learn Mode',
-              ),
-              const SizedBox(width: 2),
-              // Algorithm Library button
-              IconButton(
-                visualDensity: VisualDensity.compact,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                icon: const Icon(Icons.menu_book_rounded,
-                    color: Colors.white70, size: 24),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const AlgLibraryScreen(),
-                  ),
-                ),
-                tooltip: 'Algorithm Library',
               ),
               const SizedBox(width: 2),
               // Settings button

@@ -4,7 +4,9 @@ import 'widgets/learn_options_sheet.dart';
 import 'widgets/premium_upsell_sheet.dart';
 import 'utils/logging_config.dart';
 import 'models/cube_state.dart';
+import 'models/cube_move.dart';
 import 'widgets/layer_by_layer_guide_sheet.dart';
+import 'widgets/cfop_guide_screen.dart';
 import 'widgets/home_header.dart';
 import 'widgets/cube_interactive_view.dart';
 import 'widgets/solve_controls.dart';
@@ -68,7 +70,11 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
 
   void _onDemoFinished(int? stepIndex, String? demoType) {
     if (stepIndex != null) {
-      _showLayerByLayerGuide(initialStepIndex: stepIndex);
+      if (demoType == 'advanced') {
+        _showCfopGuide(initialStepIndex: stepIndex);
+      } else {
+        _showLayerByLayerGuide(initialStepIndex: stepIndex);
+      }
     }
   }
 
@@ -166,7 +172,7 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
           children: [
             HomeHeader(
               onScanPressed: _startScan,
-              onLearnPressed: () => _showLearnMenu(),
+              onLearnPressed: _showLearnMenu,
               onSettingsPressed: _showSettings,
             ),
             CubeInteractiveView(
@@ -247,11 +253,12 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => LearnOptionsSheet(
-        onSelectIntroduction: () {
-          _showIntroduction();
-        },
+        onSelectIntroduction: _showIntroduction,
         onSelectLayerByLayerMethod: () {
           _showLayerByLayerGuide(initialStepIndex: initialStepIndex);
+        },
+        onSelectCfopMethod: () {
+          _showCfopGuide(initialStepIndex: initialStepIndex);
         },
       ),
     );
@@ -275,22 +282,80 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
             demoType,
             stickerLabels,
             targetPieces}) {
-          _homeController.handleDemoRequested(
-            stepIndex,
-            initialState,
-            moves: moves,
-            initialRotationX: initialRotationX,
-            targetRotationX: targetRotationX,
-            initialRotationY: initialRotationY,
-            targetRotationY: targetRotationY,
-            demoType: 'beginner',
-            stickerLabels: stickerLabels,
-            targetPieces: targetPieces,
-          );
-          Navigator.pop(context);
+          _onDemoRequested(stepIndex, initialState,
+              moves: moves,
+              initialRotationX: initialRotationX,
+              targetRotationX: targetRotationX,
+              initialRotationY: initialRotationY,
+              targetRotationY: targetRotationY,
+              demoType: 'beginner',
+              stickerLabels: stickerLabels,
+              targetPieces: targetPieces);
         },
       ),
     );
+  }
+
+  void _showCfopGuide({int initialStepIndex = -1}) {
+    _homeController.showingSolution = false;
+    _homeController.path = null;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CfopGuideScreen(
+          initialExpandedStepIndex: initialStepIndex != -1 ? initialStepIndex : (_homeController.lastCfopStepIndex ?? -1),
+          initialScrollOffset: _homeController.lastCfopScrollOffset ?? 0.0,
+          onDemoRequested: (stepIndex, initialState,
+              {moves,
+              initialRotationX,
+              targetRotationX,
+              initialRotationY,
+              targetRotationY,
+              demoType,
+              stickerLabels,
+              targetPieces,
+              scrollOffset}) {
+            if (scrollOffset != null) {
+              _homeController.updateCfopProgress(stepIndex, scrollOffset);
+            }
+            _onDemoRequested(stepIndex, initialState,
+                moves: moves,
+                initialRotationX: initialRotationX,
+                targetRotationX: targetRotationX,
+                initialRotationY: initialRotationY,
+                targetRotationY: targetRotationY,
+                demoType: 'advanced',
+                stickerLabels: stickerLabels,
+                targetPieces: targetPieces);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _onDemoRequested(int stepIndex, CubeState initialState,
+      {List<CubeMove>? moves,
+      double? initialRotationX,
+      double? targetRotationX,
+      double? initialRotationY,
+      double? targetRotationY,
+      String? demoType,
+      Map<CubeFace, Map<int, String>>? stickerLabels,
+      List<int>? targetPieces}) {
+    _homeController.handleDemoRequested(
+      stepIndex,
+      initialState,
+      moves: moves,
+      initialRotationX: initialRotationX,
+      targetRotationX: targetRotationX,
+      initialRotationY: initialRotationY,
+      targetRotationY: targetRotationY,
+      demoType: demoType ?? 'beginner',
+      stickerLabels: stickerLabels,
+      targetPieces: targetPieces,
+    );
+    // Dismiss the learn options / guide sheet
+    Navigator.pop(context);
   }
 
   void _showReviewPrompt() {

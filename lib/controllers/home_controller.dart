@@ -46,6 +46,10 @@ class HomeController extends ChangeNotifier {
   int _solvesCompleted = 0;
   VoidCallback? onReviewPromptRequested;
 
+  // Tutorial Progress Persistence
+  int? _lastCfopStepIndex;
+  double? _lastCfopScrollOffset;
+
   // Learn Mode (Interactive) State
   List<CubeMove>? _path;
   set path(List<CubeMove>? value) {
@@ -116,6 +120,8 @@ class HomeController extends ChangeNotifier {
   bool get showExplanations => _showExplanations;
   Map<CubeFace, Map<int, String>>? get stickerLabels => _stickerLabels;
   bool get isScanned => _isScanned;
+  int? get lastCfopStepIndex => _lastCfopStepIndex;
+  double? get lastCfopScrollOffset => _lastCfopScrollOffset;
 
   // Setters
   set rotationX(double value) {
@@ -140,6 +146,12 @@ class HomeController extends ChangeNotifier {
 
   set showExplanations(bool value) {
     _showExplanations = value;
+    notifyListeners();
+  }
+
+  void updateCfopProgress(int stepIndex, double scrollOffset) {
+    _lastCfopStepIndex = stepIndex;
+    _lastCfopScrollOffset = scrollOffset;
     notifyListeners();
   }
 
@@ -570,6 +582,8 @@ class HomeController extends ChangeNotifier {
     if (moves == null) {
       _path = null;
       _showingSolution = false;
+      _moveIndex = 0;
+      _solutionStartIndex = 0;
     } else {
       _pathStartRotationX = initialRotationX;
       _pathTargetRotationX = targetRotationX;
@@ -579,6 +593,8 @@ class HomeController extends ChangeNotifier {
 
       // Update Move History and Analysis Controller to list moves in UI
       _moveHistory = List.from(moves);
+      _moveIndex = 0;
+      _solutionStartIndex = 0;
       _analysisController.loadSolution(moves, initialState, moves.length);
       _showingSolution = true;
 
@@ -599,8 +615,8 @@ class HomeController extends ChangeNotifier {
 
     await Future.delayed(const Duration(milliseconds: 1000));
 
-    final targetRotationX = _pathTargetRotationX ?? 0.5;
-    final targetRotationY = _pathTargetRotationY ?? 0.75;
+    final targetRotationX = _pathTargetRotationX ?? _rotationX;
+    final targetRotationY = _pathTargetRotationY ?? _rotationY;
 
     if (_rotationX != targetRotationX || _rotationY != targetRotationY) {
       // For now, simpler rotation jump till we move camera tilt controller too
@@ -612,8 +628,11 @@ class HomeController extends ChangeNotifier {
 
     _animationController.setSpeed(const Duration(milliseconds: 800));
 
-    for (int i = 0; i < _path!.length; i++) {
-      final move = _path![i];
+    final path = _path;
+    if (path == null) return;
+
+    for (int i = 0; i < path.length; i++) {
+      final move = path[i];
       if (_playGeneration != myGeneration) break;
       performMove(move);
       // Update analysis controller to highlight current move

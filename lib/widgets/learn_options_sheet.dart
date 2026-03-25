@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import '../utils/premium_manager.dart';
-import 'premium_upsell_sheet.dart';
 
 class LearnOptionsSheet extends StatelessWidget {
   final VoidCallback onSelectIntroduction;
   final VoidCallback onSelectLayerByLayerMethod;
+  final VoidCallback onSelectCfopMethod;
 
   const LearnOptionsSheet({
     super.key,
     required this.onSelectIntroduction,
     required this.onSelectLayerByLayerMethod,
+    required this.onSelectCfopMethod,
   });
 
   @override
@@ -89,18 +90,19 @@ class LearnOptionsSheet extends StatelessWidget {
                     description: 'Learn to solve your first cube step-by-step.',
                     onTap: () {
                       Navigator.pop(context);
-                      if (!kIsWeb && !PremiumManager().isPremium) {
-                        showModalBottomSheet(
-                          context: context,
-                          backgroundColor: Colors.transparent,
-                          isScrollControlled: true,
-                          builder: (_) => const PremiumUpsellSheet(),
-                        );
-                        return;
-                      }
                       onSelectLayerByLayerMethod();
                     },
-                    isPremium: true,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildOptionCard(
+                    icon: Icons.bolt,
+                    isAdvanced: true,
+                    title: 'CFOP Tutorial',
+                    description: 'The next step to a faster solution',
+                    onTap: () {
+                      Navigator.pop(context);
+                      onSelectCfopMethod();
+                    },
                   ),
                   const SizedBox(height: 40),
                 ],
