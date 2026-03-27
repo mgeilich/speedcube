@@ -8,6 +8,8 @@ import '../controllers/analysis_controller.dart';
 import '../utils/premium_manager.dart';
 import '../utils/haptic_service.dart';
 import '../services/solver_service.dart';
+// import '../widgets/ar_guided_solver_screen.dart'; // Removed
+// import '../controllers/guided_solver_controller.dart'; // Removed
 
 enum SolveMethod { kociemba, lbl, cfop }
 
@@ -516,6 +518,8 @@ class HomeController extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  // Removed startARGuidedSolve
 
   void performMove(CubeMove move) {
     if (_animationController.isAnimating) return;

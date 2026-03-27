@@ -218,6 +218,7 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
               onReset: _homeController.resetToSaved,
               canReset: _homeController.canReset,
               isScanned: _homeController.isScanned,
+// onARMode: () => _homeController.startARGuidedSolve(context), // Removed
             ),
           ],
         ),

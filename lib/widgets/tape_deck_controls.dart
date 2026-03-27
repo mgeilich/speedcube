@@ -12,6 +12,7 @@ class TapeDeckControls extends StatelessWidget {
   final VoidCallback onFastForward;
   final VoidCallback onJumpToStart;
   final VoidCallback onJumpToEnd;
+// final VoidCallback? onARMode; // Removed
   final Color activeColor;
 
   const TapeDeckControls({
@@ -26,6 +27,7 @@ class TapeDeckControls extends StatelessWidget {
     required this.onFastForward,
     required this.onJumpToStart,
     required this.onJumpToEnd,
+// this.onARMode, // Removed
     required this.activeColor,
   });
 
@@ -71,6 +73,7 @@ class TapeDeckControls extends StatelessWidget {
             onPressed: hasNext ? onJumpToEnd : null,
             tooltip: "Jump to End",
           ),
+// Removed AR Mode button
         ],
       ),
     );

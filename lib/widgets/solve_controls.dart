@@ -36,6 +36,7 @@ class SolveControls extends StatelessWidget {
   final VoidCallback? onReset;
   final bool canReset;
   final bool isScanned;
+// final VoidCallback? onARMode; // Removed
 
   const SolveControls({
     super.key,
@@ -61,7 +62,31 @@ class SolveControls extends StatelessWidget {
     this.onReset,
     this.canReset = false,
     required this.isScanned,
+// this.onARMode, // Removed
   });
+
+  void _showPhase2Info(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E293B),
+        title: const Text("Phase 2 Rules",
+            style: TextStyle(color: Colors.white, fontSize: 18)),
+        content: const Text(
+          MoveExplainer.phase2Note,
+          style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.4),
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Got it",
+                style: TextStyle(color: Color(0xFF38BDF8))),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,6 +176,7 @@ class SolveControls extends StatelessWidget {
                   onJumpToStart: () => onSeek(0, immediate: true),
                   onJumpToEnd: () =>
                       onSeek(analysisController.solution.length, immediate: true),
+// onARMode: onARMode, // Removed
                   activeColor:
                       SolveTheme.getStageColor(analysisController.stageName),
                 ),
@@ -304,14 +330,14 @@ class SolveControls extends StatelessWidget {
                                                   : FontWeight.normal,
                                             ),
                                           ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
+                            );
                         }
 
                         // Compact tappable summary row - ONLY FOR PREMIUM
@@ -389,26 +415,59 @@ class SolveControls extends StatelessWidget {
                                     const SizedBox(width: 4),
                                   // Move info
                                   Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(bottom: 2),
-                                          child: Row(
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 2),
+                                            child: Row(
                                             children: [
-                                              Text(
-                                                (isKociemba
-                                                    ? "PHASE ${index <= analysisController.phase1MoveCount ? 1 : 2}"
-                                                    : stageName.toUpperCase()),
-                                                style: TextStyle(
-                                                  color: isCompleted
-                                                      ? Colors.white38
-                                                      : stageColor,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  letterSpacing: 0.5,
+                                              GestureDetector(
+                                                onTap: () {
+                                                  if (isKociemba &&
+                                                      index >
+                                                          analysisController
+                                                              .phase1MoveCount) {
+                                                    _showPhase2Info(context);
+                                                  }
+                                                },
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      (isKociemba
+                                                          ? "PHASE ${index <= analysisController.phase1MoveCount ? 1 : 2}"
+                                                          : stageName
+                                                              .toUpperCase()),
+                                                      style: TextStyle(
+                                                        color: isCompleted
+                                                            ? Colors.white38
+                                                            : stageColor,
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        letterSpacing: 0.5,
+                                                      ),
+                                                    ),
+                                                    if (isKociemba &&
+                                                        index >
+                                                            analysisController
+                                                                .phase1MoveCount) ...[
+                                                      const SizedBox(width: 4),
+                                                      Icon(
+                                                        Icons.info_outline,
+                                                        size: 10,
+                                                        color: isCompleted
+                                                            ? Colors.white38
+                                                            : stageColor,
+                                                      ),
+                                                    ],
+                                                  ],
                                                 ),
                                               ),
                                               if (algorithmName != null) ...[
@@ -473,7 +532,16 @@ class SolveControls extends StatelessWidget {
                                             ),
                                           ),
                                         Text(
-                                          fullObjective,
+                                          isKociemba
+                                              ? MoveExplainer.getRationale(
+                                                  move,
+                                                  index - 1,
+                                                  analysisController.solution.length,
+                                                  analysisController.states[index - 1],
+                                                  analysisController.states[index],
+                                                  phase: index <= analysisController.phase1MoveCount ? 1 : 2,
+                                                )
+                                              : fullObjective,
                                           style: TextStyle(
                                             color: isCompleted
                                                 ? Colors.white38
@@ -482,9 +550,13 @@ class SolveControls extends StatelessWidget {
                                             fontWeight: isCurrent
                                                 ? FontWeight.w600
                                                 : FontWeight.normal,
+                                            fontStyle: isKociemba
+                                                ? FontStyle.italic
+                                                : FontStyle.normal,
                                           ),
                                         ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -686,7 +758,7 @@ class PremiumSolverSelector extends StatefulWidget {
 }
 
 class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
-  SolveMethod _selectedMethod = SolveMethod.kociemba;
+  SolveMethod _selectedMethod = SolveMethod.lbl;
 
   @override
   Widget build(BuildContext context) {
@@ -698,17 +770,17 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
           child: CupertinoSlidingSegmentedControl<SolveMethod>(
             groupValue: _selectedMethod,
             children: const {
-              SolveMethod.kociemba: Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: Text('Kociemba', style: TextStyle(color: Colors.white, fontSize: 13)),
-              ),
               SolveMethod.lbl: Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
                 child: Text('LBL', style: TextStyle(color: Colors.white, fontSize: 13)),
               ),
               SolveMethod.cfop: Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
-                child: Text('CFOP Beta', style: TextStyle(color: Colors.white, fontSize: 13)),
+                child: Text('CFOP', style: TextStyle(color: Colors.white, fontSize: 13)),
+              ),
+              SolveMethod.kociemba: Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Text('Kociemba', style: TextStyle(color: Colors.white, fontSize: 13)),
               ),
             },
             backgroundColor: Colors.white12,
@@ -740,7 +812,7 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
       case SolveMethod.lbl:
         return 'Solve Layer-by-Layer';
       case SolveMethod.cfop:
-        return 'Solve CFOP (Beta)';
+        return 'Solve CFOP';
     }
   }
 

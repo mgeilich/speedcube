@@ -621,7 +621,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
         _buildPLLCornerStep('1. Headlights Found', 
           'Put headlights in the back and do Aa-Perm.', 
           'pll_aa', 
-          "(x) R' U R' D2 R U' R' D2 R2"
+          "R' F R' B2 R F' R' B2 R2"
         ),
         
         const SizedBox(height: 16),
@@ -879,8 +879,10 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
   CubeState _getWhiteOnBottomState() {
     final state = CubeState.solved();
     for (int i = 0; i < 9; i++) {
-        state.u[i] = CubeColor.yellow;
-        state.d[i] = CubeColor.white;
+      state.u[i] = CubeColor.yellow;
+    }
+    for (int i = 0; i < 9; i++) {
+      state.d[i] = CubeColor.white;
     }
     return state;
   }
@@ -967,7 +969,9 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
 
   CubeState _forceF2LSolved(CubeState state) {
     // Set bottom face to White
-    for (int i = 0; i < 9; i++) state.d[i] = CubeColor.white;
+    for (int i = 0; i < 9; i++) {
+      state.d[i] = CubeColor.white;
+    }
     // Set side colors for middle and bottom layers (indices 3-8)
     for (int i = 3; i < 9; i++) {
       state.f[i] = CubeColor.green;
