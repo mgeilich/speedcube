@@ -39,12 +39,12 @@ class PremiumManager extends ChangeNotifier {
   Future<void> initPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     _isPremium = prefs.getBool(_kPremiumKey) ?? false;
-    
-    // Auto-unlock premium in debug mode for testing
+
+    // // Auto-unlock premium in debug mode for testing
     if (kDebugMode && !_isPremium) {
       _unlockPremium();
     }
-    
+
     notifyListeners();
   }
 
@@ -113,7 +113,8 @@ class PremiumManager extends ChangeNotifier {
   void _onPurchaseUpdate(List<PurchaseDetails> purchaseDetailsList) {
     for (var purchase in purchaseDetailsList) {
       if (purchase.status == PurchaseStatus.error) {
-        _lastError = purchase.error?.message ?? 'An error occurred during purchase.';
+        _lastError =
+            purchase.error?.message ?? 'An error occurred during purchase.';
         notifyListeners();
       } else if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {

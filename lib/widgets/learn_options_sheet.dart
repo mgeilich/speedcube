@@ -97,6 +97,7 @@ class LearnOptionsSheet extends StatelessWidget {
                   _buildOptionCard(
                     icon: Icons.bolt,
                     isAdvanced: true,
+                    isPremium: true,
                     title: 'CFOP Tutorial',
                     description: 'The next step to a faster solution',
                     onTap: () {
@@ -168,11 +169,25 @@ class LearnOptionsSheet extends StatelessWidget {
                       if (isPremium &&
                           !kIsWeb &&
                           !PremiumManager().isPremium) ...[
-                        const SizedBox(width: 8),
-                        const Icon(
-                          Icons.lock,
-                          color: Color(0xFFF59E0B),
-                          size: 14,
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                                color: const Color(0xFFF59E0B)
+                                    .withValues(alpha: 0.5)),
+                          ),
+                          child: const Text(
+                            'PRO',
+                            style: TextStyle(
+                              color: Color(0xFFF59E0B),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
                         ),
                       ],
                     ],

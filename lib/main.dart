@@ -66,6 +66,7 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
     _homeController.addListener(_onControllerUpdate);
     _homeController.onDemoFinished = _onDemoFinished;
     _homeController.onReviewPromptRequested = _showReviewPrompt;
+    _homeController.onPremiumUpsellRequested = _showPremiumUpsell;
   }
 
   void _onDemoFinished(int? stepIndex, String? demoType) {

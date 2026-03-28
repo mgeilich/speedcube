@@ -45,8 +45,6 @@ class _PremiumUpsellSheetState extends State<PremiumUpsellSheet> {
 
     try {
       await PremiumManager().buyPremium();
-      // Note: We don't pop immediately because the native IAP sheet 
-      // may take time to appear or complete.
     } catch (e) {
       if (mounted) {
         String message = e.toString();
@@ -99,214 +97,298 @@ class _PremiumUpsellSheetState extends State<PremiumUpsellSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: Color(0xFF1E1E2E),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-      ),
-      child: SafeArea(
+    return DraggableScrollableSheet(
+      initialChildSize: 0.8,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (context, scrollController) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0F172A),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.5),
+              blurRadius: 40,
+              spreadRadius: 10,
+            ),
+          ],
+        ),
         child: SingleChildScrollView(
+          controller: scrollController,
+          padding: const EdgeInsets.only(bottom: 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Drag handle
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.white24,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+            Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(2),
               ),
-              const SizedBox(height: 30),
+            ),
+            const SizedBox(height: 32),
 
-              // Icon/Title
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
-                  ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
-                      blurRadius: 20,
-                      spreadRadius: 5,
-                    ),
-                  ],
-                ),
-                child: const Icon(Icons.workspace_premium,
-                    color: Colors.white, size: 40),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Upgrade to PRO',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Unlock the full potential of your SpeedCube AR experience.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white.withValues(alpha: 0.7),
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              // Features
-              _buildFeatureRow(
-                Icons.camera_alt,
-                'Scan and solve a real cube',
-                'Scan your physical cube in seconds using your camera and get an instant solution.',
-              ),
-              const SizedBox(height: 16),
-
-              _buildFeatureRow(
-                Icons.auto_awesome,
-                'Step-by-step solution explanations',
-                'Examine each step of a solution and understand its purpose',
-              ),
-              const SizedBox(height: 16),
-              _buildFeatureRow(
-                Icons.school,
-                'Layer-by-Layer tutorial',
-                'Learn to solve a 3x3 cube from scratch with our step-by-step interactive tutorial.',
-              ),
-              const SizedBox(height: 16),
-              _buildFeatureRow(
-                Icons.shuffle,
-                'Pro Scrambler (50 moves)',
-                'Challenge yourself with complex scrambles up to 50 moves and see step-by-step solutions.',
-              ),
-
-              const SizedBox(height: 40),
-
-              // Error Message Section
-              if (_errorMessage != null) ...[
+            // Header Section with Badge
+            Stack(
+              alignment: Alignment.center,
+              children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.error_outline, color: Colors.red, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          _errorMessage!,
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 14,
-                          ),
-                        ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF6366F1).withValues(alpha: 0.4),
+                        blurRadius: 40,
+                        spreadRadius: 2,
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
-              ],
-
-              // Buy Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleUnlock,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF818CF8), Color(0xFF4F46E5)],
                     ),
-                    elevation: 0,
+                    shape: BoxShape.circle,
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Text(
-                          'Unlock All Features',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  child: const Icon(
+                    Icons.auto_awesome_rounded,
+                    color: Colors.white,
+                    size: 48,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'SpeedCube AR Pro',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.5,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Solve faster. Learn smarter.',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.white.withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(height: 40),
+
+            // Feature Grid / List
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.03),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.05),
+                ),
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  _buildFeatureRow(
+                    Icons.camera_rounded,
+                    'Instant AR Scan',
+                    'Scan physical cubes in seconds.',
+                    true,
+                  ),
+                  _buildDivider(),
+                  _buildFeatureRow(
+                    Icons.school_rounded,
+                    'Advanced Solving Method Tutorials',
+                    'Go beyond the Layer-by-Layer method.',
+                    false,
+                  ),
+                  _buildDivider(),
+                  _buildFeatureRow(
+                    Icons.psychology_rounded,
+                    'Pro AR Solvers',
+                    'Unlock LBL, CFOP, and Kociemba algorithms.',
+                    false,
+                  ),
+                  _buildDivider(),
+                  _buildFeatureRow(
+                    Icons.lightbulb_rounded,
+                    'Step-By-Step Explanations',
+                    'Understand the purpose of every move.',
+                    false,
+                  ),
+                ],
+              ),
+            ),
+
+            if (_errorMessage != null) ...[
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 14,
                         ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: _isLoading ? null : () => Navigator.pop(context),
-                child: Text(
-                  'Maybe Later',
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+            ],
+
+            const SizedBox(height: 48),
+
+            // Buy Button
+            SizedBox(
+              width: double.infinity,
+              height: 64,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _handleUnlock,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6366F1),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 8,
+                  shadowColor: const Color(0xFF6366F1).withValues(alpha: 0.5),
                 ),
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'Unlock Full Access',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
               ),
-              TextButton(
-                onPressed: _isLoading ? null : _handleRestore,
-                child: Text(
-                  'Restore Purchases',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    decoration: TextDecoration.underline,
+            ),
+            const SizedBox(height: 16),
+            
+            // Footer Links
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: _isLoading ? null : _handleRestore,
+                  child: Text(
+                    'Restore Purchases',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.4),
+                      fontSize: 13,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(
+                    '•',
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.2)),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    'Maybe Later',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.4),
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
         ),
       ),
+    ),
+  );
+}
+
+  Widget _buildDivider() {
+    return Divider(
+      height: 1,
+      indent: 52,
+      color: Colors.white.withValues(alpha: 0.05),
     );
   }
 
-  Widget _buildFeatureRow(IconData icon, String title, String description) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(10),
+  Widget _buildFeatureRow(IconData icon, String title, String description, bool isPrimary) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isPrimary 
+                  ? const Color(0xFF6366F1).withValues(alpha: 0.1)
+                  : Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon, 
+              color: isPrimary ? const Color(0xFF818CF8) : Colors.white70,
+              size: 24
+            ),
           ),
-          child: Icon(icon, color: const Color(0xFFF59E0B), size: 20),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                  ),
                 ),
-              ),
-              Text(
-                description,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
-                  fontSize: 14,
+                Text(
+                  description,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.4),
+                    fontSize: 14,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

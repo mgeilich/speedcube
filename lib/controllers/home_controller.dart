@@ -47,6 +47,7 @@ class HomeController extends ChangeNotifier {
   final List<bool> _moveDirectionQueue = [];
   int _solvesCompleted = 0;
   VoidCallback? onReviewPromptRequested;
+  VoidCallback? onPremiumUpsellRequested;
 
   // Tutorial Progress Persistence
   int? _lastCfopStepIndex;
@@ -137,6 +138,10 @@ class HomeController extends ChangeNotifier {
   }
 
   set scrambleLength(int value) {
+    if (value > 20 && !PremiumManager().isPremium) {
+      onPremiumUpsellRequested?.call();
+      return;
+    }
     _scrambleLength = value;
     notifyListeners();
   }
