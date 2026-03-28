@@ -41,9 +41,12 @@ class PremiumManager extends ChangeNotifier {
     _isPremium = prefs.getBool(_kPremiumKey) ?? false;
 
     // // Auto-unlock premium in debug mode for testing
-    if (kDebugMode && !_isPremium) {
-      _unlockPremium();
-    }
+    // if (kDebugMode && !_isPremium) {
+    //   _unlockPremium();
+    // }
+    
+    // TEMPORARY OVERRIDE FOR SCREENSHOTS
+    _isPremium = false;
 
     notifyListeners();
   }
