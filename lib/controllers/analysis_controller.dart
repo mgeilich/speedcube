@@ -108,12 +108,20 @@ class AnalysisController extends ChangeNotifier {
   }
 
   /// Set playing state internally
+  /// Set playing state internally
   void setPlayingInternal(bool playing) {
     _isPlaying = playing;
     if (!playing) {
       _isRewinding = false;
       _isFastForwarding = false;
     }
+    notifyListeners();
+  }
+
+  /// Set animating index internally (used by main state while move is in progress)
+  void setAnimatingIndexInternal(int? index) {
+    if (index != null && (index < 0 || index > _solution.length)) return;
+    _animatingIndex = index;
     notifyListeners();
   }
 

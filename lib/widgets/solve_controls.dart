@@ -182,8 +182,8 @@ class SolveControls extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
 
-                // Analysis buttons (timeline) - GATED
-                if ((showExplanations || isDemo) && PremiumManager().isPremium) ...[
+                // Analysis buttons (timeline)
+                if (showExplanations || isDemo) ...[
                   AnalysisTimeline(
                     controller: analysisController,
                   ),
@@ -193,7 +193,7 @@ class SolveControls extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Move Explanation Area
-                if (showExplanations)
+                if (showExplanations && !isDemo)
                   Expanded(
                     child: AnimatedBuilder(
                       animation: analysisController,
@@ -365,10 +365,8 @@ class SolveControls extends StatelessWidget {
                         final stageGoal = stageName != null
                             ? MoveExplainer.getStageGoal(stageName)
                             : null;
-
                         final isKociemba = stageName == null;
 
-                        // Refine objective: prioritized high-level desc, drop piece movements if desc exists
                         final fullObjective =
                             (stageDesc != null && stageDesc.isNotEmpty)
                                 ? stageDesc
@@ -425,136 +423,143 @@ class SolveControls extends StatelessWidget {
                                             padding: const EdgeInsets.only(
                                                 bottom: 2),
                                             child: Row(
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  if (isKociemba &&
-                                                      index >
-                                                          analysisController
-                                                              .phase1MoveCount) {
-                                                    _showPhase2Info(context);
-                                                  }
-                                                },
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Text(
-                                                      (isKociemba
-                                                          ? "PHASE ${index <= analysisController.phase1MoveCount ? 1 : 2}"
-                                                          : stageName
-                                                              .toUpperCase()),
-                                                      style: TextStyle(
-                                                        color: isCompleted
-                                                            ? Colors.white38
-                                                            : stageColor,
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        letterSpacing: 0.5,
-                                                      ),
-                                                    ),
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
                                                     if (isKociemba &&
                                                         index >
                                                             analysisController
-                                                                .phase1MoveCount) ...[
-                                                      const SizedBox(width: 4),
-                                                      Icon(
-                                                        Icons.info_outline,
-                                                        size: 10,
-                                                        color: isCompleted
-                                                            ? Colors.white38
-                                                            : stageColor,
+                                                                .phase1MoveCount) {
+                                                      _showPhase2Info(context);
+                                                    }
+                                                  },
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Text(
+                                                        (isKociemba
+                                                            ? "PHASE ${index <= analysisController.phase1MoveCount ? 1 : 2}"
+                                                            : stageName
+                                                                .toUpperCase()),
+                                                        style: TextStyle(
+                                                          color: isCompleted
+                                                              ? Colors.white38
+                                                              : stageColor,
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          letterSpacing: 0.5,
+                                                        ),
                                                       ),
+                                                      if (isKociemba &&
+                                                          index >
+                                                              analysisController
+                                                                  .phase1MoveCount) ...[
+                                                        const SizedBox(width: 4),
+                                                        Icon(
+                                                          Icons.info_outline,
+                                                          size: 10,
+                                                          color: isCompleted
+                                                              ? Colors.white38
+                                                              : stageColor,
+                                                        ),
+                                                      ],
                                                     ],
-                                                  ],
+                                                  ),
                                                 ),
-                                              ),
-                                              if (algorithmName != null) ...[
-                                                const SizedBox(width: 8),
-                                                Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 5,
-                                                      vertical: 1),
-                                                  decoration: BoxDecoration(
-                                                    color: (isCompleted
-                                                            ? Colors.white12
-                                                            : const Color(
-                                                                0xFFFACC15))
-                                                        .withValues(
-                                                            alpha: 0.15),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            4),
-                                                    border: Border.all(
+                                                if (algorithmName != null) ...[
+                                                  const SizedBox(width: 8),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                            horizontal: 5,
+                                                            vertical: 1),
+                                                    decoration: BoxDecoration(
                                                       color: (isCompleted
                                                               ? Colors.white12
                                                               : const Color(
                                                                   0xFFFACC15))
                                                           .withValues(
-                                                              alpha: 0.3),
-                                                      width: 0.5,
+                                                              alpha: 0.15),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4),
+                                                      border: Border.all(
+                                                        color: (isCompleted
+                                                                ? Colors.white12
+                                                                : const Color(
+                                                                    0xFFFACC15))
+                                                            .withValues(
+                                                                alpha: 0.3),
+                                                        width: 0.5,
+                                                      ),
+                                                    ),
+                                                    child: Text(
+                                                      algorithmName.toUpperCase(),
+                                                      style: TextStyle(
+                                                        color: isCompleted
+                                                            ? Colors.white38
+                                                            : const Color(
+                                                                0xFFFACC15),
+                                                        fontSize: 8,
+                                                        fontWeight:
+                                                            FontWeight.w900,
+                                                        letterSpacing: 0.5,
+                                                      ),
                                                     ),
                                                   ),
-                                                  child: Text(
-                                                    algorithmName.toUpperCase(),
-                                                    style: TextStyle(
-                                                      color: isCompleted
-                                                          ? Colors.white38
-                                                          : const Color(
-                                                              0xFFFACC15),
-                                                      fontSize: 8,
-                                                      fontWeight:
-                                                          FontWeight.w900,
-                                                      letterSpacing: 0.5,
-                                                    ),
-                                                  ),
-                                                ),
+                                                ],
                                               ],
-                                            ],
-                                          ),
-                                        ),
-                                        if (stageGoal != null)
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 6),
-                                            child: Text(
-                                              stageGoal,
-                                              style: TextStyle(
-                                                color: isCompleted
-                                                    ? Colors.white24
-                                                    : Colors.white70,
-                                                fontSize: 11,
-                                                fontStyle: FontStyle.italic,
-                                                height: 1.2,
-                                              ),
                                             ),
                                           ),
-                                        Text(
-                                          isKociemba
-                                              ? MoveExplainer.getRationale(
-                                                  move,
-                                                  index - 1,
-                                                  analysisController.solution.length,
-                                                  analysisController.states[index - 1],
-                                                  analysisController.states[index],
-                                                  phase: index <= analysisController.phase1MoveCount ? 1 : 2,
-                                                )
-                                              : fullObjective,
-                                          style: TextStyle(
-                                            color: isCompleted
-                                                ? Colors.white38
-                                                : Colors.white,
-                                            fontSize: 13,
-                                            fontWeight: isCurrent
-                                                ? FontWeight.w600
-                                                : FontWeight.normal,
-                                            fontStyle: isKociemba
-                                                ? FontStyle.italic
-                                                : FontStyle.normal,
+                                          if (stageGoal != null)
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 6),
+                                              child: Text(
+                                                stageGoal,
+                                                style: TextStyle(
+                                                  color: isCompleted
+                                                      ? Colors.white24
+                                                      : Colors.white70,
+                                                  fontSize: 11,
+                                                  fontStyle: FontStyle.italic,
+                                                  height: 1.2,
+                                                ),
+                                              ),
+                                            ),
+                                          Text(
+                                            isKociemba
+                                                ? MoveExplainer.getRationale(
+                                                    move,
+                                                    index - 1,
+                                                    analysisController
+                                                        .solution.length,
+                                                    analysisController
+                                                        .states[index - 1],
+                                                    analysisController
+                                                        .states[index],
+                                                    phase: index <=
+                                                            analysisController
+                                                                .phase1MoveCount
+                                                        ? 1
+                                                        : 2,
+                                                  )
+                                                : fullObjective,
+                                            style: TextStyle(
+                                              color: isCompleted
+                                                  ? Colors.white38
+                                                  : Colors.white,
+                                              fontSize: 13,
+                                              fontWeight: isCurrent
+                                                  ? FontWeight.w600
+                                                  : FontWeight.normal,
+                                              fontStyle: isKociemba
+                                                  ? FontStyle.italic
+                                                  : FontStyle.normal,
+                                            ),
                                           ),
-                                        ),
                                         ],
                                       ),
                                     ),

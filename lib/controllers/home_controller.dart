@@ -188,6 +188,7 @@ class HomeController extends ChangeNotifier {
         HapticService.impactLight();
 
         // Always update analysis state to keep UI in sync
+        _analysisController.setAnimatingIndexInternal(null);
         _analysisController.updateIndexInternal(vizIndex);
 
         if (_guideSeekTarget != null) {
@@ -322,6 +323,7 @@ class HomeController extends ChangeNotifier {
     if (!_showingSolution || !_analysisController.hasNext) return;
 
     final move = _analysisController.solution[_analysisController.currentIndex];
+    _analysisController.setAnimatingIndexInternal(_analysisController.currentIndex + 1);
     _queueAnalysisMove(move, false, overrideDuration: overrideDuration);
   }
 
@@ -329,6 +331,7 @@ class HomeController extends ChangeNotifier {
     if (!_showingSolution || !_analysisController.hasPrevious) return;
 
     final prevMoveIndex = _analysisController.currentIndex - 1;
+    _analysisController.setAnimatingIndexInternal(_analysisController.currentIndex);
     final move = _analysisController.solution[prevMoveIndex];
     final inverseMove = move.inverse;
 
@@ -566,6 +569,7 @@ class HomeController extends ChangeNotifier {
     String? demoType,
     Map<CubeFace, Map<int, String>>? stickerLabels,
     List<int>? targetPieces,
+    List<String?>? moveDescriptions,
   }) async {
     _cubeState = initialState;
     _activeDemoStepIndex = stepIndex;
@@ -588,8 +592,14 @@ class HomeController extends ChangeNotifier {
       _moveHistory = List.from(moves);
       _moveIndex = 0;
       _solutionStartIndex = 0;
-      _analysisController.loadSolution(moves, initialState, moves.length);
+      _analysisController.loadSolution(
+        moves,
+        initialState,
+        moves.length,
+        moveStageDescriptions: moveDescriptions,
+      );
       _showingSolution = true;
+      _showExplanations = true;
     }
     notifyListeners();
   }

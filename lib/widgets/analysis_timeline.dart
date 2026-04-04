@@ -31,9 +31,9 @@ class _AnalysisTimelineState extends State<AnalysisTimeline> {
   }
 
   void _onControllerChanged() {
-    // Auto-scroll to keep current move visible
+    // Auto-scroll to keep current or animating move visible
     if (_scrollController.hasClients) {
-      final index = widget.controller.currentIndex;
+      final index = widget.controller.animatingIndex ?? widget.controller.currentIndex;
       final itemWidth = 72.0; // Width of each move chip + spacing
       final targetOffset = index * itemWidth - 100; // Center it
 
@@ -72,6 +72,7 @@ class _AnalysisTimelineState extends State<AnalysisTimeline> {
                   1, // Start + Moves (Solved is reachable via last move)
               itemBuilder: (context, index) {
                 final isCurrent = index == widget.controller.currentIndex;
+                final isAnimating = index == widget.controller.animatingIndex;
                 final isPast = index < widget.controller.currentIndex;
 
                 if (index == 0) {
@@ -79,7 +80,7 @@ class _AnalysisTimelineState extends State<AnalysisTimeline> {
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: _StartChip(
-                      isCurrent: isCurrent,
+                      isCurrent: isCurrent || isAnimating,
                       onTap: () => widget.controller.goToMove(0),
                     ),
                   );
@@ -92,7 +93,7 @@ class _AnalysisTimelineState extends State<AnalysisTimeline> {
                   padding: const EdgeInsets.only(right: 8),
                   child: _MoveChip(
                     move: move,
-                    isCurrent: isCurrent,
+                    isCurrent: isCurrent || isAnimating,
                     isPast: isPast,
                     onTap: () => widget.controller.goToMove(index),
                   ),

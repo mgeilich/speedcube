@@ -103,7 +103,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'CFOP (Cross, F2L, OLL, PLL) is the standard method for speedcubing. It allows for incredibly fast solves by merging steps and using advanced pattern recognition.',
+              'CFOP (Cross, F2L, OLL, PLL) is the standard method for speedcubing. It allows for faster solves than the LBL method by merging steps and using pattern recognition.',
               style: TextStyle(color: Colors.white70, fontSize: 16, height: 1.5),
             ),
             const SizedBox(height: 32),
@@ -321,7 +321,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
 
         _buildIllustration(
           '2. Edge Extraction',
-          'If an edge is stuck in the middle, use R U R\' U\' to extract it.',
+          'If an edge is stuck in the middle, use R U2 R\' to extract it while keeping the corner on the top layer.',
           _getF2LEdgeExtractionState(),
           rotationX: 0.4,
           rotationY: 0.75,
@@ -335,7 +335,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
             label: 'Show Edge Extraction',
             onTap: () {
               _requestDemo(1, _getF2LEdgeExtractionState(),
-                moves: [CubeMove.r, CubeMove.u, CubeMove.rPrime, CubeMove.uPrime],
+                moves: [CubeMove.r, CubeMove.u2, CubeMove.rPrime],
                 initialRotationX: 0.4,
                 initialRotationY: 0.75,
               );
@@ -350,7 +350,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
           'If a corner and edge are next to each other in the top layer but not correctly oriented or matched, use R U2 R\' to separate them.',
           _getF2LSeparationState(),
           rotationX: 0.4,
-          rotationY: 0.75,
+          rotationY: -0.75,
           highlightedStickers: [
             MapEntry(CubeFace.u, 8),
             MapEntry(CubeFace.f, 2),
@@ -366,7 +366,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
               _requestDemo(1, _getF2LSeparationState(),
                 moves: [CubeMove.r, CubeMove.u2, CubeMove.rPrime],
                 initialRotationX: 0.4,
-                initialRotationY: 0.75,
+                initialRotationY: -0.75,
               );
             },
           ),
@@ -394,7 +394,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
           'The white sticker faces the Right side. Check if the top sticker of the edge matches the corner top color.',
           _getF2LMatchingSideState(),
           rotationX: 0.4,
-          rotationY: 0.75,
+          rotationY: -0.75,
         ),
         const SizedBox(height: 12),
         _buildDemoButtons([
@@ -404,7 +404,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
               _requestDemo(1, _getF2LMatchingSideState(),
                 moves: [CubeMove.u, CubeMove.fPrime, CubeMove.u2, CubeMove.f, CubeMove.u2, CubeMove.fPrime, CubeMove.u, CubeMove.f],
                 initialRotationX: 0.4,
-                initialRotationY: 0.75,
+                initialRotationY: -0.75,
               );
             },
           ),
@@ -414,7 +414,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
               _requestDemo(1, _getF2LNonMatchingSideState(),
                 moves: [CubeMove.r, CubeMove.u, CubeMove.rPrime],
                 initialRotationX: 0.4,
-                initialRotationY: 0.75,
+                initialRotationY: -0.75,
               );
             },
           ),
@@ -446,7 +446,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
             label: 'Non-Matching Edge',
             onTap: () {
               _requestDemo(1, _getF2LNonMatchingFrontState(),
-                moves: [CubeMove.uPrime, CubeMove.r, CubeMove.uPrime, CubeMove.r2, CubeMove.u, CubeMove.r, CubeMove.u2, CubeMove.fPrime, CubeMove.u, CubeMove.f],
+                moves: [CubeMove.fPrime, CubeMove.uPrime, CubeMove.f],
                 initialRotationX: 0.4,
                 initialRotationY: 0.75,
               );
@@ -459,7 +459,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
         // Case 3: White Facing Up
         _buildIllustration(
           'Case 3: White Facing Up',
-          'The white sticker faces Up. This requires a setup move to rotate the corner so white faces the side.',
+          'The white sticker faces Up. This requires a setup move to rotate the edge so that its side color matches the correct face.',
           _getF2LTopState(),
           rotationX: 0.4,
           rotationY: 0.75,
@@ -595,26 +595,15 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 16),
+          _buildCubePreview(state, rotationX: 0.5),
+          const SizedBox(height: 16),
+          _buildAlgorithmText(alg),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              _buildCubePreview(state, rotationX: 0.5),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildAlgorithmText(alg),
-                    const SizedBox(height: 8),
-                    _buildShowMeButton(
-                      label: 'Show Me',
-                      color: const Color(0xFF6366F1),
-                      onPressed: () => _requestDemo(2, state, moves: _parseAlg(alg), initialRotationX: 0.5),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          _buildShowMeButton(
+            label: 'Show Me',
+            color: const Color(0xFF6366F1),
+            onPressed: () => _requestDemo(2, state, moves: _parseAlg(alg), initialRotationX: 0.5),
           ),
         ],
       ),
@@ -949,12 +938,22 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.white10),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 12,
+        runSpacing: 8,
         children: [
           const Icon(Icons.code, color: Colors.white38, size: 18),
-          const SizedBox(width: 12),
-          Text(text, style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 16, letterSpacing: 1.5, fontWeight: FontWeight.bold)),
+          Text(text, 
+            style: const TextStyle(
+              color: Colors.white, 
+              fontFamily: 'monospace', 
+              fontSize: 16, 
+              letterSpacing: 1.5, 
+              fontWeight: FontWeight.bold
+            ),
+            softWrap: true,
+          ),
         ],
       ),
     );
@@ -964,17 +963,6 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
   // ── State Generators ──────────────────────────────────────────────────────
 
 
-
-  CubeState _getWhiteOnBottomState() {
-    final state = CubeState.solved();
-    for (int i = 0; i < 9; i++) {
-      state.u[i] = CubeColor.yellow;
-    }
-    for (int i = 0; i < 9; i++) {
-      state.d[i] = CubeColor.white;
-    }
-    return state;
-  }
 
   /// Returns a state where the bottom two layers (F2L) are solved.
   CubeState _getF2LCompleteState() {
@@ -991,17 +979,11 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
 
   /// Returns a state where the White Cross is solved, but the rest is scrambled.
   CubeState _getScrambledBaseState() {
-    // Start with solved cross on bottom
-    final state = _getWhiteOnBottomState();
+    // Start with solved cross on bottom (White) and yellow on top
+    final state = CubeState.yellowTopSolved();
     
-    // Apply several noise moves that preserve the cross
-    // Using U/U'/U2 and specific combinations
-    final noise = [
-      CubeMove.u, CubeMove.r, CubeMove.u, CubeMove.rPrime, CubeMove.uPrime,
-      CubeMove.lPrime, CubeMove.uPrime, CubeMove.l, CubeMove.u,
-      CubeMove.f, CubeMove.u, CubeMove.fPrime, CubeMove.uPrime,
-      CubeMove.bPrime, CubeMove.uPrime, CubeMove.b, CubeMove.u,
-    ];
+    // Only apply top layer turns to avoid bringing white stickers to the side/top faces
+    final noise = [CubeMove.u, CubeMove.u];
     return state.applyMoves(noise);
   }
 
@@ -1074,29 +1056,39 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
   // --- NEW F2L Case Generators ---
 
   CubeState _getF2LCornerExtractionState() {
-    // Only corner trapped in bottom slot
-    final state = _getScrambledBaseState();
-    // Target corner: White, Orange, Green (trapped in FRB slot)
+    // Corner trapped in bottom slot (Front-Right-Down)
+    final state = CubeState.yellowTopSolved();
+    
+    // F2L Corner: White-Orange-Green
+    // In FRD slot: f[8], r[6], d[2]
     state.f[8] = CubeColor.white;
     state.r[6] = CubeColor.orange;
-    state.d[2] = CubeColor.green;
-    state.applyMoves([CubeMove.r, CubeMove.u, CubeMove.rPrime, CubeMove.uPrime]);
+    state.d[2] = CubeColor.green; // Explicitly set D face to prevent 2 whites on this corner
+
+    // Associated Edge (Orange-Green) elsewhere (top layer)
+    state.u[1] = CubeColor.orange; 
+    state.b[1] = CubeColor.green;
+
     return state;
   }
 
   CubeState _getF2LEdgeExtractionState() {
-    // Only edge trapped in middle slot
-    final state = _getScrambledBaseState();
-    // Target edge: Orange, Green (trapped in FR middle slot)
+    // Edge trapped flipped in middle slot (Front-Right)
+    final state = CubeState.yellowTopSolved();
+
+    // F2L Edge: Orange-Green (trapped flipped in FR slot: f[5]/r[3])
     state.f[5] = CubeColor.orange;
     state.r[3] = CubeColor.green;
-    // User requested the corresponding corner (White/Orange/Green) be on top too
-    // Position it at UFR (Back-Right-Top)
-    state.u[8] = CubeColor.white;
-    state.r[0] = CubeColor.orange;
-    state.b[2] = CubeColor.green;
+
+    // Corresponding Corner (White-Orange-Green) visible on top at UFR
+    // UFR corner: u[8], f[2], r[0]
+    state.u[8] = CubeColor.green;
+    state.f[2] = CubeColor.orange;
+    state.r[0] = CubeColor.white;
     
-    state.applyMoves([CubeMove.lPrime, CubeMove.uPrime, CubeMove.l, CubeMove.u]);
+    // Ensure the bottom face (d[2]) under the slot is NOT white to avoid 2 whites on a corner
+    state.d[2] = CubeColor.red; 
+
     return state;
   }
 
@@ -1174,13 +1166,13 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
     state.f[5] = CubeColor.red; state.r[3] = CubeColor.red;
     state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.white;
 
-    // Corner at UFR: White on F, Green on R, Orange on U
-    state.u[8] = CubeColor.orange;
+    // Corner at UFR: White on F, Orange on R, Green on U
+    state.u[8] = CubeColor.green;
     state.f[2] = CubeColor.white;
-    state.r[0] = CubeColor.green;
-    // Edge at UB: Green on U, Orange on B (Non-matching top colors)
-    state.u[1] = CubeColor.green;
-    state.b[1] = CubeColor.orange;
+    state.r[0] = CubeColor.orange;
+    // Edge at UL: Orange on U, Green on L (Mismatch with Corner Top)
+    state.u[3] = CubeColor.orange;
+    state.l[1] = CubeColor.green;
     return state;
   }
 
