@@ -2,6 +2,7 @@ import 'package:logging/logging.dart';
 import 'package:speedcube_ar/utils/logging_config.dart';
 import 'package:speedcube_ar/models/cube_state.dart';
 import 'package:speedcube_ar/models/cube_move.dart';
+import 'package:speedcube_ar/models/solve_result.dart';
 import 'package:speedcube_ar/solver/lbl_solver.dart';
 
 void main() {

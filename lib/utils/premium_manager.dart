@@ -153,7 +153,8 @@ class PremiumManager extends ChangeNotifier {
       'ar_scan',
       'advanced_scramble',
       'lbl_solver',
-      'detailed_explanations'
+      'detailed_explanations',
+      'cfop_tutorial'
     ];
     return !gatedFeatures.contains(featureId);
   }

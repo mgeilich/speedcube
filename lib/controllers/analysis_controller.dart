@@ -11,6 +11,7 @@ class AnalysisController extends ChangeNotifier {
   List<String?> _moveStageDescriptions = [];
   List<String?> _moveAlgorithmNames = [];
   int _currentIndex = 0;
+  int? _animatingIndex;
   String? _stageName;
   int _phase1MoveCount = 0;
   bool _isPlaying = false;
@@ -45,6 +46,7 @@ class AnalysisController extends ChangeNotifier {
   List<String?> get moveStageDescriptions => _moveStageDescriptions;
   List<String?> get moveAlgorithmNames => _moveAlgorithmNames;
   int get currentIndex => _currentIndex;
+  int? get animatingIndex => _animatingIndex;
   bool get isPlaying => _isPlaying;
   bool get isRewinding => _isRewinding;
   bool get isFastForwarding => _isFastForwarding;

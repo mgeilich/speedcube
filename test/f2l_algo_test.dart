@@ -1,6 +1,6 @@
 import 'package:speedcube_ar/models/cube_state.dart';
 import 'package:speedcube_ar/models/cube_move.dart';
-import 'package:speedcube_ar/solver/lbl_solver.dart';
+import 'package:speedcube_ar/solver/cfop_solver.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';

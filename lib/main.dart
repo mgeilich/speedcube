@@ -229,7 +229,6 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
 
   void _showIntroduction() {
     _homeController.showingSolution = false;
-    _homeController.path = null;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -268,7 +267,6 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
 
   void _showLayerByLayerGuide({int initialStepIndex = -1}) {
     _homeController.showingSolution = false;
-    _homeController.path = null;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -299,13 +297,19 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
   }
 
   void _showCfopGuide({int initialStepIndex = -1}) {
+    if (!PremiumManager().canAccessFeature('cfop_tutorial')) {
+      _showPremiumUpsell();
+      return;
+    }
+
     _homeController.showingSolution = false;
-    _homeController.path = null;
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CfopGuideScreen(
-          initialExpandedStepIndex: initialStepIndex != -1 ? initialStepIndex : (_homeController.lastCfopStepIndex ?? -1),
+          initialExpandedStepIndex: initialStepIndex != -1
+              ? initialStepIndex
+              : (_homeController.lastCfopStepIndex ?? -1),
           initialScrollOffset: _homeController.lastCfopScrollOffset ?? 0.0,
           onDemoRequested: (stepIndex, initialState,
               {moves,

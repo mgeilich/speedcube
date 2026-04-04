@@ -67,8 +67,8 @@ class CubeState {
       d: List.filled(9, CubeColor.white),
       f: List.filled(9, CubeColor.green),
       b: List.filled(9, CubeColor.blue),
-      r: List.filled(9, CubeColor.red),
-      l: List.filled(9, CubeColor.orange),
+      r: List.filled(9, CubeColor.orange),
+      l: List.filled(9, CubeColor.red),
     );
   }
 

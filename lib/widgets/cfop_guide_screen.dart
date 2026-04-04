@@ -517,12 +517,73 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
         const Text('Step 3b: Orient Corners', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         const Text(
-          'Once the cross is solved, there are 7 possible patterns for the remaining corners. Match your pattern and execute the corresponding algorithm.',
+          'Once the cross is solved, there are exactly 7 patterns for the remaining corners. Match your pattern and execute the corresponding algorithm.',
           style: TextStyle(color: Colors.white54, fontSize: 14, height: 1.5),
         ),
         const SizedBox(height: 24),
 
+        _buildPatternRecognitionGuide(),
+
+        const SizedBox(height: 24),
+        
         _buildOCLLGrid(),
+      ],
+    );
+  }
+
+  Widget _buildPatternRecognitionGuide() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.search_rounded, color: Color(0xFF6366F1), size: 20),
+              SizedBox(width: 8),
+              Text(
+                'Pattern Recognition Guide',
+                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildRecognitionStep(
+            '1. Count yellow corners ON TOP',
+            'How many yellow corners are already solved (yellow stickers facing Up)?',
+          ),
+          const SizedBox(height: 12),
+          _buildRecognitionStep(
+            '2. Find your group',
+            '• 0 Corners on top: Headlights (H) or Pi\n• 1 Corner on top: Sune or Anti-Sune (The "Fish")\n• 2 Corners on top: U, T, or L (Bowtie)',
+          ),
+          const Divider(height: 24, color: Colors.white10),
+          const Text(
+            'Q: What if I have MORE yellow stickers on top than the demo?',
+            style: TextStyle(color: Color(0xFF6366F1), fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Extra yellow stickers on top are great! It just means you are already in a 1-corner or 2-corner case. If 4 are on top, you are finished with OLL!',
+            style: TextStyle(color: Colors.white38, fontSize: 12, height: 1.4),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecognitionStep(String title, String desc) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        Text(desc, style: const TextStyle(color: Colors.white38, fontSize: 12, height: 1.4)),
       ],
     );
   }
@@ -561,42 +622,70 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
   }
 
   Widget _buildOCLLGrid() {
-    final ocllCases = [
-      MapEntry('Sune', 'oll27'),
-      MapEntry('Anti-Sune', 'oll26'),
-      MapEntry('H (Double Sune)', 'oll21'),
-      MapEntry('Pi', 'oll22'),
-      MapEntry('U (Headlights)', 'oll23'),
-      MapEntry('T (Chamfer)', 'oll24'),
-      MapEntry('L (Bowtie)', 'oll25'),
-    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildOCLLGroup('0 Corners on Top', [
+          MapEntry('H (Double Sune)', 'oll21'),
+          MapEntry('Pi', 'oll22'),
+        ]),
+        const SizedBox(height: 32),
+        _buildOCLLGroup('1 Corner on Top (The Fish)', [
+          MapEntry('Sune', 'oll27'),
+          MapEntry('Anti-Sune', 'oll26'),
+        ]),
+        const SizedBox(height: 32),
+        _buildOCLLGroup('2 Corners on Top', [
+          MapEntry('U (Headlights)', 'oll23'),
+          MapEntry('T (Chamfer)', 'oll24'),
+          MapEntry('L (Bowtie)', 'oll25'),
+        ]),
+      ],
+    );
+  }
 
-    return Wrap(
-      spacing: 16,
-      runSpacing: 24,
-      children: ocllCases.map((e) {
-        final algCase = AlgLibrary.ollCases.firstWhere((a) => a.id == e.value);
-        final state = _getOCLLState(e.value);
-        return SizedBox(
-          width: 160,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(e.key, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              _buildCubePreview(state, rotationX: 0.5),
-              const SizedBox(height: 8),
-              Text(algCase.algorithm, style: const TextStyle(color: Colors.white38, fontFamily: 'monospace', fontSize: 11)),
-              const SizedBox(height: 8),
-              _buildShowMeButton(
-                label: 'Demo',
-                color: const Color(0xFF6366F1),
-                onPressed: () => _requestDemo(2, state, moves: algCase.algorithmMoves, initialRotationX: 0.5),
-              ),
-            ],
+  Widget _buildOCLLGroup(String title, List<MapEntry<String, String>> cases) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: Color(0xFF6366F1),
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
           ),
-        );
-      }).toList(),
+        ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 16,
+          runSpacing: 24,
+          children: cases.map((e) {
+            final algCase = AlgLibrary.ollCases.firstWhere((a) => a.id == e.value);
+            final state = _getOCLLState(e.value);
+            return SizedBox(
+              width: 160,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(e.key, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  _buildCubePreview(state, rotationX: 0.5),
+                  const SizedBox(height: 8),
+                  Text(algCase.algorithm, style: const TextStyle(color: Colors.white38, fontFamily: 'monospace', fontSize: 10)),
+                  const SizedBox(height: 8),
+                  _buildShowMeButton(
+                    label: 'Demo',
+                    color: const Color(0xFF6366F1),
+                    onPressed: () => _requestDemo(2, state, moves: algCase.algorithmMoves, initialRotationX: 0.5),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 
@@ -961,9 +1050,9 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
 
   CubeState _clearTopCorners(CubeState state) {
     state.u[0] = CubeColor.blue;
-    state.u[2] = CubeColor.red;
+    state.u[2] = CubeColor.orange;
     state.u[6] = CubeColor.green;
-    state.u[8] = CubeColor.orange;
+    state.u[8] = CubeColor.red;
     return state;
   }
 
@@ -976,8 +1065,8 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
     for (int i = 3; i < 9; i++) {
       state.f[i] = CubeColor.green;
       state.b[i] = CubeColor.blue;
-      state.l[i] = CubeColor.orange;
-      state.r[i] = CubeColor.red;
+      state.l[i] = CubeColor.red;
+      state.r[i] = CubeColor.orange;
     }
     return state;
   }
@@ -987,9 +1076,9 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
   CubeState _getF2LCornerExtractionState() {
     // Only corner trapped in bottom slot
     final state = _getScrambledBaseState();
-    // Target corner: White, Red, Green (trapped in FRB slot)
+    // Target corner: White, Orange, Green (trapped in FRB slot)
     state.f[8] = CubeColor.white;
-    state.r[6] = CubeColor.red;
+    state.r[6] = CubeColor.orange;
     state.d[2] = CubeColor.green;
     state.applyMoves([CubeMove.r, CubeMove.u, CubeMove.rPrime, CubeMove.uPrime]);
     return state;
@@ -998,13 +1087,13 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
   CubeState _getF2LEdgeExtractionState() {
     // Only edge trapped in middle slot
     final state = _getScrambledBaseState();
-    // Target edge: Red, Green (trapped in FR middle slot)
-    state.f[5] = CubeColor.red;
+    // Target edge: Orange, Green (trapped in FR middle slot)
+    state.f[5] = CubeColor.orange;
     state.r[3] = CubeColor.green;
-    // User requested the corresponding corner (White/Red/Green) be on top too
+    // User requested the corresponding corner (White/Orange/Green) be on top too
     // Position it at UFR (Back-Right-Top)
     state.u[8] = CubeColor.white;
-    state.r[0] = CubeColor.red;
+    state.r[0] = CubeColor.orange;
     state.b[2] = CubeColor.green;
     
     state.applyMoves([CubeMove.lPrime, CubeMove.uPrime, CubeMove.l, CubeMove.u]);
@@ -1013,16 +1102,16 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
 
   CubeState _getF2LMatchingSideState() {
     final state = CubeState.yellowTopSolved();
-    // Clear FR slot (Red/Green)
-    state.f[5] = CubeColor.orange; state.r[3] = CubeColor.orange;
-    state.f[8] = CubeColor.orange; state.r[6] = CubeColor.orange; state.d[2] = CubeColor.white;
+    // Clear FR slot (Orange/Green)
+    state.f[5] = CubeColor.red; state.r[3] = CubeColor.red;
+    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.white;
 
-    // Corner at UFR: White on R, Red on U, Green on F
-    state.u[8] = CubeColor.red;
+    // Corner at UFR: White on R, Orange on U, Green on F
+    state.u[8] = CubeColor.orange;
     state.f[2] = CubeColor.green;
     state.r[0] = CubeColor.white;
-    // Edge at UB: Red on U, Green on B (Matching top color: Red)
-    state.u[1] = CubeColor.red;
+    // Edge at UB: Orange on U, Green on B (Matching top color: Orange)
+    state.u[1] = CubeColor.orange;
     state.b[1] = CubeColor.green; 
     return state;
   }
@@ -1030,83 +1119,83 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
   CubeState _getF2LNonMatchingSideState() {
     // Start with a state where the target pieces are NOT in their slots
     final state = CubeState.yellowTopSolved();
-    // Clear the original Red/Green pieces in the FR slot to avoid duplicates
-    state.f[5] = CubeColor.orange; // Edge side
-    state.r[3] = CubeColor.orange; // Edge side
-    state.f[8] = CubeColor.orange; // Corner side
-    state.r[6] = CubeColor.orange; // Corner side
+    // Clear the original Orange/Green pieces in the FR slot to avoid duplicates
+    state.f[5] = CubeColor.red; // Edge side
+    state.r[3] = CubeColor.red; // Edge side
+    state.f[8] = CubeColor.red; // Corner side
+    state.r[6] = CubeColor.red; // Corner side
     state.d[2] = CubeColor.white;  // Corner bottom (keep it white or something neutral)
 
-    // Corner at UFR: White on R, Green on F, Red on U
-    state.u[8] = CubeColor.red;
+    // Corner at UFR: White on R, Green on F, Orange on U
+    state.u[8] = CubeColor.orange;
     state.f[2] = CubeColor.green;
     state.r[0] = CubeColor.white;
-    // Edge at UB: Green on U, Red on B (Non-matching top colors)
+    // Edge at UB: Green on U, Orange on B (Non-matching top colors)
     state.u[1] = CubeColor.green;
-    state.b[1] = CubeColor.red;
+    state.b[1] = CubeColor.orange;
     return state;
   }
 
   CubeState _getF2LTopState() {
     final state = CubeState.yellowTopSolved();
-    // Clear FR slot (Red/Green)
-    state.f[5] = CubeColor.orange; state.r[3] = CubeColor.orange;
-    state.f[8] = CubeColor.orange; state.r[6] = CubeColor.orange; state.d[2] = CubeColor.white;
+    // Clear FR slot (Orange/Green)
+    state.f[5] = CubeColor.red; state.r[3] = CubeColor.red;
+    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.white;
 
-    // Corner at UFR: White on Top, Red on Front, Green on Right (Reversed)
+    // Corner at UFR: White on Top, Orange on Front, Green on Right (Reversed)
     state.u[8] = CubeColor.white;
-    state.f[2] = CubeColor.red;
+    state.f[2] = CubeColor.orange;
     state.r[0] = CubeColor.green;
-    // Edge at UL: Red on Top, Green on Left (Reversed Red/Green)
-    state.u[3] = CubeColor.red;
+    // Edge at UL: Orange on Top, Green on Left (Reversed Orange/Green)
+    state.u[3] = CubeColor.orange;
     state.l[1] = CubeColor.green;
     return state;
   }
 
   CubeState _getF2LMatchingFrontState() {
     final state = CubeState.yellowTopSolved();
-    // Clear FR slot (Red/Green)
-    state.f[5] = CubeColor.orange; state.r[3] = CubeColor.orange;
-    state.f[8] = CubeColor.orange; state.r[6] = CubeColor.orange; state.d[2] = CubeColor.white;
+    // Clear FR slot (Orange/Green)
+    state.f[5] = CubeColor.red; state.r[3] = CubeColor.red;
+    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.white;
 
-    // Corner at UFR: White on F, Red on R, Green on U
+    // Corner at UFR: White on F, Orange on R, Green on U
     state.u[8] = CubeColor.green;
     state.f[2] = CubeColor.white;
-    state.r[0] = CubeColor.red;
-    // Edge at UB: Green on U, Red on B (Matching top color: Green)
+    state.r[0] = CubeColor.orange;
+    // Edge at UB: Green on U, Orange on B (Matching top color: Green)
     state.u[1] = CubeColor.green;
-    state.b[1] = CubeColor.red;
+    state.b[1] = CubeColor.orange;
     return state;
   }
 
   CubeState _getF2LNonMatchingFrontState() {
     final state = CubeState.yellowTopSolved();
     // Clear FR slot
-    state.f[5] = CubeColor.orange; state.r[3] = CubeColor.orange;
-    state.f[8] = CubeColor.orange; state.r[6] = CubeColor.orange; state.d[2] = CubeColor.white;
+    state.f[5] = CubeColor.red; state.r[3] = CubeColor.red;
+    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.white;
 
-    // Corner at UFR: White on F, Green on R, Red on U
-    state.u[8] = CubeColor.red;
+    // Corner at UFR: White on F, Green on R, Orange on U
+    state.u[8] = CubeColor.orange;
     state.f[2] = CubeColor.white;
     state.r[0] = CubeColor.green;
-    // Edge at UB: Green on U, Red on B (Non-matching top colors)
+    // Edge at UB: Green on U, Orange on B (Non-matching top colors)
     state.u[1] = CubeColor.green;
-    state.b[1] = CubeColor.red;
+    state.b[1] = CubeColor.orange;
     return state;
   }
 
   CubeState _getF2LSeparationState() {
     final state = CubeState.yellowTopSolved();
     // Clear FR slot
-    state.f[5] = CubeColor.orange; state.r[3] = CubeColor.orange;
-    state.f[8] = CubeColor.orange; state.r[6] = CubeColor.orange; state.d[2] = CubeColor.white;
+    state.f[5] = CubeColor.red; state.r[3] = CubeColor.red;
+    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.white;
 
-    // Corner at UFR: White on R, Red on F, Green on U
+    // Corner at UFR: White on R, Orange on F, Green on U
     state.u[8] = CubeColor.green;
-    state.f[2] = CubeColor.red;
+    state.f[2] = CubeColor.orange;
     state.r[0] = CubeColor.white;
-    // Edge at UR: Red on U, Green on R (Mismatched with corner)
-    state.u[5] = CubeColor.red;
+    // Edge at UR: Orange on U, Green on R (Mismatched with corner)
+    state.u[5] = CubeColor.orange;
     state.r[1] = CubeColor.green;
     return state;
   }

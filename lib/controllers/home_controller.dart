@@ -53,19 +53,6 @@ class HomeController extends ChangeNotifier {
   int? _lastCfopStepIndex;
   double? _lastCfopScrollOffset;
 
-  // Learn Mode (Interactive) State
-  List<CubeMove>? _path;
-  set path(List<CubeMove>? value) {
-    _path = value;
-    notifyListeners();
-  }
-
-  double? _pathStartRotationX;
-  double? _pathTargetRotationX;
-  double? _pathStartRotationY;
-  double? _pathTargetRotationY;
-  int _playGeneration = 0;
-
   HomeController({required this.vsync}) {
     _animationController = CubeAnimationController(
       vsync: vsync,
@@ -589,16 +576,13 @@ class HomeController extends ChangeNotifier {
     _initialCubeState = initialState;
 
     if (moves == null) {
-      _path = null;
       _showingSolution = false;
       _moveIndex = 0;
       _solutionStartIndex = 0;
     } else {
-      _pathStartRotationX = initialRotationX;
-      _pathTargetRotationX = targetRotationX;
-      _pathStartRotationY = initialRotationY;
-      _pathTargetRotationY = targetRotationY;
-      _path = moves;
+      // Initialize camera orientation for the demo
+      _rotationX = initialRotationX ?? 0.5;
+      _rotationY = initialRotationY ?? 0.75;
 
       // Update Move History and Analysis Controller to list moves in UI
       _moveHistory = List.from(moves);
@@ -606,59 +590,13 @@ class HomeController extends ChangeNotifier {
       _solutionStartIndex = 0;
       _analysisController.loadSolution(moves, initialState, moves.length);
       _showingSolution = true;
-
-      _playGeneration++;
-      _playPath();
     }
     notifyListeners();
-  }
-
-  Future<void> _playPath() async {
-    if (_path == null) return;
-    _playGeneration++;
-    final myGeneration = _playGeneration;
-
-    _rotationX = _pathStartRotationX ?? 0.5;
-    _rotationY = _pathStartRotationY ?? 0.75;
-    notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 1000));
-
-    final targetRotationX = _pathTargetRotationX ?? _rotationX;
-    final targetRotationY = _pathTargetRotationY ?? _rotationY;
-
-    if (_rotationX != targetRotationX || _rotationY != targetRotationY) {
-      // For now, simpler rotation jump till we move camera tilt controller too
-      _rotationX = targetRotationX;
-      _rotationY = targetRotationY;
-      notifyListeners();
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
-
-    _animationController.setSpeed(const Duration(milliseconds: 800));
-
-    final path = _path;
-    if (path == null) return;
-
-    for (int i = 0; i < path.length; i++) {
-      final move = path[i];
-      if (_playGeneration != myGeneration) break;
-      performMove(move);
-      // Update analysis controller to highlight current move
-      _analysisController.updateIndexInternal(i + 1);
-      await Future.delayed(const Duration(milliseconds: 1000));
-    }
-
-    if (_playGeneration == myGeneration) {
-      _animationController.setSpeed(const Duration(milliseconds: 400));
-    }
   }
 
   void cancelDemo() {
     final capturedStepIndex = _activeDemoStepIndex;
     final capturedDemoType = _activeDemoType;
-    _playGeneration++;
-    _path = null;
     _showingSolution = false;
     _activeDemoStepIndex = null;
     _activeDemoType = null;

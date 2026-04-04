@@ -758,7 +758,7 @@ class PremiumSolverSelector extends StatefulWidget {
 }
 
 class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
-  SolveMethod _selectedMethod = SolveMethod.lbl;
+  SolveMethod _selectedMethod = SolveMethod.cfop;
 
   @override
   Widget build(BuildContext context) {

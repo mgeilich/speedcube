@@ -1,31 +1,7 @@
 import 'package:logging/logging.dart';
 import '../models/cube_state.dart';
 import '../models/cube_move.dart';
-import '../models/alg_library.dart';
-
-part 'cfop_solver.dart';
-
-/// A single step in the LBL solution, with stage label and description.
-class LblStep {
-  final String stageName;
-  final List<CubeMove> moves;
-  final String description;
-  final String? algorithmName;
-
-  const LblStep({
-    required this.stageName,
-    required this.moves,
-    required this.description,
-    this.algorithmName,
-  });
-}
-
-/// Result of the LBL solver.
-class LblSolveResult {
-  final List<LblStep> steps;
-  List<CubeMove> get allMoves => steps.expand((s) => s.moves).toList();
-  const LblSolveResult({required this.steps});
-}
+import '../models/solve_result.dart';
 
 /// A perspective defines which physical faces correspond to logical faces (U,D,L,R,F,B).
 class Perspective {
@@ -76,7 +52,9 @@ class LblSolver {
   /// Solve the cube.
   static LblSolveResult? solve(CubeState initial) {
     var s = initial;
-    if (s.isSolved) return LblSolveResult(steps: []);
+    if (s.isSolved) {
+      return LblSolveResult(steps: []);
+    }
 
     final steps = <LblStep>[];
 
@@ -137,7 +115,9 @@ class LblSolver {
 
   static CubeFace _findCenterFace(CubeState s, CubeColor c) {
     for (final f in CubeFace.values) {
-      if (s.getFace(f)[4] == c) return f;
+      if (s.getFace(f)[4] == c) {
+        return f;
+      }
     }
     return CubeFace.u;
   }
@@ -257,7 +237,9 @@ class LblSolver {
   }
 
   static Perspective _perspectiveRotateY(Perspective p, CubeFace logicalFront) {
-    if (logicalFront == CubeFace.f) return p;
+    if (logicalFront == CubeFace.f) {
+      return p;
+    }
     final physFront = _remapFace(logicalFront, p);
     final physRight = _cross(p.u, physFront);
     final physLeft = _opposite(physRight);
@@ -284,12 +266,24 @@ class LblSolver {
   }
 
   static CubeFace _logicalFaceFor(CubeFace physical, Perspective p) {
-    if (physical == p.u) return CubeFace.u;
-    if (physical == p.d) return CubeFace.d;
-    if (physical == p.f) return CubeFace.f;
-    if (physical == p.b) return CubeFace.b;
-    if (physical == p.r) return CubeFace.r;
-    if (physical == p.l) return CubeFace.l;
+    if (physical == p.u) {
+      return CubeFace.u;
+    }
+    if (physical == p.d) {
+      return CubeFace.d;
+    }
+    if (physical == p.f) {
+      return CubeFace.f;
+    }
+    if (physical == p.b) {
+      return CubeFace.b;
+    }
+    if (physical == p.r) {
+      return CubeFace.r;
+    }
+    if (physical == p.l) {
+      return CubeFace.l;
+    }
     return CubeFace.u;
   }
 
@@ -298,16 +292,30 @@ class LblSolver {
   // ─────────────────────────────────────────────────────────────────────────
 
   static bool isCrossSolved(CubeState s, Perspective p) {
-    if (s.getFace(p.u)[4] != s.getFace(p.u)[7]) return false;
-    if (s.getFace(p.u)[4] != s.getFace(p.u)[5]) return false;
-    if (s.getFace(p.u)[4] != s.getFace(p.u)[1]) return false;
-    if (s.getFace(p.u)[4] != s.getFace(p.u)[3]) return false;
-
-    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.f, p)) return false;
-    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.r, p)) return false;
-    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.b, p)) return false;
-    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.l, p)) return false;
-
+    if (s.getFace(p.u)[4] != s.getFace(p.u)[7]) {
+      return false;
+    }
+    if (s.getFace(p.u)[4] != s.getFace(p.u)[5]) {
+      return false;
+    }
+    if (s.getFace(p.u)[4] != s.getFace(p.u)[1]) {
+      return false;
+    }
+    if (s.getFace(p.u)[4] != s.getFace(p.u)[3]) {
+      return false;
+    }
+    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.f, p)) {
+      return false;
+    }
+    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.r, p)) {
+      return false;
+    }
+    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.b, p)) {
+      return false;
+    }
+    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.l, p)) {
+      return false;
+    }
     return true;
   }
 
@@ -345,7 +353,9 @@ class LblSolver {
           }
         }
       }
-      if (allInDaisy) break;
+      if (allInDaisy) {
+        break;
+      }
     }
 
     // Phase 2: Move from Daisy to Cross
@@ -437,7 +447,9 @@ class LblSolver {
     final moves = <CubeMove>[];
     var currentS = s;
     void apply(List<CubeMove> m) {
-      if (m.isEmpty) return;
+      if (m.isEmpty) {
+        return;
+      }
       moves.addAll(m);
       currentS = currentS.applyMoves(m);
     }
@@ -492,8 +504,7 @@ class LblSolver {
       final fColor = currentS.getFace(currP.f)[4];
       final rColor = currentS.getFace(currP.r)[4];
 
-      if (_isCornerSolved(
-          currentS, CubeFace.d, CubeFace.f, CubeFace.r, currP)) {
+      if (_isCornerSolved(currentS, CubeFace.d, CubeFace.f, CubeFace.r, currP)) {
         continue;
       }
 
@@ -515,7 +526,9 @@ class LblSolver {
     final moves = <CubeMove>[];
     var currentS = s;
     void apply(List<CubeMove> m) {
-      if (m.isEmpty) return;
+      if (m.isEmpty) {
+        return;
+      }
       moves.addAll(m);
       currentS = currentS.applyMoves(m);
     }
@@ -542,7 +555,9 @@ class LblSolver {
 
     // 2. Find it now
     var found = _findCorner(currentS, cBottom, cF, cR);
-    if (found == null) return moves;
+    if (found == null) {
+      return moves;
+    }
     var (f1, i1, f2, i2, f3, i3) = found;
 
     if (f1 != p.u && f2 != p.u && f3 != p.u) {
@@ -657,7 +672,9 @@ class LblSolver {
         final fC = currentS.getFace(currP.f)[4];
         final rC = currentS.getFace(currP.r)[4];
 
-        if (_isEdgeSolved(currentS, CubeFace.f, CubeFace.r, currP)) continue;
+        if (_isEdgeSolved(currentS, CubeFace.f, CubeFace.r, currP)) {
+          continue;
+        }
 
         allSolved = false;
         final edgeMoves = _solveEdgeToMiddle(currentS, currP, fC, rC);
@@ -673,7 +690,9 @@ class LblSolver {
         }
       }
 
-      if (allSolved || !anySolvedThisPass) break;
+      if (allSolved || !anySolvedThisPass) {
+        break;
+      }
     }
     return steps;
   }
@@ -683,7 +702,9 @@ class LblSolver {
     final moves = <CubeMove>[];
     var currentS = s; // Use currentS to track state changes
     void apply(List<CubeMove> m) {
-      if (m.isEmpty) return;
+      if (m.isEmpty) {
+        return;
+      }
       moves.addAll(m);
       currentS = currentS.applyMoves(m);
     }
@@ -781,8 +802,9 @@ class LblSolver {
           (rOriented ? 1 : 0) +
           (fOriented ? 1 : 0);
 
-      if (orientedCount == 4) break;
-
+      if (orientedCount == 4) {
+        break;
+      }
       final moves = <CubeMove>[];
       if (orientedCount == 0) {
         // Dot: Apply from any front
@@ -810,8 +832,9 @@ class LblSolver {
         }
       }
 
-      if (moves.isEmpty) break; // Should not happen
-
+      if (moves.isEmpty) {
+        break; // Should not happen
+      }
       steps.add(LblStep(
           stageName: 'Yellow Cross',
           moves: moves,
@@ -1032,7 +1055,10 @@ class LblSolver {
         bool remainsUnsolved = false;
         for (int k = i + 1; k < 4; k++) {
             final testRot = [_remap(CubeMove(CubeFace.u, k - i), p)];
-            if (currentS.applyMoves(testRot).getFace(pu)[idx] != yellow) { remainsUnsolved = true; break; }
+            if (currentS.applyMoves(testRot).getFace(pu)[idx] != yellow) {
+              remainsUnsolved = true;
+              break;
+            }
         }
         
         if (remainsUnsolved) {
@@ -1184,7 +1210,9 @@ class LblSolver {
   ];
 
   static List<LblStep> optimizeSteps(List<LblStep> steps) {
-    if (steps.isEmpty) return [];
+    if (steps.isEmpty) {
+      return [];
+    }
 
     // 1. Optimize moves within each step
     var currentSteps = steps
@@ -1211,8 +1239,12 @@ class LblSolver {
           final moveB = next.moves.first;
 
           int totalTurns = (moveA.turns + moveB.turns) % 4;
-          if (totalTurns > 2) totalTurns -= 4;
-          if (totalTurns < -1) totalTurns += 4;
+          if (totalTurns > 2) {
+            totalTurns -= 4;
+          }
+          if (totalTurns < -1) {
+            totalTurns += 4;
+          }
 
           final newMovesA = List<CubeMove>.from(current.moves);
           newMovesA.removeLast();
