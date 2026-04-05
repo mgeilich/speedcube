@@ -272,7 +272,12 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => LayerByLayerGuideSheet(
-        initialExpandedStepIndex: initialStepIndex,
+        initialExpandedStepIndex: initialStepIndex != -1
+            ? initialStepIndex
+            : (_homeController.lastLblStepIndex ?? -1),
+        onTabChanged: (index) {
+          _homeController.updateLblProgress(index);
+        },
         onDemoRequested: (stepIndex, initialState,
             {moves,
             initialRotationX,
@@ -311,6 +316,18 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
               ? initialStepIndex
               : (_homeController.lastCfopStepIndex ?? -1),
           initialScrollOffset: _homeController.lastCfopScrollOffset ?? 0.0,
+          initialOllSubIndex: _homeController.lastOllSubTabIndex ?? 0,
+          initialPllSubIndex: _homeController.lastPllSubTabIndex ?? 0,
+          initialF2lSubIndex: _homeController.lastF2lSubTabIndex ?? 0,
+          onTabChanged: (index, {ollSubIndex, pllSubIndex, f2lSubIndex}) {
+            _homeController.updateCfopProgress(
+              index,
+              0.0,
+              ollSubIndex: ollSubIndex,
+              pllSubIndex: pllSubIndex,
+              f2lSubIndex: f2lSubIndex,
+            );
+          },
           onDemoRequested: (stepIndex, initialState,
               {moves,
               initialRotationX,
@@ -320,9 +337,18 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
               demoType,
               stickerLabels,
               targetPieces,
-              scrollOffset}) {
+              scrollOffset,
+              ollSubIndex,
+              pllSubIndex,
+              f2lSubIndex}) {
             if (scrollOffset != null) {
-              _homeController.updateCfopProgress(stepIndex, scrollOffset);
+              _homeController.updateCfopProgress(
+                stepIndex,
+                scrollOffset,
+                ollSubIndex: ollSubIndex,
+                pllSubIndex: pllSubIndex,
+                f2lSubIndex: f2lSubIndex,
+              );
             }
             _onDemoRequested(stepIndex, initialState,
                 moves: moves,

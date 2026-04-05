@@ -27,12 +27,14 @@ class LayerByLayerGuideSheet extends StatefulWidget {
     List<int>? targetPieces,
   })? onDemoRequested;
   final VoidCallback? onKociembaRequested;
+  final void Function(int index)? onTabChanged;
 
   const LayerByLayerGuideSheet({
     super.key,
     this.initialExpandedStepIndex = -1,
     this.onDemoRequested,
     this.onKociembaRequested,
+    this.onTabChanged,
   });
 
   @override
@@ -40,10 +42,33 @@ class LayerByLayerGuideSheet extends StatefulWidget {
 }
 
 class _LayerByLayerGuideSheetState extends State<LayerByLayerGuideSheet>
-    with TickerProviderStateMixin {
-  // -1 means no step is expanded.
-  late int _expandedStepIndex = widget.initialExpandedStepIndex;
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
 
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(
+      length: 6,
+      vsync: this,
+      initialIndex: widget.initialExpandedStepIndex != -1
+          ? widget.initialExpandedStepIndex
+          : 0,
+    );
+    _tabController.addListener(_handleTabChange);
+  }
+
+  void _handleTabChange() {
+    if (_tabController.indexIsChanging) return;
+    widget.onTabChanged?.call(_tabController.index);
+  }
+
+  @override
+  void dispose() {
+    _tabController.removeListener(_handleTabChange);
+    _tabController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -99,80 +124,49 @@ class _LayerByLayerGuideSheetState extends State<LayerByLayerGuideSheet>
               ),
             ),
             const SizedBox(height: 12),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 12, 24, 40),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'The Layer-by-Layer (LBL) method is the easiest way to solve your first cube. Instead of solving side-by-side, we solve one "layer" at a time.',
-                      style: TextStyle(
-                          color: Colors.white70, fontSize: 16, height: 1.5),
-                    ),
-                    const SizedBox(height: 32),
-                    Theme(
-                      data: Theme.of(context).copyWith(
-                        cardColor: Colors.transparent,
-                        dividerColor: Colors.white10,
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                      ),
-                      child: ExpansionPanelList(
-                        elevation: 0,
-                        expansionCallback: (int index, bool isExpanded) {
-                          setState(() {
-                            // In this version of Flutter, isExpanded represents the
-                            // *new* desired state of the panel.
-                            // If isExpanded is true, the user wants it open -> set to index.
-                            // If isExpanded is false, the user wants it closed -> set to -1.
-                            _expandedStepIndex = isExpanded ? index : -1;
-                          });
-                        },
-                        children: [
-                          _buildExpansionPanel(
-                            index: 0,
-                            title: 'White Cross',
-                            icon: Icons.add_circle_outline,
-                            body: _buildStep1Body(),
-                          ),
-                          _buildExpansionPanel(
-                            index: 1,
-                            title: 'First Layer',
-                            icon: Icons.extension,
-                            body: _buildStep2Body(),
-                          ),
-                          _buildExpansionPanel(
-                            index: 2,
-                            title: 'Second Layer',
-                            icon: Icons.layers,
-                            body: _buildStep3Body(),
-                          ),
-                          _buildExpansionPanel(
-                            index: 3,
-                            title: 'Yellow Cross',
-                            icon: Icons.wb_sunny,
-                            body: _buildStep4Body(),
-                          ),
-                          _buildExpansionPanel(
-                            index: 4,
-                            title: 'Yellow Corners',
-                            icon: Icons.star_border,
-                            body: _buildStep5Body(),
-                          ),
-                          _buildExpansionPanel(
-                            index: 5,
-                            title: 'Last Layer',
-                            icon: Icons.check_circle_outline,
-                            body: _buildStep6Body(),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  tabAlignment: TabAlignment.start,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  dividerColor: Colors.transparent,
+                  indicator: BoxDecoration(
+                    color: const Color(0xFF10B981),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.white54,
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  tabs: const [
+                    _TutorialTab(step: 1, label: 'CROSS'),
+                    _TutorialTab(step: 2, label: '1ST LAYER'),
+                    _TutorialTab(step: 3, label: '2ND LAYER'),
+                    _TutorialTab(step: 4, label: 'Y-CROSS'),
+                    _TutorialTab(step: 5, label: 'Y-CORNERS'),
+                    _TutorialTab(step: 6, label: 'LAST LAYER'),
                   ],
                 ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildTabPage(_buildStep1Body()),
+                  _buildTabPage(_buildStep2Body()),
+                  _buildTabPage(_buildStep3Body()),
+                  _buildTabPage(_buildStep4Body()),
+                  _buildTabPage(_buildStep5Body()),
+                  _buildTabPage(_buildStep6Body()),
+                ],
               ),
             ),
           ],
@@ -181,53 +175,13 @@ class _LayerByLayerGuideSheetState extends State<LayerByLayerGuideSheet>
     );
   }
 
-  ExpansionPanel _buildExpansionPanel({
-    required int index,
-    required String title,
-    required IconData icon,
-    required Widget body,
-  }) {
-    final isExpanded = _expandedStepIndex == index;
-    return ExpansionPanel(
-      backgroundColor: isExpanded
-          ? Colors.white.withValues(alpha: 0.05)
-          : Colors.transparent,
-      headerBuilder: (BuildContext context, bool _) {
-        return ListTile(
-          leading: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: isExpanded
-                  ? const Color(0xFF6366F1).withValues(alpha: 0.2)
-                  : Colors.white.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              icon,
-              color: isExpanded ? const Color(0xFF6366F1) : Colors.white54,
-              size: 20,
-            ),
-          ),
-          title: Text(
-            title,
-            style: TextStyle(
-              color: isExpanded ? Colors.white : Colors.white70,
-              fontSize: 18,
-              fontWeight: isExpanded ? FontWeight.bold : FontWeight.w500,
-            ),
-          ),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        );
-      },
-      body: Padding(
-        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 24),
-        child: body,
-      ),
-      isExpanded: isExpanded,
-      canTapOnHeader: true,
+  Widget _buildTabPage(Widget body) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
+      child: body,
     );
   }
+
 
   Widget _buildStep1Body() {
     return Column(
@@ -1464,5 +1418,30 @@ class _LayerByLayerGuideSheetState extends State<LayerByLayerGuideSheet>
     state.getFace(f2A)[i2A] = tA;
     state.getFace(f2B)[i2B] = tB;
     state.getFace(f2C)[i2C] = tC;
+  }
+}
+
+class _TutorialTab extends StatelessWidget {
+  final int step;
+  final String label;
+
+  const _TutorialTab({required this.step, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Tab(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Step $step',
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.normal)),
+            Text(label,
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
   }
 }

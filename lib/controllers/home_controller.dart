@@ -52,6 +52,10 @@ class HomeController extends ChangeNotifier {
   // Tutorial Progress Persistence
   int? _lastCfopStepIndex;
   double? _lastCfopScrollOffset;
+  int? _lastLblStepIndex;
+  int? _lastOllSubTabIndex;
+  int? _lastPllSubTabIndex;
+  int? _lastF2lSubTabIndex;
 
   HomeController({required this.vsync}) {
     _animationController = CubeAnimationController(
@@ -112,6 +116,10 @@ class HomeController extends ChangeNotifier {
   bool get isScanned => _isScanned;
   int? get lastCfopStepIndex => _lastCfopStepIndex;
   double? get lastCfopScrollOffset => _lastCfopScrollOffset;
+  int? get lastLblStepIndex => _lastLblStepIndex;
+  int? get lastOllSubTabIndex => _lastOllSubTabIndex;
+  int? get lastPllSubTabIndex => _lastPllSubTabIndex;
+  int? get lastF2lSubTabIndex => _lastF2lSubTabIndex;
 
   // Setters
   set rotationX(double value) {
@@ -143,9 +151,17 @@ class HomeController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateCfopProgress(int stepIndex, double scrollOffset) {
+  void updateCfopProgress(int stepIndex, double scrollOffset, {int? ollSubIndex, int? pllSubIndex, int? f2lSubIndex}) {
     _lastCfopStepIndex = stepIndex;
     _lastCfopScrollOffset = scrollOffset;
+    if (ollSubIndex != null) _lastOllSubTabIndex = ollSubIndex;
+    if (pllSubIndex != null) _lastPllSubTabIndex = pllSubIndex;
+    if (f2lSubIndex != null) _lastF2lSubTabIndex = f2lSubIndex;
+    notifyListeners();
+  }
+
+  void updateLblProgress(int stepIndex) {
+    _lastLblStepIndex = stepIndex;
     notifyListeners();
   }
 
