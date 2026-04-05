@@ -220,18 +220,15 @@ class MoveExplainer {
 
   static String _getFaceFullName(CubeFace face) {
     switch (face) {
-      case CubeFace.u:
-        return "Top";
-      case CubeFace.d:
-        return "Bottom";
-      case CubeFace.f:
-        return "Front";
-      case CubeFace.b:
-        return "Back";
-      case CubeFace.r:
-        return "Right";
-      case CubeFace.l:
-        return "Left";
+      case CubeFace.u: return "Top";
+      case CubeFace.d: return "Bottom";
+      case CubeFace.f: return "Front";
+      case CubeFace.b: return "Back";
+      case CubeFace.r: return "Right";
+      case CubeFace.l: return "Left";
+      case CubeFace.x: return "Whole Cube (X)";
+      case CubeFace.y: return "Whole Cube (Y)";
+      case CubeFace.z: return "Whole Cube (Z)";
     }
   }
 
@@ -353,18 +350,13 @@ class MoveExplainer {
 
   static String _getFaceAbbr(CubeFace face) {
     switch (face) {
-      case CubeFace.u:
-        return "Top";
-      case CubeFace.d:
-        return "Bottom";
-      case CubeFace.f:
-        return "Front";
-      case CubeFace.b:
-        return "Back";
-      case CubeFace.r:
-        return "Right";
-      case CubeFace.l:
-        return "Left";
+      case CubeFace.u: return "Top";
+      case CubeFace.d: return "Bottom";
+      case CubeFace.f: return "Front";
+      case CubeFace.b: return "Back";
+      case CubeFace.r: return "Right";
+      case CubeFace.l: return "Left";
+      default: return "Rotate";
     }
   }
 

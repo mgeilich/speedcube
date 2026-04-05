@@ -88,6 +88,9 @@ class Polygon {
         return cubieZ == 1;
       case CubeFace.b:
         return cubieZ == -1;
+      default:
+        // x, y, z rotations affect all cubies
+        return true;
     }
   }
 }
@@ -357,6 +360,8 @@ class CubeRenderer extends CustomPainter {
             return Vec3(cx + off, cy + p.dy, cz - p.dx);
           case CubeFace.l:
             return Vec3(cx - off, cy + p.dy, cz + p.dx);
+          default:
+            return Vec3(cx, cy, cz);
         }
       }).toList();
     } else {
@@ -408,6 +413,9 @@ class CubeRenderer extends CustomPainter {
             Vec3(cx - s, cy + s, cz + s),
             Vec3(cx - s, cy + s, cz - s)
           ];
+          break;
+        default:
+          verts = [];
           break;
       }
     }
@@ -493,6 +501,10 @@ class CubeRenderer extends CustomPainter {
         col = cz + 1;
         row = 1 - cy;
         break;
+      default:
+        col = 0;
+        row = 0;
+        break;
     }
     return Offset(col.toDouble(), row.toDouble());
   }
@@ -512,6 +524,12 @@ class CubeRenderer extends CustomPainter {
         return p.rotateZ(-angle);
       case CubeFace.b:
         return p.rotateZ(angle);
+      case CubeFace.x:
+        return p.rotateX(-angle);
+      case CubeFace.y:
+        return p.rotateY(-angle);
+      case CubeFace.z:
+        return p.rotateZ(-angle);
     }
   }
 

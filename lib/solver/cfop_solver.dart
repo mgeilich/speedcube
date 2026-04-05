@@ -15,6 +15,7 @@ class Perspective {
     required this.r,
     required this.l,
   });
+  static const identity = Perspective(u: CubeFace.u, d: CubeFace.d, f: CubeFace.f, b: CubeFace.b, r: CubeFace.r, l: CubeFace.l);
 
   factory Perspective.fromState(CubeState s,
       {required CubeColor upColor, required CubeColor frontColor}) {
@@ -34,7 +35,7 @@ class Perspective {
   }
 
   static CubeFace _findFaceWithCenter(CubeState s, CubeColor c) {
-    for (final f in CubeFace.values) {
+    for (final f in CubeFace.physicalFaces) {
       if (s.getFace(f)[4] == c) {
         return f;
       }
@@ -53,8 +54,34 @@ class CfopSolver {
     }
 
     final steps = <LblStep>[];
-    final whiteFace = _findCenterFace(s, CubeColor.white);
-    final p = perspectiveFor(whiteFace);
+    final orientationMoves = <CubeMove>[];
+    
+    // 1. Physically Move White to Bottom (CubeFace.d)
+    final whiteFace = _findCenterFace(initial, CubeColor.white);
+    if (whiteFace == CubeFace.u) { orientationMoves.add(CubeMove.x2); }
+    else if (whiteFace == CubeFace.f) { orientationMoves.add(CubeMove.xPrime); }
+    else if (whiteFace == CubeFace.b) { orientationMoves.add(CubeMove.x); }
+    else if (whiteFace == CubeFace.l) { orientationMoves.add(CubeMove.zPrime); }
+    else if (whiteFace == CubeFace.r) { orientationMoves.add(CubeMove.z); }
+    
+    s = initial.applyMoves(orientationMoves);
+    
+    // 2. Physically Move Green to Front (CubeFace.f)
+    // After moving white to bottom, yellow is at top. Green must be on sides.
+    CubeFace greenFace = _findCenterFace(s, CubeColor.green);
+    if (greenFace == CubeFace.b) { orientationMoves.add(CubeMove.y2); }
+    else if (greenFace == CubeFace.r) { orientationMoves.add(CubeMove.y); }
+    else if (greenFace == CubeFace.l) { orientationMoves.add(CubeMove.yPrime); }
+    
+    s = initial.applyMoves(orientationMoves);
+    final p = Perspective.identity;
+
+    // 0. Orientation Note
+    steps.add(LblStep(
+      stageName: 'Orientation',
+      moves: orientationMoves,
+      description: 'Orient the cube with white on bottom and ${_cn(s.getFace(p.f)[4])} on front.',
+    ));
 
     // 1. Cross
     if (!isCrossSolved(s, p)) {
@@ -65,24 +92,22 @@ class CfopSolver {
       }
     }
 
-    final p2 = perspectiveFlipped(p);
-    
     // 2. F2L
-    final s2 = _f2l(s, p2);
+    final s2 = _f2l(s, p);
     for (final step in s2) {
       s = s.applyMoves(step.moves);
       steps.add(step);
     }
 
     // 3. OLL
-    final s3 = _oll(s, p2);
+    final s3 = _oll(s, p);
     for (final step in s3) {
       s = s.applyMoves(step.moves);
       steps.add(step);
     }
 
     // 4. PLL
-    final s4 = _pll(s, p2);
+    final s4 = _pll(s, p);
     for (final step in s4) {
       s = s.applyMoves(step.moves);
       steps.add(step);
@@ -90,18 +115,18 @@ class CfopSolver {
     
     // Final check for tiny gaps or errors in beginner fallbacks
     if (!s.isSolved) {
-      final align = _alignYellowEdges(s, p2);
+      final align = _alignYellowEdges(s, p);
       for (final st in align) {
         s = s.applyMoves(st.moves);
+        steps.add(st);
       }
-      steps.addAll(align);
     }
     if (!s.isSolved) {
-      final corners = _yellowCorners(s, p2).where((st) => st.stageName == 'Yellow Corners');
+      final corners = _yellowCorners(s, p);
       for (final st in corners) {
         s = s.applyMoves(st.moves);
+        steps.add(st);
       }
-      steps.addAll(corners);
     }
 
     return LblSolveResult(steps: optimizeSteps(steps));
@@ -421,12 +446,12 @@ class CfopSolver {
   }
 
   static bool isCrossSolved(CubeState s, Perspective p) {
-    final pu = s.getFace(p.u);
-    if (pu[4] != pu[7] || pu[4] != pu[5] || pu[4] != pu[1] || pu[4] != pu[3]) return false;
-    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.f, p)) return false;
-    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.r, p)) return false;
-    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.b, p)) return false;
-    if (!_isEdgeSolved(s, CubeFace.u, CubeFace.l, p)) return false;
+    final pd = s.getFace(p.d);
+    if (pd[4] != pd[7] || pd[4] != pd[5] || pd[4] != pd[1] || pd[4] != pd[3]) return false;
+    if (!_isEdgeSolved(s, CubeFace.d, CubeFace.f, p)) return false;
+    if (!_isEdgeSolved(s, CubeFace.d, CubeFace.r, p)) return false;
+    if (!_isEdgeSolved(s, CubeFace.d, CubeFace.b, p)) return false;
+    if (!_isEdgeSolved(s, CubeFace.d, CubeFace.l, p)) return false;
     return true;
   }
 
@@ -442,8 +467,8 @@ class CfopSolver {
         return false;
       }
       final (f1, i1, f2, i2) = edge;
-      return (f1 == p.d && state.getFace(f1)[i1] == white) ||
-          (f2 == p.d && state.getFace(f2)[i2] == white);
+      return (f1 == p.u && state.getFace(f1)[i1] == white) ||
+          (f2 == p.u && state.getFace(f2)[i2] == white);
     }
 
     int daisySafety = 0;
@@ -456,7 +481,7 @@ class CfopSolver {
           allInDaisy = false;
           final moves = _solveEdgeToDaisy(currentS, logicalSide, sideColor, p);
           if (moves.isNotEmpty) {
-            steps.add(LblStep(stageName: 'CFOP Cross', moves: moves, description: 'Moving white-${_cn(sideColor)} edge to bottom'));
+            steps.add(LblStep(stageName: 'CFOP Cross', moves: moves, description: 'Moving white-${_cn(sideColor)} edge to top'));
             currentS = currentS.applyMoves(moves);
           }
         }
@@ -469,12 +494,12 @@ class CfopSolver {
     for (final logicalSide in sideFaces) {
       final phSide = _remapFace(logicalSide, p);
       final sideColor = currentS.getFace(phSide)[4];
-      if (_isEdgeSolved(currentS, CubeFace.u, logicalSide, p)) {
+      if (_isEdgeSolved(currentS, CubeFace.d, logicalSide, p)) {
         continue;
       }
-      final moves = _finalizeEdgeToU(currentS, phSide, sideColor, p);
+      final moves = _finalizeEdgeToD(currentS, phSide, sideColor, p);
       if (moves.isNotEmpty) {
-        steps.add(LblStep(stageName: 'CFOP Cross', moves: moves, description: 'Moving white-${_cn(sideColor)} edge to top'));
+        steps.add(LblStep(stageName: 'CFOP Cross', moves: moves, description: 'Moving white-${_cn(sideColor)} edge to bottom'));
         currentS = currentS.applyMoves(moves);
       }
     }
@@ -485,57 +510,58 @@ class CfopSolver {
     final moves = <CubeMove>[];
     var currentS = s;
     void apply(List<CubeMove> m) { moves.addAll(m); currentS = currentS.applyMoves(m); }
-    bool whiteOnD() {
+    bool whiteOnU() {
       final edge = _findEdge(currentS, CubeColor.white, cSide);
       if (edge == null) return false;
       final (f1, i1, f2, i2) = edge;
-      return (f1 == p.d && currentS.getFace(f1)[i1] == CubeColor.white) ||
-          (f2 == p.d && currentS.getFace(f2)[i2] == CubeColor.white);
+      return (f1 == p.u && currentS.getFace(f1)[i1] == CubeColor.white) ||
+          (f2 == p.u && currentS.getFace(f2)[i2] == CubeColor.white);
     }
     int safety = 0;
-    while (!whiteOnD() && safety++ < 30) {
+    while (!whiteOnU() && safety++ < 20) {
       final edge = _findEdge(currentS, CubeColor.white, cSide)!;
       final (f1, i1, f2, i2) = edge;
-      if (f1 == p.u || f2 == p.u) {
-        final pSideFace = (f1 == p.u) ? f2 : f1;
-        if (currentS.getFace(p.u)[(f1 == p.u) ? i1 : i2] == CubeColor.white) {
-          while (currentS.getFace(p.d)[_getPhysicalEdgeIndex(p.d, pSideFace)] == CubeColor.white && safety++ < 60) {
-            apply([_remap(CubeMove(CubeFace.d, 1), p)]);
+      if (f1 == p.d || f2 == p.d) {
+        final pSideFace = (f1 == p.d) ? f2 : f1;
+        if (currentS.getFace(p.d)[(f1 == p.d) ? i1 : i2] == CubeColor.white) {
+          while (currentS.getFace(p.u)[_getPhysicalEdgeIndex(p.u, pSideFace)] == CubeColor.white && safety++ < 60) {
+            apply([_remap(CubeMove(CubeFace.u, 1), p)]);
           }
-          apply([_remap(CubeMove(pSideFace, 2), p)]);
+          apply([CubeMove(pSideFace, 2)]);
         } else {
-          apply([_remap(CubeMove(pSideFace, 1), p)]);
+          apply([CubeMove(pSideFace, 1)]);
         }
-      } else if (f1 == p.d || f2 == p.d) {
-        apply([_remap(CubeMove((f1 == p.d) ? f2 : f1, 1), p)]);
+      } else if (f1 == p.u || f2 == p.u) {
+        final pSideFace = (f1 == p.u) ? f2 : f1;
+        apply([CubeMove(pSideFace, 1)]);
       } else {
         final fWhite = (currentS.getFace(f1)[i1] == CubeColor.white) ? f1 : f2;
         final fOther = (fWhite == f1) ? f2 : f1;
-        while (currentS.getFace(p.d)[_getPhysicalEdgeIndex(p.d, fOther)] == CubeColor.white && safety++ < 60) {
-          apply([_remap(CubeMove(CubeFace.d, 1), p)]);
+        while (currentS.getFace(p.u)[_getPhysicalEdgeIndex(p.u, fOther)] == CubeColor.white && safety++ < 60) {
+          apply([_remap(CubeMove(CubeFace.u, 1), p)]);
         }
-        apply([_remap(CubeMove(fOther, 1), p)]);
+        apply([CubeMove(fOther, 1)]);
       }
     }
     return moves;
   }
 
-  static List<CubeMove> _finalizeEdgeToU(CubeState s, CubeFace physicalSide, CubeColor cSide, Perspective p) {
+  static List<CubeMove> _finalizeEdgeToD(CubeState s, CubeFace physicalSide, CubeColor cSide, Perspective p) {
     final moves = <CubeMove>[];
     var currentS = s;
     void apply(List<CubeMove> m) { moves.addAll(m); currentS = currentS.applyMoves(m); }
     var edge = _findEdge(currentS, CubeColor.white, cSide)!;
-    if (!((edge.$1 == p.d && currentS.getFace(edge.$1)[edge.$2] == CubeColor.white) ||
-        (edge.$3 == p.d && currentS.getFace(edge.$3)[edge.$4] == CubeColor.white))) {
+    if (!((edge.$1 == p.u && currentS.getFace(edge.$1)[edge.$2] == CubeColor.white) ||
+        (edge.$3 == p.u && currentS.getFace(edge.$3)[edge.$4] == CubeColor.white))) {
       apply(_solveEdgeToDaisy(currentS, _logicalFaceFor(physicalSide, p), cSide, p));
       edge = _findEdge(currentS, CubeColor.white, cSide)!;
     }
-    final physSideOfPiece = (edge.$1 == p.d) ? edge.$3 : edge.$1;
-    final turns = _logicalDTurns(_logicalFaceFor(physSideOfPiece, p), _logicalFaceFor(physicalSide, p));
+    final physSideOfPiece = (edge.$1 == p.u) ? edge.$3 : edge.$1;
+    final turns = _logicalUTurns(_logicalFaceFor(physSideOfPiece, p), _logicalFaceFor(physicalSide, p));
     if (turns != 0) {
-      apply([_remap(CubeMove(CubeFace.d, turns), p)]);
+      apply([_remap(CubeMove(CubeFace.u, turns), p)]);
     }
-    apply([_remap(CubeMove(_logicalFaceFor(physicalSide, p), 2), p)]);
+    apply([CubeMove(physicalSide, 2)]);
     return moves;
   }
 
@@ -722,11 +748,20 @@ class CfopSolver {
             currentS = currentS.applyMoves(uMoves);
           }
           CubeFace frontForSune = CubeFace.f;
-          if (matched.contains(CubeFace.b) && matched.contains(CubeFace.r)) frontForSune = CubeFace.f;
-          else if (matched.contains(CubeFace.r) && matched.contains(CubeFace.f)) frontForSune = CubeFace.l;
-          else if (matched.contains(CubeFace.f) && matched.contains(CubeFace.l)) frontForSune = CubeFace.b;
-          else if (matched.contains(CubeFace.l) && matched.contains(CubeFace.b)) frontForSune = CubeFace.r;
-          else frontForSune = matched.first;
+          if (matched.contains(CubeFace.b) && matched.contains(CubeFace.r)) {
+            frontForSune = CubeFace.f;
+          } else if (matched.contains(CubeFace.r) &&
+              matched.contains(CubeFace.f)) {
+            frontForSune = CubeFace.l;
+          } else if (matched.contains(CubeFace.f) &&
+              matched.contains(CubeFace.l)) {
+            frontForSune = CubeFace.b;
+          } else if (matched.contains(CubeFace.l) &&
+              matched.contains(CubeFace.b)) {
+            frontForSune = CubeFace.r;
+          } else {
+            frontForSune = matched.first;
+          }
 
           final suneMoves = _remapFor(_parse("R U R' U R U2 R'"), frontForSune, p);
           steps.add(LblStep(stageName: 'CFOP Edge Align (Fallback)', moves: suneMoves, algorithmName: 'Sune', description: 'Cycling edges'));
@@ -807,7 +842,8 @@ class CfopSolver {
     return s.getFace(pu)[_getPhysicalCornerIndex(pu, pf, pr)] == s.getFace(pu)[4] && s.getFace(pf)[_getPhysicalCornerIndex(pf, pu, pr)] == s.getFace(pf)[4] && s.getFace(pr)[_getPhysicalCornerIndex(pr, pu, pf)] == s.getFace(pr)[4];
   }
 
-  static Perspective perspectiveFor(CubeFace up) {
+  static Perspective perspectiveForDown(CubeFace down) {
+    final up = _opposite(down);
     CubeFace front = (up == CubeFace.u || up == CubeFace.d || up == CubeFace.r) ? CubeFace.f : (up == CubeFace.f ? CubeFace.d : (up == CubeFace.b ? CubeFace.u : CubeFace.f));
     return _perspectiveFromUpFront(up, front);
   }
@@ -822,6 +858,7 @@ class CfopSolver {
       case CubeFace.u: return CubeFace.d; case CubeFace.d: return CubeFace.u;
       case CubeFace.f: return CubeFace.b; case CubeFace.b: return CubeFace.f;
       case CubeFace.r: return CubeFace.l; case CubeFace.l: return CubeFace.r;
+      default: return f;
     }
   }
 
@@ -845,6 +882,7 @@ class CfopSolver {
       case CubeFace.u: pf = p.u; break; case CubeFace.d: pf = p.d; break;
       case CubeFace.f: pf = p.f; break; case CubeFace.b: pf = p.b; break;
       case CubeFace.r: pf = p.r; break; case CubeFace.l: pf = p.l; break;
+      default: pf = m.face; break;
     }
     return CubeMove(pf, m.turns);
   }
@@ -872,6 +910,7 @@ class CfopSolver {
       case CubeFace.u: return p.u; case CubeFace.d: return p.d;
       case CubeFace.f: return p.f; case CubeFace.b: return p.b;
       case CubeFace.r: return p.r; case CubeFace.l: return p.l;
+      default: return f;
     }
   }
 
@@ -898,7 +937,7 @@ class CfopSolver {
   }
 
   static CubeFace _findCenterFace(CubeState s, CubeColor c) {
-    for (final f in CubeFace.values) {
+    for (final f in CubeFace.physicalFaces) {
       if (s.getFace(f)[4] == c) {
         return f;
       }
@@ -925,12 +964,6 @@ class CfopSolver {
 
   static int _logicalUTurns(CubeFace from, CubeFace to) {
     const cycle = [CubeFace.f, CubeFace.l, CubeFace.b, CubeFace.r];
-    final fi = cycle.indexOf(from), ti = cycle.indexOf(to);
-    return (fi == -1 || ti == -1) ? 0 : (ti - fi + 4) % 4;
-  }
-
-  static int _logicalDTurns(CubeFace from, CubeFace to) {
-    const cycle = [CubeFace.f, CubeFace.r, CubeFace.b, CubeFace.l];
     final fi = cycle.indexOf(from), ti = cycle.indexOf(to);
     return (fi == -1 || ti == -1) ? 0 : (ti - fi + 4) % 4;
   }

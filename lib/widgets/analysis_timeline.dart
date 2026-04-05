@@ -189,6 +189,8 @@ class _MoveChip extends StatelessWidget {
         return const Color(0xFFB71234); // Red
       case CubeFace.l:
         return const Color(0xFFFF5800); // Orange
+      default:
+        return Colors.grey;
     }
   }
 }

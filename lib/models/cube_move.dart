@@ -1,7 +1,10 @@
 /// Represents a single move on a puzzle cube using standard notation.
-enum CubeFace { u, d, r, l, f, b }
+enum CubeFace {
+  u, d, r, l, f, b, x, y, z;
+  static const physicalFaces = [u, d, r, l, f, b];
+}
 
-/// A move on a puzzle cube (e.g., R, R', R2)
+/// A move on a puzzle cube (e.g., R, R', R2, X, Y, Z)
 class CubeMove {
   final CubeFace face;
   final int turns; // 1 = clockwise, -1 = counter-clockwise, 2 = 180°
@@ -28,41 +31,46 @@ class CubeMove {
   static const bPrime = CubeMove(CubeFace.b, -1);
   static const b2 = CubeMove(CubeFace.b, 2);
 
-  static const allMoves = [
-    u,
-    uPrime,
-    u2,
-    d,
-    dPrime,
-    d2,
-    r,
-    rPrime,
-    r2,
-    l,
-    lPrime,
-    l2,
-    f,
-    fPrime,
-    f2,
-    b,
-    bPrime,
-    b2,
+  // Whole-cube rotations
+  static const x = CubeMove(CubeFace.x);
+  static const xPrime = CubeMove(CubeFace.x, -1);
+  static const x2 = CubeMove(CubeFace.x, 2);
+  static const y = CubeMove(CubeFace.y);
+  static const yPrime = CubeMove(CubeFace.y, -1);
+  static const y2 = CubeMove(CubeFace.y, 2);
+  static const z = CubeMove(CubeFace.z);
+  static const zPrime = CubeMove(CubeFace.z, -1);
+  static const z2 = CubeMove(CubeFace.z, 2);
+
+  static const physicalMoves = [
+    u, uPrime, u2,
+    d, dPrime, d2,
+    r, rPrime, r2,
+    l, lPrime, l2,
+    f, fPrime, f2,
+    b, bPrime, b2,
   ];
 
-  static const singleMoves = [
-    u,
-    d,
-    r,
-    l,
-    f,
-    b,
-    uPrime,
-    dPrime,
-    rPrime,
-    lPrime,
-    fPrime,
-    bPrime
+  static const allMoves = [
+    ...physicalMoves,
+    x, xPrime, x2,
+    y, yPrime, y2,
+    z, zPrime, z2,
   ];
+
+  static const physicalSingleMoves = [
+    u, d, r, l, f, b,
+    uPrime, dPrime, rPrime, lPrime, fPrime, bPrime
+  ];
+
+  static const allSingleMoves = [
+    ...physicalSingleMoves,
+    x, y, z,
+    xPrime, yPrime, zPrime
+  ];
+
+  @Deprecated('Use physicalSingleMoves or allSingleMoves')
+  static const singleMoves = physicalSingleMoves;
 
   /// Get the inverse of this move
   CubeMove get inverse {
@@ -76,38 +84,28 @@ class CubeMove {
     return turns * quarterTurn;
   }
 
-  /// Parse from standard notation (e.g., "R", "R'", "R2")
+  /// Parse from standard notation (e.g., "R", "X", "Y'", "Z2")
   static CubeMove? parse(String notation) {
     if (notation.isEmpty) return null;
 
     final faceChar = notation[0].toUpperCase();
     final CubeFace? face;
     switch (faceChar) {
-      case 'U':
-        face = CubeFace.u;
-        break;
-      case 'D':
-        face = CubeFace.d;
-        break;
-      case 'R':
-        face = CubeFace.r;
-        break;
-      case 'L':
-        face = CubeFace.l;
-        break;
-      case 'F':
-        face = CubeFace.f;
-        break;
-      case 'B':
-        face = CubeFace.b;
-        break;
-      default:
-        return null;
+      case 'U': face = CubeFace.u; break;
+      case 'D': face = CubeFace.d; break;
+      case 'R': face = CubeFace.r; break;
+      case 'L': face = CubeFace.l; break;
+      case 'F': face = CubeFace.f; break;
+      case 'B': face = CubeFace.b; break;
+      case 'X': face = CubeFace.x; break;
+      case 'Y': face = CubeFace.y; break;
+      case 'Z': face = CubeFace.z; break;
+      default: return null;
     }
 
     int turns = 1;
     if (notation.length > 1) {
-      if (notation.endsWith("'") || notation.endsWith("'")) {
+      if (notation.endsWith("'") || notation.endsWith("’")) {
         turns = -1;
       } else if (notation.endsWith("2")) {
         turns = 2;

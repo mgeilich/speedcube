@@ -248,6 +248,8 @@ class KociembaCube {
         _cycle4(cp, [2, 6, 7, 3], co, [1, 2, 1, 2], 3);
         _cycle4(ep, [3, 10, 7, 11], eo, [1, 1, 1, 1], 2);
         break;
+      default:
+        break;
     }
   }
 

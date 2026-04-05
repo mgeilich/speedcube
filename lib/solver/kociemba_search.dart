@@ -208,8 +208,40 @@ class KociembaSolver {
   }
 
   static Future<KociembaSolveResult> solve(CubeState state) async {
+    final orientationMoves = <CubeMove>[];
+    
+    // 1. Orient White to Top
+    final whiteFace = _findCenterFace(state, CubeColor.white);
+    if (whiteFace == CubeFace.d) { orientationMoves.add(CubeMove.x2); }
+    else if (whiteFace == CubeFace.f) { orientationMoves.add(CubeMove.x); }
+    else if (whiteFace == CubeFace.b) { orientationMoves.add(CubeMove.xPrime); }
+    else if (whiteFace == CubeFace.l) { orientationMoves.add(CubeMove.z); }
+    else if (whiteFace == CubeFace.r) { orientationMoves.add(CubeMove.zPrime); }
+    
+    var orientedState = state.applyMoves(orientationMoves);
+    
+    // 2. Orient Green to Front (White is now on Top)
+    final greenFace = _findCenterFace(orientedState, CubeColor.green);
+    if (greenFace == CubeFace.b) { orientationMoves.add(CubeMove.y2); }
+    else if (greenFace == CubeFace.r) { orientationMoves.add(CubeMove.y); }
+    else if (greenFace == CubeFace.l) { orientationMoves.add(CubeMove.yPrime); }
+    
+    orientedState = state.applyMoves(orientationMoves);
+
     final search = KociembaSearch(timeLimitMs: 400);
-    final result = await search.solve(state);
-    return result ?? KociembaSolveResult(moves: [], phase1MoveCount: 0);
+    final result = await search.solve(orientedState);
+    if (result == null) return KociembaSolveResult(moves: [], phase1MoveCount: 0);
+    
+    return KociembaSolveResult(
+      moves: [...orientationMoves, ...result.moves],
+      phase1MoveCount: orientationMoves.length + result.phase1MoveCount,
+    );
+  }
+
+  static CubeFace _findCenterFace(CubeState s, CubeColor c) {
+    for (final f in CubeFace.physicalFaces) {
+      if (s.getFace(f)[4] == c) return f;
+    }
+    return CubeFace.u;
   }
 }

@@ -37,7 +37,7 @@ class Perspective {
   }
 
   static CubeFace _findFaceWithCenter(CubeState s, CubeColor c) {
-    for (final f in CubeFace.values) {
+    for (final f in CubeFace.physicalFaces) {
       if (s.getFace(f)[4] == c) {
         return f;
       }
@@ -114,7 +114,7 @@ class LblSolver {
   }
 
   static CubeFace _findCenterFace(CubeState s, CubeColor c) {
-    for (final f in CubeFace.values) {
+    for (final f in CubeFace.physicalFaces) {
       if (s.getFace(f)[4] == c) {
         return f;
       }
@@ -169,6 +169,8 @@ class LblSolver {
         return CubeFace.l;
       case CubeFace.l:
         return CubeFace.r;
+      default:
+        return f;
     }
   }
 
@@ -221,6 +223,9 @@ class LblSolver {
       case CubeFace.l:
         pf = p.l;
         break;
+      default:
+        pf = m.face;
+        break;
     }
 
     return CubeMove(pf, m.turns);
@@ -262,6 +267,8 @@ class LblSolver {
         return p.r;
       case CubeFace.l:
         return p.l;
+      default:
+        return f;
     }
   }
 
