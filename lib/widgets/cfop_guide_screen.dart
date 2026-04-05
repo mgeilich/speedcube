@@ -562,16 +562,6 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
             '2. Find your group',
             '• 0 Corners on top: Headlights (H) or Pi\n• 1 Corner on top: Sune or Anti-Sune (The "Fish")\n• 2 Corners on top: U, T, or L (Bowtie)',
           ),
-          const Divider(height: 24, color: Colors.white10),
-          const Text(
-            'Q: What if I have MORE yellow stickers on top than the demo?',
-            style: TextStyle(color: Color(0xFF6366F1), fontSize: 13, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Extra yellow stickers on top are great! It just means you are already in a 1-corner or 2-corner case. If 4 are on top, you are finished with OLL!',
-            style: TextStyle(color: Colors.white38, fontSize: 12, height: 1.4),
-          ),
         ],
       ),
     );
@@ -595,15 +585,29 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 16),
-          _buildCubePreview(state, rotationX: 0.5),
-          const SizedBox(height: 16),
-          _buildAlgorithmText(alg),
           const SizedBox(height: 12),
-          _buildShowMeButton(
-            label: 'Show Me',
-            color: const Color(0xFF6366F1),
-            onPressed: () => _requestDemo(2, state, moves: _parseAlg(alg), initialRotationX: 0.5),
+          Row(
+            children: [
+              _buildCubePreview(state, rotationX: 0.5),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(alg, 
+                      style: const TextStyle(color: Colors.white38, fontFamily: 'monospace', fontSize: 12),
+                      softWrap: true,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildShowMeButton(
+                      label: 'Show Me',
+                      color: const Color(0xFF6366F1),
+                      onPressed: () => _requestDemo(2, state, moves: _parseAlg(alg), initialRotationX: 0.5),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -637,37 +641,52 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: Color(0xFF6366F1),
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
+        if (title.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: Color(0xFF6366F1),
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
           ),
-        ),
-        const SizedBox(height: 16),
-        Wrap(
-          spacing: 16,
-          runSpacing: 24,
+        Column(
           children: cases.map((e) {
             final algCase = AlgLibrary.ollCases.firstWhere((a) => a.id == e.value);
             final state = _getOCLLState(e.value);
-            return SizedBox(
-              width: 160,
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(e.key, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 8),
-                  _buildCubePreview(state, rotationX: 0.5),
-                  const SizedBox(height: 8),
-                  Text(algCase.algorithm, style: const TextStyle(color: Colors.white38, fontFamily: 'monospace', fontSize: 10)),
-                  const SizedBox(height: 8),
-                  _buildShowMeButton(
-                    label: 'Demo',
-                    color: const Color(0xFF6366F1),
-                    onPressed: () => _requestDemo(2, state, moves: algCase.algorithmMoves, initialRotationX: 0.5),
+                  Text(e.key, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      _buildCubePreview(state, rotationX: 0.5),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(algCase.algorithm, 
+                              style: const TextStyle(color: Colors.white38, fontFamily: 'monospace', fontSize: 12),
+                              softWrap: true,
+                            ),
+                            const SizedBox(height: 12),
+                            _buildShowMeButton(
+                              label: 'Demo',
+                              color: const Color(0xFF6366F1),
+                              onPressed: () => _requestDemo(2, state, moves: algCase.algorithmMoves, initialRotationX: 0.5),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -770,27 +789,39 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
       MapEntry('Z-Perm', 'pll_z'),
     ];
 
-    return Wrap(
-      spacing: 16,
-      runSpacing: 24,
+    return Column(
       children: cases.map((e) {
         final algCase = AlgLibrary.pllCases.firstWhere((a) => a.id == e.value);
         final state = _getPLLState(e.value);
-        return SizedBox(
-          width: 160,
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(e.key, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              _buildCubePreview(state, rotationX: 0.4),
-              const SizedBox(height: 8),
-              Text(algCase.algorithm, style: const TextStyle(color: Colors.white38, fontFamily: 'monospace', fontSize: 10)),
-              const SizedBox(height: 8),
-              _buildShowMeButton(
-                label: 'Demo',
-                color: const Color(0xFF6366F1),
-                onPressed: () => _requestDemo(3, state, moves: algCase.algorithmMoves, initialRotationX: 0.4),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildCubePreview(state, rotationX: 0.4),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(algCase.algorithm, 
+                          style: const TextStyle(color: Colors.white38, fontFamily: 'monospace', fontSize: 12),
+                          softWrap: true,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildShowMeButton(
+                          label: 'Demo',
+                          color: const Color(0xFF6366F1),
+                          onPressed: () => _requestDemo(3, state, moves: algCase.algorithmMoves, initialRotationX: 0.4),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -929,37 +960,6 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
     );
   }
 
-  Widget _buildAlgorithmText(String text) {
-    return Container(
-      margin: const EdgeInsets.only(top: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.black26,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: Wrap(
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 12,
-        runSpacing: 8,
-        children: [
-          const Icon(Icons.code, color: Colors.white38, size: 18),
-          Text(text, 
-            style: const TextStyle(
-              color: Colors.white, 
-              fontFamily: 'monospace', 
-              fontSize: 16, 
-              letterSpacing: 1.5, 
-              fontWeight: FontWeight.bold
-            ),
-            softWrap: true,
-          ),
-        ],
-      ),
-    );
-  }
-
-
   // ── State Generators ──────────────────────────────────────────────────────
 
 
@@ -1096,7 +1096,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
     final state = CubeState.yellowTopSolved();
     // Clear FR slot (Orange/Green)
     state.f[5] = CubeColor.red; state.r[3] = CubeColor.red;
-    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.white;
+    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.yellow;
 
     // Corner at UFR: White on R, Orange on U, Green on F
     state.u[8] = CubeColor.orange;
@@ -1116,7 +1116,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
     state.r[3] = CubeColor.red; // Edge side
     state.f[8] = CubeColor.red; // Corner side
     state.r[6] = CubeColor.red; // Corner side
-    state.d[2] = CubeColor.white;  // Corner bottom (keep it white or something neutral)
+    state.d[2] = CubeColor.yellow;  // Corner bottom (now non-white)
 
     // Corner at UFR: White on R, Green on F, Orange on U
     state.u[8] = CubeColor.orange;
@@ -1132,7 +1132,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
     final state = CubeState.yellowTopSolved();
     // Clear FR slot (Orange/Green)
     state.f[5] = CubeColor.red; state.r[3] = CubeColor.red;
-    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.white;
+    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.yellow;
 
     // Corner at UFR: White on Top, Orange on Front, Green on Right (Reversed)
     state.u[8] = CubeColor.white;
@@ -1148,7 +1148,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
     final state = CubeState.yellowTopSolved();
     // Clear FR slot (Orange/Green)
     state.f[5] = CubeColor.red; state.r[3] = CubeColor.red;
-    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.white;
+    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.yellow;
 
     // Corner at UFR: White on F, Orange on R, Green on U
     state.u[8] = CubeColor.green;
@@ -1164,7 +1164,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
     final state = CubeState.yellowTopSolved();
     // Clear FR slot
     state.f[5] = CubeColor.red; state.r[3] = CubeColor.red;
-    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.white;
+    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.yellow;
 
     // Corner at UFR: White on F, Orange on R, Green on U
     state.u[8] = CubeColor.green;
@@ -1180,7 +1180,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen> {
     final state = CubeState.yellowTopSolved();
     // Clear FR slot
     state.f[5] = CubeColor.red; state.r[3] = CubeColor.red;
-    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.white;
+    state.f[8] = CubeColor.red; state.r[6] = CubeColor.red; state.d[2] = CubeColor.yellow;
 
     // Corner at UFR: White on R, Orange on F, Green on U
     state.u[8] = CubeColor.green;
