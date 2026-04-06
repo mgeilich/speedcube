@@ -492,7 +492,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Once pieces are in the top layer, use these logic cases to pair and insert them.',
+          'First, rotate the top layer until the corner piece (with white) is directly above its final position. Then rotate the cube until that piece is in the front right corner. The white sticker will be facing either Right, Forward, or Up. Use these logic cases to pair and insert them.',
           style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.5),
         ),
         const SizedBox(height: 32),
@@ -943,7 +943,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen>
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: 16,
       childAspectRatio: 2.2,
-      children: AlgLibrary.pllCases.where((c) => c.id.startsWith('pll_u')).toList().asMap().entries.map((e) {
+      children: AlgLibrary.pllCases.where((c) => c.subcategory == 'Edges Only').toList().asMap().entries.map((e) {
         final algCase = e.value;
         final state = _getPllState(algCase.id);
         return Container(

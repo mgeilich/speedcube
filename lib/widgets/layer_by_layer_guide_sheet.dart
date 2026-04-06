@@ -593,26 +593,13 @@ class _LayerByLayerGuideSheetState extends State<LayerByLayerGuideSheet>
                 _getStep4DotState(),
                 moves: [
                   // 1. Dot to Angle
-                  CubeMove.f,
-                  CubeMove.r,
-                  CubeMove.u,
-                  CubeMove.rPrime,
-                  CubeMove.uPrime,
-                  CubeMove.fPrime,
-                  // 2. Angle to Line
-                  CubeMove.f,
-                  CubeMove.r,
-                  CubeMove.u,
-                  CubeMove.rPrime,
-                  CubeMove.uPrime,
-                  CubeMove.fPrime,
-                  // 3. Line to Cross (Assuming it's horizontal after the above)
-                  CubeMove.f,
-                  CubeMove.r,
-                  CubeMove.u,
-                  CubeMove.rPrime,
-                  CubeMove.uPrime,
-                  CubeMove.fPrime
+                  CubeMove.f, CubeMove.r, CubeMove.u, CubeMove.rPrime, CubeMove.uPrime, CubeMove.fPrime,
+                  // Reorient Angle to Back-Left (U2 moves the Angle from Front-Right to Back-Left)
+                  CubeMove.u2,
+                  // 2. Angle to Line (Results in a horizontal line across UL and UR)
+                  CubeMove.f, CubeMove.r, CubeMove.u, CubeMove.rPrime, CubeMove.uPrime, CubeMove.fPrime,
+                  // 3. Line to Cross
+                  CubeMove.f, CubeMove.r, CubeMove.u, CubeMove.rPrime, CubeMove.uPrime, CubeMove.fPrime,
                 ],
                 initialRotationX: 0.5,
               );
@@ -1068,20 +1055,31 @@ class _LayerByLayerGuideSheetState extends State<LayerByLayerGuideSheet>
   }
 
   CubeState _getStep4DotState() {
-    // Starting from a cross, apply inverse algs to reach a Dot.
-    // Alg: F R U R' U' F'
-    // Inverse: F U R U' R' F'
-    return _getWhiteOnBottomState().applyMoves([
-      // Cross to Line
-      CubeMove.f, CubeMove.u, CubeMove.r, CubeMove.uPrime, CubeMove.rPrime,
-      CubeMove.fPrime,
-      // Line to Angle
-      CubeMove.f, CubeMove.u, CubeMove.r, CubeMove.uPrime, CubeMove.rPrime,
-      CubeMove.fPrime,
-      // Angle to Dot
-      CubeMove.f, CubeMove.u, CubeMove.r, CubeMove.uPrime, CubeMove.rPrime,
-      CubeMove.fPrime,
-    ]);
+    final state = _getWhiteOnBottomState();
+    // A "dot" state: only the center yellow sticker (U4) is oriented on the top face.
+    // Edge stickers are 1 (UB), 3 (UL), 5 (UR), 7 (UF).
+    // We flip all 4 edges so their yellow sticker is on the side, not the top face.
+
+    // UB Edge (U1, B1)
+    state.u[1] = CubeColor.blue;
+    state.b[1] = CubeColor.yellow;
+    // UL Edge (U3, L1)
+    state.u[3] = CubeColor.orange;
+    state.l[1] = CubeColor.yellow;
+    // UR Edge (U5, R1)
+    state.u[5] = CubeColor.red;
+    state.r[1] = CubeColor.yellow;
+    // UF Edge (U7, F1)
+    state.u[7] = CubeColor.green;
+    state.f[1] = CubeColor.yellow;
+
+    // Optional: Mess up the corners so they don't appear yellow on top
+    state.u[0] = CubeColor.blue;
+    state.u[2] = CubeColor.red;
+    state.u[6] = CubeColor.orange;
+    state.u[8] = CubeColor.green;
+
+    return state;
   }
 
   CubeState _getCrossTargetState() {
@@ -1207,13 +1205,13 @@ class _LayerByLayerGuideSheetState extends State<LayerByLayerGuideSheet>
   }
 
   CubeState _getSolvedTargetState() {
-    return CubeState.solved();
+    return _getWhiteOnBottomState();
   }
 
   CubeState _getCornerPermutationDemoState() {
     // Setup for Headlights algorithm: R' F R' B2 R F' R' B2 R2
     // Apply inverse to solved cube: R2 B2 R F R' B2 R F' R
-    return CubeState.solved().applyMoves([
+    return _getWhiteOnBottomState().applyMoves([
       CubeMove.r2,
       CubeMove.b2,
       CubeMove.r,
@@ -1229,7 +1227,7 @@ class _LayerByLayerGuideSheetState extends State<LayerByLayerGuideSheet>
   CubeState _getEdgeCycleDemoState() {
     // Setup for Clockwise Cycle: R2 U R U R' U' R' U' R' U R'
     // Apply Counter-Clockwise Cycle: R U' R U R U R U' R' U' R2
-    return CubeState.solved().applyMoves([
+    return _getWhiteOnBottomState().applyMoves([
       CubeMove.r,
       CubeMove.uPrime,
       CubeMove.r,
