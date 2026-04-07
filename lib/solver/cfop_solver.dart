@@ -85,10 +85,21 @@ class CfopSolver {
 
     // 1. Cross
     if (!isCrossSolved(s, p)) {
-      final crossSteps = _whiteCross(s, p);
-      for (final step in crossSteps) {
-        s = s.applyMoves(step.moves);
-        steps.add(step);
+      final crossMoves = _findAdvancedCross(s, p);
+      if (crossMoves.isNotEmpty) {
+        steps.add(LblStep(
+          stageName: 'Advanced Cross',
+          moves: crossMoves,
+          description: 'Solving the white cross directly on the bottom.'
+        ));
+        s = s.applyMoves(crossMoves);
+      } else {
+        // Fallback to Daisy (shouldn't be needed)
+        final daisySteps = _whiteCross(s, p);
+        for (final step in daisySteps) {
+          s = s.applyMoves(step.moves);
+          steps.add(step);
+        }
       }
     }
 
@@ -445,13 +456,112 @@ class CfopSolver {
     return null;
   }
 
+  static List<CubeMove> _findAdvancedCross(CubeState s, Perspective p) {
+    if (isCrossSolved(s, p)) return [];
+
+    final white = CubeColor.white;
+    final cF = s.getFace(p.f)[4];
+    final cR = s.getFace(p.r)[4];
+    final cB = s.getFace(p.b)[4];
+    final cL = s.getFace(p.l)[4];
+
+    // Goal: the 4 edges are in their corresponding bottom-layer physical slots
+    bool isCrossSolvedTest(CubeState state) {
+      // Piece 1: White-FrontColor @ (p.d, 7)
+      if (!_isStickerAt(state, p.d, 7, white)) return false;
+      if (!_isStickerAt(state, p.f, 7, cF)) return false;
+      
+      // Piece 2: White-RightColor @ (p.d, 5)
+      if (!_isStickerAt(state, p.d, 5, white)) return false;
+      if (!_isStickerAt(state, p.r, 7, cR)) return false;
+      
+      // Piece 3: White-BackColor @ (p.d, 1)
+      if (!_isStickerAt(state, p.d, 1, white)) return false;
+      if (!_isStickerAt(state, p.b, 7, cB)) return false;
+      
+      // Piece 4: White-LeftColor @ (p.d, 3)
+      if (!_isStickerAt(state, p.d, 3, white)) return false;
+      if (!_isStickerAt(state, p.l, 7, cL)) return false;
+      
+      return true;
+    }
+
+    // Small BFS (Cross is max 8 moves)
+    // Branching: 18 moves, pruning same-face turns.
+    final queue = <_CrossSearchNode>[
+      _CrossSearchNode(s, [])
+    ];
+    final visited = <String>{_crossId(s, [cF, cR, cB, cL], p)};
+    
+    int nodesProcessed = 0;
+    while (queue.isNotEmpty && nodesProcessed++ < 50000) {
+      final current = queue.removeAt(0);
+
+      // Branching
+      for (final move in CubeMove.physicalMoves) {
+        // Simple pruning: don't move the same face twice in a row
+        if (current.moves.isNotEmpty && current.moves.last.face == move.face) {
+          continue;
+        }
+
+        final nextS = current.state.applyMoves([move]);
+        if (isCrossSolvedTest(nextS)) {
+          return [...current.moves, move];
+        }
+
+        if (current.moves.length < 6) { // Depth limit for BFS to keep it responsive
+          final nextId = _crossId(nextS, [cF, cR, cB, cL], p);
+          if (!visited.contains(nextId)) {
+            visited.add(nextId);
+            queue.add(_CrossSearchNode(nextS, [...current.moves, move]));
+          }
+        }
+      }
+    }
+
+    // Fallback if optimal not found within depth 6 (should happen for difficult scrambles)
+    // We could use IDA* here for depth up to 8, but we'll try a greedy one-by-one solve
+    // or just return empty to trigger the Daisy fallback if needed.
+    return [];
+  }
+
+  static bool _isStickerAt(CubeState s, CubeFace f, int idx, CubeColor c) => s.getFace(f)[idx] == c;
+
+  static String _crossId(CubeState s, List<CubeColor> sideColors, Perspective p) {
+    // Return a string identifying the position/orientation of the 4 white edges
+    final white = CubeColor.white;
+    final parts = <String>[];
+    for (final sideColor in sideColors) {
+      final pos = _findEdge(s, white, sideColor);
+      if (pos == null) {
+        parts.add("?");
+      } else {
+        // Normalize position relative to white sticker
+        final whiteOnFace1 = s.getFace(pos.$1)[pos.$2] == white;
+        final fW = whiteOnFace1 ? pos.$1 : pos.$3;
+        final iW = whiteOnFace1 ? pos.$2 : pos.$4;
+        parts.add("${fW.index}$iW");
+      }
+    }
+    return parts.join("|");
+  }
+
   static bool isCrossSolved(CubeState s, Perspective p) {
     final pd = s.getFace(p.d);
+    
+    // Check bottom-layer stickers
     if (pd[4] != pd[7] || pd[4] != pd[5] || pd[4] != pd[1] || pd[4] != pd[3]) return false;
-    if (!_isEdgeSolved(s, CubeFace.d, CubeFace.f, p)) return false;
-    if (!_isEdgeSolved(s, CubeFace.d, CubeFace.r, p)) return false;
-    if (!_isEdgeSolved(s, CubeFace.d, CubeFace.b, p)) return false;
-    if (!_isEdgeSolved(s, CubeFace.d, CubeFace.l, p)) return false;
+    
+    final cF = s.getFace(p.f)[4];
+    final cR = s.getFace(p.r)[4];
+    final cB = s.getFace(p.b)[4];
+    final cL = s.getFace(p.l)[4];
+
+    if (s.getFace(p.f)[7] != cF) return false;
+    if (s.getFace(p.r)[7] != cR) return false;
+    if (s.getFace(p.b)[7] != cB) return false;
+    if (s.getFace(p.l)[7] != cL) return false;
+    
     return true;
   }
 
@@ -551,8 +661,9 @@ class CfopSolver {
     var currentS = s;
     void apply(List<CubeMove> m) { moves.addAll(m); currentS = currentS.applyMoves(m); }
     var edge = _findEdge(currentS, CubeColor.white, cSide)!;
-    if (!((edge.$1 == p.u && currentS.getFace(edge.$1)[edge.$2] == CubeColor.white) ||
-        (edge.$3 == p.u && currentS.getFace(edge.$3)[edge.$4] == CubeColor.white))) {
+    const white = CubeColor.white;
+    if (!((edge.$1 == p.u && currentS.getFace(edge.$1)[edge.$2] == white) ||
+        (edge.$3 == p.u && currentS.getFace(edge.$3)[edge.$4] == white))) {
       apply(_solveEdgeToDaisy(currentS, _logicalFaceFor(physicalSide, p), cSide, p));
       edge = _findEdge(currentS, CubeColor.white, cSide)!;
     }
@@ -582,7 +693,7 @@ class CfopSolver {
         break;
       }
     }
-    var fnd = _findCorner(currentS, white, cF, cR);
+    var fnd = _findCorner(currentS, CubeColor.white, cF, cR);
     if (fnd == null) {
       return moves;
     }
@@ -1034,4 +1145,9 @@ class CfopSolver {
     }
     return result;
   }
+}
+class _CrossSearchNode {
+  final CubeState state;
+  final List<CubeMove> moves;
+  _CrossSearchNode(this.state, this.moves);
 }
