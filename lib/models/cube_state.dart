@@ -13,6 +13,7 @@ class CubeState {
   final List<CubeColor> b; // Back face
   final List<CubeColor> r; // Right face
   final List<CubeColor> l; // Left face
+  int? _hashCode;
 
   CubeState._({
     required this.u,
@@ -58,14 +59,49 @@ class CubeState {
 
   CubeState clone() {
     return CubeState._(
-      u: List.from(u),
-      d: List.from(d),
-      f: List.from(f),
-      b: List.from(b),
-      r: List.from(r),
-      l: List.from(l),
+      u: List<CubeColor>.from(u),
+      d: List<CubeColor>.from(d),
+      f: List<CubeColor>.from(f),
+      b: List<CubeColor>.from(b),
+      r: List<CubeColor>.from(r),
+      l: List<CubeColor>.from(l),
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! CubeState) return false;
+    
+    for (int i = 0; i < 9; i++) {
+      if (u[i] != other.u[i]) return false;
+      if (d[i] != other.d[i]) return false;
+      if (f[i] != other.f[i]) return false;
+      if (b[i] != other.b[i]) return false;
+      if (r[i] != other.r[i]) return false;
+      if (l[i] != other.l[i]) return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode {
+    if (_hashCode != null) return _hashCode!;
+    
+    int h = 0;
+    for (int i = 0; i < 9; i++) {
+      h = h * 31 + u[i].index;
+      h = h * 31 + d[i].index;
+      h = h * 31 + f[i].index;
+      h = h * 31 + b[i].index;
+      h = h * 31 + r[i].index;
+      h = h * 31 + l[i].index;
+    }
+    _hashCode = h;
+    return h;
+  }
+
+
 
   bool get isSolved {
     bool faceIsSolved(List<CubeColor> face) {
@@ -92,6 +128,23 @@ class CubeState {
       if (move.turns == 1) return rotateZ();
       if (move.turns == -1) return rotateZ().rotateZ().rotateZ();
       if (move.turns == 2) return rotateZ().rotateZ();
+    }
+
+    if (move.isWide) {
+      // Decompose wide move into face move + inverse slice move
+      // Rw = R + M', Lw = L + M, etc.
+      List<CubeMove> componentMoves = [];
+      componentMoves.add(CubeMove(move.face, move.turns, false));
+      switch (move.face) {
+        case CubeFace.r: componentMoves.add(CubeMove(CubeFace.m, -move.turns)); break;
+        case CubeFace.l: componentMoves.add(CubeMove(CubeFace.m, move.turns)); break;
+        case CubeFace.u: componentMoves.add(CubeMove(CubeFace.e, -move.turns)); break;
+        case CubeFace.d: componentMoves.add(CubeMove(CubeFace.e, move.turns)); break;
+        case CubeFace.f: componentMoves.add(CubeMove(CubeFace.s, move.turns)); break;
+        case CubeFace.b: componentMoves.add(CubeMove(CubeFace.s, -move.turns)); break;
+        default: break;
+      }
+      return applyMoves(componentMoves);
     }
 
     final state = clone();
@@ -153,6 +206,18 @@ class CubeState {
         _rotateFaceClockwise(l);
         _cycleEdgesComplex(u, [0, 3, 6], f, [0, 3, 6], d, [0, 3, 6], b, [8, 5, 2]);
         break;
+      case CubeFace.m:
+        // M is in direction of L: U -> F -> D -> B -> U
+        _cycleEdgesComplex(u, [1, 4, 7], f, [1, 4, 7], d, [1, 4, 7], b, [7, 4, 1]);
+        break;
+      case CubeFace.e:
+        // E is in direction of D: F -> R -> B -> L -> F
+        _cycleEdgesComplex(f, [3, 4, 5], r, [3, 4, 5], b, [3, 4, 5], l, [3, 4, 5]);
+        break;
+      case CubeFace.s:
+        // S is in direction of F: U -> R -> D -> L -> U
+        _cycleEdgesComplex(u, [3, 4, 5], r, [1, 4, 7], d, [5, 4, 3], l, [7, 4, 1]);
+        break;
       default:
         break;
     }
@@ -206,6 +271,23 @@ class CubeState {
   }
 
   MapEntry<CubeFace, int> stickerAfterMove(CubeFace face, int index, CubeMove move) {
+    if (move.isWide) {
+      // Decompose wide move logic
+      var current = MapEntry(face, index);
+      // Face move
+      current = stickerAfterMove(current.key, current.value, CubeMove(move.face, move.turns));
+      // Slice move
+      switch (move.face) {
+        case CubeFace.r: return stickerAfterMove(current.key, current.value, CubeMove(CubeFace.m, -move.turns));
+        case CubeFace.l: return stickerAfterMove(current.key, current.value, CubeMove(CubeFace.m, move.turns));
+        case CubeFace.u: return stickerAfterMove(current.key, current.value, CubeMove(CubeFace.e, -move.turns));
+        case CubeFace.d: return stickerAfterMove(current.key, current.value, CubeMove(CubeFace.e, move.turns));
+        case CubeFace.f: return stickerAfterMove(current.key, current.value, CubeMove(CubeFace.s, move.turns));
+        case CubeFace.b: return stickerAfterMove(current.key, current.value, CubeMove(CubeFace.s, -move.turns));
+        default: return current;
+      }
+    }
+
     int turns = move.turns;
     if (turns == -1) turns = 3;
     if (turns == 2) turns = 2;
@@ -276,6 +358,33 @@ class CubeState {
         for (int k = 0; k < lE.length; k++) {
           if (lE[k][0] == face && lE[k][1] == index) {
             return MapEntry(lN[k][0] as CubeFace, lN[k][1] as int);
+          }
+        }
+        return MapEntry(face, index);
+      case CubeFace.m:
+        const mE = [[CubeFace.u, 1], [CubeFace.u, 4], [CubeFace.u, 7], [CubeFace.f, 1], [CubeFace.f, 4], [CubeFace.f, 7], [CubeFace.d, 1], [CubeFace.d, 4], [CubeFace.d, 7], [CubeFace.b, 7], [CubeFace.b, 4], [CubeFace.b, 1]];
+        const mN = [[CubeFace.f, 1], [CubeFace.f, 4], [CubeFace.f, 7], [CubeFace.d, 1], [CubeFace.d, 4], [CubeFace.d, 7], [CubeFace.b, 7], [CubeFace.b, 4], [CubeFace.b, 1], [CubeFace.u, 1], [CubeFace.u, 4], [CubeFace.u, 7]];
+        for (int k = 0; k < mE.length; k++) {
+          if (mE[k][0] == face && mE[k][1] == index) {
+            return MapEntry(mN[k][0] as CubeFace, mN[k][1] as int);
+          }
+        }
+        return MapEntry(face, index);
+      case CubeFace.e:
+        const eE = [[CubeFace.f, 3], [CubeFace.f, 4], [CubeFace.f, 5], [CubeFace.r, 3], [CubeFace.r, 4], [CubeFace.r, 5], [CubeFace.b, 3], [CubeFace.b, 4], [CubeFace.b, 5], [CubeFace.l, 3], [CubeFace.l, 4], [CubeFace.l, 5]];
+        const eN = [[CubeFace.r, 3], [CubeFace.r, 4], [CubeFace.r, 5], [CubeFace.b, 3], [CubeFace.b, 4], [CubeFace.b, 5], [CubeFace.l, 3], [CubeFace.l, 4], [CubeFace.l, 5], [CubeFace.f, 3], [CubeFace.f, 4], [CubeFace.f, 5]];
+        for (int k = 0; k < eE.length; k++) {
+          if (eE[k][0] == face && eE[k][1] == index) {
+            return MapEntry(eN[k][0] as CubeFace, eN[k][1] as int);
+          }
+        }
+        return MapEntry(face, index);
+      case CubeFace.s:
+        const sE = [[CubeFace.u, 3], [CubeFace.u, 4], [CubeFace.u, 5], [CubeFace.r, 1], [CubeFace.r, 4], [CubeFace.r, 7], [CubeFace.d, 5], [CubeFace.d, 4], [CubeFace.d, 3], [CubeFace.l, 7], [CubeFace.l, 4], [CubeFace.l, 1]];
+        const sN = [[CubeFace.r, 1], [CubeFace.r, 4], [CubeFace.r, 7], [CubeFace.d, 5], [CubeFace.d, 4], [CubeFace.d, 3], [CubeFace.l, 7], [CubeFace.l, 4], [CubeFace.l, 1], [CubeFace.u, 3], [CubeFace.u, 4], [CubeFace.u, 5]];
+        for (int k = 0; k < sE.length; k++) {
+          if (sE[k][0] == face && sE[k][1] == index) {
+            return MapEntry(sN[k][0] as CubeFace, sN[k][1] as int);
           }
         }
         return MapEntry(face, index);

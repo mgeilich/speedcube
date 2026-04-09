@@ -7,6 +7,7 @@ import 'models/cube_state.dart';
 import 'models/cube_move.dart';
 import 'widgets/layer_by_layer_guide_sheet.dart';
 import 'widgets/cfop_guide_screen.dart';
+import 'widgets/roux_guide_screen.dart';
 import 'widgets/home_header.dart';
 import 'widgets/cube_interactive_view.dart';
 import 'widgets/solve_controls.dart';
@@ -63,6 +64,7 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
   void initState() {
     super.initState();
     _homeController = HomeController(vsync: this);
+    _homeController.initSettings();
     _homeController.addListener(_onControllerUpdate);
     _homeController.onDemoFinished = _onDemoFinished;
     _homeController.onReviewPromptRequested = _showReviewPrompt;
@@ -73,6 +75,8 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
     if (stepIndex != null) {
       if (demoType == 'advanced') {
         _showCfopGuide(initialStepIndex: stepIndex);
+      } else if (demoType == 'roux') {
+        _showRouxGuide(initialStepIndex: stepIndex);
       } else {
         _showLayerByLayerGuide(initialStepIndex: stepIndex);
       }
@@ -219,7 +223,8 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
               onReset: _homeController.resetToSaved,
               canReset: _homeController.canReset,
               isScanned: _homeController.isScanned,
-// onARMode: () => _homeController.startARGuidedSolve(context), // Removed
+              selectedMethod: _homeController.selectedSolveMethod,
+              onMethodChanged: _homeController.setSelectedSolveMethod,
             ),
           ],
         ),
@@ -260,6 +265,9 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
         },
         onSelectCfopMethod: () {
           _showCfopGuide(initialStepIndex: initialStepIndex);
+        },
+        onSelectRouxMethod: () {
+          _showRouxGuide(initialStepIndex: initialStepIndex);
         },
       ),
     );
@@ -445,6 +453,64 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _showRouxGuide({int? initialStepIndex, double? scrollOffset, int? cmllSubIndex, int? lseSubIndex}) {
+    if (!PremiumManager().canAccessFeature('roux_tutorial')) {
+      _showPremiumUpsell();
+      return;
+    }
+
+    _homeController.showingSolution = false;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RouxGuideScreen(
+          initialExpandedStepIndex: initialStepIndex ?? _homeController.lastRouxStepIndex ?? 0,
+          initialScrollOffset: scrollOffset ?? _homeController.lastRouxScrollOffset ?? 0,
+          initialCmllSubIndex: cmllSubIndex ?? _homeController.lastCmllSubTabIndex ?? 0,
+          initialLseSubIndex: lseSubIndex ?? _homeController.lastLseSubTabIndex ?? 0,
+          onTabChanged: (stepIndex, {cmllSubIndex, lseSubIndex}) {
+            _homeController.updateRouxProgress(
+              stepIndex,
+              0,
+              cmllSubIndex: cmllSubIndex,
+              lseSubIndex: lseSubIndex,
+            );
+          },
+          onDemoRequested: (stepIndex, initialState,
+              {moves,
+              initialRotationX,
+              targetRotationX,
+              initialRotationY,
+              targetRotationY,
+              demoType,
+              stickerLabels,
+              targetPieces,
+              scrollOffset,
+              cmllSubIndex,
+              lseSubIndex}) {
+            if (scrollOffset != null) {
+              _homeController.updateRouxProgress(
+                stepIndex,
+                scrollOffset,
+                cmllSubIndex: cmllSubIndex,
+                lseSubIndex: lseSubIndex,
+              );
+            }
+            _onDemoRequested(stepIndex, initialState,
+                moves: moves,
+                initialRotationX: initialRotationX,
+                targetRotationX: targetRotationX,
+                initialRotationY: initialRotationY,
+                targetRotationY: targetRotationY,
+                demoType: 'roux',
+                stickerLabels: stickerLabels,
+                targetPieces: targetPieces);
+          },
         ),
       ),
     );

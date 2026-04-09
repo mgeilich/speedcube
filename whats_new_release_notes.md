@@ -1,8 +1,14 @@
-# App Store Release Notes: Version 2026.2.0
+# App Store Release Notes: Version 2026.3.0
 
 ## What's New in SpeedCube AR
 
 We've been hard at work to make your speedcubing journey even smoother! This update brings professional-grade solver enhancements and fixes to our learning tools.
+
+### 🧩 NEW: Roux Method Solver
+We are excited to introduce the **Roux Method Solver**! Known for its high move efficiency and intuitive block-building approach, you can now solve your cube using one of the most popular speedcubing methods in the world.
+- **Move Efficiency**: Solutions are typically ~48 moves, significantly shorter than beginner methods.
+- **Color Neutrality**: The solver automatically finds the most efficient block-building start regardless of your starting colors.
+- **Advanced Moves**: Full support for M-slice (middle) rotations and wide moves.
 
 ### 🧩 CFOP Solver Upgrade: Advanced White Cross
 For our advanced users, we've replaced the beginner "Daisy Method" with a move-optimized **Advanced White Cross** algorithm.

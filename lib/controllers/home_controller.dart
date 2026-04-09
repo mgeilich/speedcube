@@ -8,12 +8,11 @@ import '../controllers/analysis_controller.dart';
 import '../utils/premium_manager.dart';
 import '../utils/haptic_service.dart';
 import '../services/solver_service.dart';
-// import '../widgets/ar_guided_solver_screen.dart'; // Removed
-// import '../controllers/guided_solver_controller.dart'; // Removed
-
-enum SolveMethod { kociemba, lbl, cfop }
+import '../models/solve_method.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController extends ChangeNotifier {
+  static const String _kSolveMethodKey = 'selected_solve_method';
   final TickerProvider vsync;
 
   CubeState _cubeState = CubeState.solved();
@@ -48,6 +47,7 @@ class HomeController extends ChangeNotifier {
   int _solvesCompleted = 0;
   VoidCallback? onReviewPromptRequested;
   VoidCallback? onPremiumUpsellRequested;
+  SolveMethod _selectedSolveMethod = SolveMethod.kociemba;
 
   // Tutorial Progress Persistence
   int? _lastCfopStepIndex;
@@ -56,6 +56,10 @@ class HomeController extends ChangeNotifier {
   int? _lastOllSubTabIndex;
   int? _lastPllSubTabIndex;
   int? _lastF2lSubTabIndex;
+  int? _lastRouxStepIndex;
+  double? _lastRouxScrollOffset;
+  int? _lastCmllSubTabIndex;
+  int? _lastLseSubTabIndex;
 
   HomeController({required this.vsync}) {
     _animationController = CubeAnimationController(
@@ -120,6 +124,11 @@ class HomeController extends ChangeNotifier {
   int? get lastOllSubTabIndex => _lastOllSubTabIndex;
   int? get lastPllSubTabIndex => _lastPllSubTabIndex;
   int? get lastF2lSubTabIndex => _lastF2lSubTabIndex;
+  int? get lastRouxStepIndex => _lastRouxStepIndex;
+  double? get lastRouxScrollOffset => _lastRouxScrollOffset;
+  int? get lastCmllSubTabIndex => _lastCmllSubTabIndex;
+  int? get lastLseSubTabIndex => _lastLseSubTabIndex;
+  SolveMethod get selectedSolveMethod => _selectedSolveMethod;
 
   // Setters
   set rotationX(double value) {
@@ -163,6 +172,35 @@ class HomeController extends ChangeNotifier {
   void updateLblProgress(int stepIndex) {
     _lastLblStepIndex = stepIndex;
     notifyListeners();
+  }
+
+  void updateRouxProgress(int stepIndex, double scrollOffset, {int? cmllSubIndex, int? lseSubIndex}) {
+    _lastRouxStepIndex = stepIndex;
+    _lastRouxScrollOffset = scrollOffset;
+    if (cmllSubIndex != null) _lastCmllSubTabIndex = cmllSubIndex;
+    if (lseSubIndex != null) _lastLseSubTabIndex = lseSubIndex;
+    notifyListeners();
+  }
+
+  Future<void> initSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedMethod = prefs.getString(_kSolveMethodKey);
+    if (savedMethod != null) {
+      try {
+        _selectedSolveMethod = SolveMethod.values.firstWhere((e) => e.name == savedMethod);
+      } catch (_) {
+        _selectedSolveMethod = SolveMethod.kociemba;
+      }
+    }
+    notifyListeners();
+  }
+
+  Future<void> setSelectedSolveMethod(SolveMethod method) async {
+    if (_selectedSolveMethod == method) return;
+    _selectedSolveMethod = method;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kSolveMethodKey, method.name);
   }
 
   void _onMoveComplete() {
@@ -460,12 +498,13 @@ class HomeController extends ChangeNotifier {
   }
 
   Future<void> solve({
-    SolveMethod method = SolveMethod.kociemba,
+    SolveMethod? method,
     bool? showExplanations,
   }) async {
+    final solveMethod = method ?? _selectedSolveMethod;
     if (_animationController.isAnimating) return;
 
-    if ((method == SolveMethod.lbl || method == SolveMethod.cfop) &&
+    if ((solveMethod == SolveMethod.lbl || solveMethod == SolveMethod.cfop) &&
         !PremiumManager().canAccessFeature('lbl_solver')) {
       return;
     }
@@ -493,10 +532,18 @@ class HomeController extends ChangeNotifier {
     }
     notifyListeners();
 
-    final solveResult = await SolverService.solve(
-      state: solveState,
-      method: method,
-    );
+    SolveResult solveResult;
+    try {
+      solveResult = await SolverService.solve(
+        state: solveState,
+        method: solveMethod,
+      );
+    } catch (e) {
+      debugPrint("Solver failed: $e");
+      _isSolving = false;
+      notifyListeners();
+      return;
+    }
 
     if (solveResult.moves.isNotEmpty) {
       if (_showingSolution) {

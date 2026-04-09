@@ -6,12 +6,14 @@ class LearnOptionsSheet extends StatelessWidget {
   final VoidCallback onSelectIntroduction;
   final VoidCallback onSelectLayerByLayerMethod;
   final VoidCallback onSelectCfopMethod;
+  final VoidCallback onSelectRouxMethod;
 
   const LearnOptionsSheet({
     super.key,
     required this.onSelectIntroduction,
     required this.onSelectLayerByLayerMethod,
     required this.onSelectCfopMethod,
+    required this.onSelectRouxMethod,
   });
 
   @override
@@ -103,6 +105,18 @@ class LearnOptionsSheet extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       onSelectCfopMethod();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildOptionCard(
+                    icon: Icons.extension,
+                    isAdvanced: true,
+                    isPremium: true,
+                    title: 'Roux Method',
+                    description: 'Innovative block building and low move counts',
+                    onTap: () {
+                      Navigator.pop(context);
+                      onSelectRouxMethod();
                     },
                   ),
                   const SizedBox(height: 40),

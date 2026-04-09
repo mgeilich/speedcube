@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import '../models/cube_state.dart';
 import '../models/cube_move.dart';
 import '../controllers/analysis_controller.dart';
-import '../controllers/home_controller.dart';
+import '../models/solve_method.dart';
 import '../utils/premium_manager.dart';
 import '../utils/move_explainer.dart';
 import '../utils/solve_theme.dart';
@@ -27,7 +27,9 @@ class SolveControls extends StatelessWidget {
   final int scrambleLength;
   final Function(int) onScrambleLengthChanged;
   final VoidCallback onScramble;
-  final Function({SolveMethod method, bool showExplanations}) onSolve;
+  final Function({SolveMethod? method, bool showExplanations}) onSolve;
+  final Function(SolveMethod) onMethodChanged;
+  final SolveMethod selectedMethod;
   final Function(int, {bool immediate}) onSeek;
   final VoidCallback onSeekStart;
   final VoidCallback onShowWebDemo;
@@ -62,7 +64,8 @@ class SolveControls extends StatelessWidget {
     this.onReset,
     this.canReset = false,
     required this.isScanned,
-// this.onARMode, // Removed
+    required this.onMethodChanged,
+    required this.selectedMethod,
   });
 
   void _showPhase2Info(BuildContext context) {
@@ -652,6 +655,8 @@ class SolveControls extends StatelessWidget {
             PremiumSolverSelector(
               isAnimating: isAnimating,
               onSolve: onSolve,
+              selectedMethod: selectedMethod,
+              onMethodChanged: onMethodChanged,
             )
           else
             _buildButton(
@@ -750,12 +755,16 @@ class SolveControls extends StatelessWidget {
 
 class PremiumSolverSelector extends StatefulWidget {
   final bool isAnimating;
-  final Function({SolveMethod method, bool showExplanations}) onSolve;
+  final Function({SolveMethod? method, bool showExplanations}) onSolve;
+  final SolveMethod selectedMethod;
+  final Function(SolveMethod) onMethodChanged;
 
   const PremiumSolverSelector({
     super.key,
     required this.isAnimating,
     required this.onSolve,
+    required this.selectedMethod,
+    required this.onMethodChanged,
   });
 
   @override
@@ -763,18 +772,17 @@ class PremiumSolverSelector extends StatefulWidget {
 }
 
 class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
-  SolveMethod _selectedMethod = SolveMethod.cfop;
-
   @override
   Widget build(BuildContext context) {
+    final selectedMethod = widget.selectedMethod;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
           width: 320,
           child: CupertinoSlidingSegmentedControl<SolveMethod>(
-            groupValue: _selectedMethod,
-            children: const {
+            groupValue: selectedMethod,
+            children: {
               SolveMethod.lbl: Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
                 child: Text('LBL', style: TextStyle(color: Colors.white, fontSize: 13)),
@@ -782,6 +790,10 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
               SolveMethod.cfop: Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
                 child: Text('CFOP', style: TextStyle(color: Colors.white, fontSize: 13)),
+              ),
+              SolveMethod.roux: Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Text('Roux', style: TextStyle(color: Colors.white, fontSize: 13)),
               ),
               SolveMethod.kociemba: Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
@@ -793,7 +805,7 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
             onValueChanged: (method) {
               if (method != null) {
                 HapticService.selection();
-                setState(() => _selectedMethod = method);
+                widget.onMethodChanged(method);
               }
             },
           ),
@@ -801,8 +813,8 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
         const SizedBox(height: 16),
         _buildSolveButton(
           icon: Icons.auto_fix_high,
-          label: _solveButtonLabel(_selectedMethod),
-          onPressed: widget.isAnimating ? null : () => widget.onSolve(method: _selectedMethod),
+          label: _solveButtonLabel(selectedMethod),
+          onPressed: widget.isAnimating ? null : () => widget.onSolve(method: selectedMethod),
           color: const Color(0xFF6366F1),
           width: 280,
         ),
@@ -818,6 +830,8 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
         return 'Solve Layer-by-Layer';
       case SolveMethod.cfop:
         return 'Solve CFOP';
+      case SolveMethod.roux:
+        return 'Solve Roux';
     }
   }
 

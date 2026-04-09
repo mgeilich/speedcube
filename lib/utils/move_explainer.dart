@@ -8,7 +8,8 @@ class MoveExplainer {
   static String getDescription(CubeMove move) {
     final faceName = _getFaceFullName(move.face);
     final direction = _getDirectionDescription(move.turns);
-    return "Rotate $faceName $direction";
+    final type = move.isWide ? " (2 layers)" : "";
+    return "Rotate $faceName $direction$type";
   }
 
   /// Returns a short, high-level objective for this specific move.
@@ -229,6 +230,9 @@ class MoveExplainer {
       case CubeFace.x: return "Whole Cube (X)";
       case CubeFace.y: return "Whole Cube (Y)";
       case CubeFace.z: return "Whole Cube (Z)";
+      case CubeFace.m: return "Middle Slice (M)";
+      case CubeFace.e: return "Equatorial Slice (E)";
+      case CubeFace.s: return "Standing Slice (S)";
     }
   }
 

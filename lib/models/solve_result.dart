@@ -19,5 +19,6 @@ class LblStep {
 class LblSolveResult {
   final List<LblStep> steps;
   List<CubeMove> get allMoves => steps.expand((s) => s.moves).toList();
+  int get totalMoves => allMoves.length;
   const LblSolveResult({required this.steps});
 }

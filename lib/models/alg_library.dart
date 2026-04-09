@@ -1,7 +1,7 @@
 import 'cube_move.dart';
 
 /// Categories for algorithm cases
-enum AlgCategory { f2l, oll, pll }
+enum AlgCategory { f2l, oll, pll, cmll }
 
 /// A single algorithm case (OLL or PLL)
 class AlgCase {
@@ -42,11 +42,12 @@ class AlgCase {
 /// Static library of all OLL and PLL algorithm cases.
 /// All algorithms use only standard face notation: U D R L F B (with ' and 2).
 class AlgLibrary {
-  static const List<AlgCase> all = [...f2lCases, ...ollCases, ...pllCases];
+  static const List<AlgCase> all = [...f2lCases, ...ollCases, ...pllCases, ...cmllCases];
 
   static List<AlgCase> get f2l => f2lCases;
   static List<AlgCase> get oll => ollCases;
   static List<AlgCase> get pll => pllCases;
+  static List<AlgCase> get cmll => cmllCases;
 
   // ─────────────────────────────────────────────────────────────────────────
   // OLL CASES
@@ -1066,5 +1067,111 @@ class AlgLibrary {
       description: 'Sledgehammer variant for F2L.',
     ),
     // ... Additional cases can be added here
+  ];
+
+  static const List<AlgCase> cmllCases = [
+    // ── O Cases (Corners Oriented) ────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_o_adj',
+      name: 'CMLL O Adjacent',
+      category: AlgCategory.cmll,
+      subcategory: 'O (Oriented)',
+      algorithm: "R U R' F' R U R' U' R' F R2 U' R'",
+      setupMoves: "R U R' F' R U R' U' R' F R2 U' R'",
+      description: 'Corners are oriented, but two adjacent ones need swapping. (J-perm variant)',
+    ),
+    AlgCase(
+      id: 'cmll_o_diag',
+      name: 'CMLL O Diagonal',
+      category: AlgCategory.cmll,
+      subcategory: 'O (Oriented)',
+      algorithm: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
+      setupMoves: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
+      description: 'Corners are oriented, but need a diagonal swap. (Y-perm)',
+    ),
+
+    // ── H Cases ───────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_h_cols',
+      name: 'CMLL H Columns',
+      category: AlgCategory.cmll,
+      subcategory: 'H',
+      algorithm: "R U R' U R U' R' U R U2 R'",
+      setupMoves: "R U2 R' U' R U R' U' R U' R'",
+      description: 'H-orientation, columns pattern.',
+    ),
+    AlgCase(
+      id: 'cmll_h_rows',
+      name: 'CMLL H Rows',
+      category: AlgCategory.cmll,
+      subcategory: 'H',
+      algorithm: "F R U R' U' R U R' U' R U R' U' F'",
+      setupMoves: "F U R U' R' U R U' R' U R U' R' F'",
+      description: 'H-orientation, rows pattern.',
+    ),
+
+    // ── Pi Cases ──────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_pi_right',
+      name: 'CMLL Pi Right',
+      category: AlgCategory.cmll,
+      subcategory: 'Pi',
+      algorithm: "R U2 R2 U' R2 U' R2 U2 R",
+      setupMoves: "R' U2 R2 U R2 U R2 U2 R'",
+      description: 'Pi-orientation, headlights right.',
+    ),
+
+    // ── Sune Cases ────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_sune_right',
+      name: 'CMLL Sune Right',
+      category: AlgCategory.cmll,
+      subcategory: 'Sune',
+      algorithm: "R U R' U R U2 R'",
+      setupMoves: "R U2 R' U' R U' R'",
+      description: 'Standard Sune CMLL.',
+    ),
+    AlgCase(
+      id: 'cmll_antisune_left',
+      name: 'CMLL Anti-Sune Left',
+      category: AlgCategory.cmll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R U2 R' U' R U' R'",
+      setupMoves: "R U R' U R U2 R'",
+      description: 'Standard Anti-Sune CMLL.',
+    ),
+
+    // ── U Cases ───────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_u_front',
+      name: 'CMLL U Front',
+      category: AlgCategory.cmll,
+      subcategory: 'U',
+      algorithm: "R2 D R' U2 R D' R' U2 R'",
+      setupMoves: "R U2 R D R' U2 R D' R2",
+      description: 'U-orientation, headlights front.',
+    ),
+
+    // ── T Cases ───────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_t_left',
+      name: 'CMLL T Left',
+      category: AlgCategory.cmll,
+      subcategory: 'T',
+      algorithm: "L' U' L U R U' R' F",
+      setupMoves: "F' R U R' U' L' U L",
+      description: 'T-orientation variant.',
+    ),
+
+    // ── L Cases ───────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_l_bowtie',
+      name: 'CMLL L Bowtie',
+      category: AlgCategory.cmll,
+      subcategory: 'L',
+      algorithm: "R' F R B' R' F' R B",
+      setupMoves: "B' R' F R B R' F' R",
+      description: 'L-orientation bowtie.',
+    ),
   ];
 }
