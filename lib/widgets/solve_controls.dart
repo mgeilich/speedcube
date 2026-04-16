@@ -776,49 +776,64 @@ class PremiumSolverSelector extends StatefulWidget {
 }
 
 class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
+  String _getMethodDisplayName(SolveMethod method) {
+    switch (method) {
+      case SolveMethod.lbl:
+        return 'Layer-by-Layer';
+      case SolveMethod.cfop:
+        return 'CFOP (Advanced)';
+      case SolveMethod.roux:
+        return 'Roux Method';
+      case SolveMethod.zz:
+        return 'ZZ (Speedcube)';
+      case SolveMethod.kociemba:
+        return 'Kociemba (Optimal)';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final selectedMethod = widget.selectedMethod;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          width: 320,
-          child: CupertinoSlidingSegmentedControl<SolveMethod>(
-            groupValue: selectedMethod,
-            children: {
-              SolveMethod.lbl: Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: Text('LBL', style: TextStyle(color: Colors.white, fontSize: 13)),
+        Container(
+          width: 280, // Match solve button width
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white12),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<SolveMethod>(
+              value: selectedMethod,
+              isExpanded: true,
+              dropdownColor: const Color(0xFF1E293B), // Match theme background
+              icon: const Icon(Icons.keyboard_arrow_down_rounded,
+                  color: Colors.white54),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
               ),
-              SolveMethod.cfop: Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: Text('CFOP', style: TextStyle(color: Colors.white, fontSize: 13)),
-              ),
-              SolveMethod.roux: Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: Text('Roux', style: TextStyle(color: Colors.white, fontSize: 13)),
-              ),
-              SolveMethod.zz: Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: Text('ZZ', style: TextStyle(color: Colors.white, fontSize: 13)),
-              ),
-              SolveMethod.kociemba: Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: Text('Kociemba', style: TextStyle(color: Colors.white, fontSize: 13)),
-              ),
-            },
-            backgroundColor: Colors.white12,
-            thumbColor: const Color(0xFF6366F1).withValues(alpha: 0.8),
-            onValueChanged: (method) {
-              if (method != null) {
-                HapticService.selection();
-                widget.onMethodChanged(method);
-              }
-            },
+              items: SolveMethod.values.map((method) {
+                return DropdownMenuItem<SolveMethod>(
+                  value: method,
+                  child: Text(_getMethodDisplayName(method)),
+                );
+              }).toList(),
+              onChanged: (method) {
+                if (method != null) {
+                  HapticService.selection();
+                  widget.onMethodChanged(method);
+                }
+              },
+            ),
           ),
         ),
         const SizedBox(height: 16),
+
         _buildSolveButton(
           icon: Icons.auto_fix_high,
           label: _solveButtonLabel(selectedMethod),
