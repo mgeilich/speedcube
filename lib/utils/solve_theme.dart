@@ -18,9 +18,15 @@ class SolveTheme {
         s.contains('white layer') ||
         s.contains('start')) {
       return Colors.white;
-    } else if (s.contains('second layer') || s.contains('middle layer') || s.contains('f2l')) {
+    } else if (s.contains('second layer') ||
+        s.contains('middle layer') ||
+        s.contains('f2l') ||
+        s.contains('block')) {
       return secondaryBlue;
-    } else if (s.contains('yellow cross') || s.contains('yellow edges') || s.contains('oll')) {
+    } else if (s.contains('yellow cross') ||
+        s.contains('yellow edges') ||
+        s.contains('oll') ||
+        s.contains('eoline')) {
       return yellowGold;
     } else if (s.contains('yellow corners') || s.contains('pll')) {
       return amber;

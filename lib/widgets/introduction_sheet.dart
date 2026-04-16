@@ -123,7 +123,8 @@ class _IntroductionSheetState extends State<IntroductionSheet>
           'Before diving into algorithms, let\'s understand how the cube moves. '
           'The cube consists of 6 faces: Up (U), Down (D), Front (F), Back (B), Left (L), and Right (R). '
           'Each face consists of 1 center sticker, 4 edge stickers, and 4 corner stickers. '
-          'Advanced methods like Roux also use the **Middle (M)**, **Equatorial (E)**, and **Standing (S)** slices, as well as **Wide moves** (moving two layers at once).',
+          'Advanced methods like Roux also use the **Middle (M)**, **Equatorial (E)**, and **Standing (S)** slices, as well as **Wide moves** (moving two layers at once). '
+          'Wide moves can be written as **Rw** or simply lowercase **r**.',
           style: TextStyle(
             color: Colors.white70,
             fontSize: 15,
@@ -212,6 +213,13 @@ class _IntroductionSheetState extends State<IntroductionSheet>
             _buildIntroMoveButton('Dw'),
             _buildIntroMoveButton('Fw'),
             _buildIntroMoveButton('Bw'),
+            const SizedBox(width: double.infinity, child: Divider(color: Colors.white10, height: 24)),
+            _buildIntroMoveButton('r'),
+            _buildIntroMoveButton('r\''),
+            _buildIntroMoveButton('l'),
+            _buildIntroMoveButton('l\''),
+            _buildIntroMoveButton('u'),
+            _buildIntroMoveButton('u\''),
           ],
         ),
       ],

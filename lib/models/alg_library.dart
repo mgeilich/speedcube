@@ -1078,7 +1078,7 @@ class AlgLibrary {
       subcategory: 'O (Oriented)',
       algorithm: "R U R' F' R U R' U' R' F R2 U' R'",
       setupMoves: "R U R' F' R U R' U' R' F R2 U' R'",
-      description: 'Corners are oriented, but two adjacent ones need swapping. (J-perm variant)',
+      description: 'Oriented. Recognition: Two adjacent corners have matching side colors ("Headlights" or a "Bar").',
     ),
     AlgCase(
       id: 'cmll_o_diag',
@@ -1087,7 +1087,7 @@ class AlgLibrary {
       subcategory: 'O (Oriented)',
       algorithm: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
       setupMoves: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
-      description: 'Corners are oriented, but need a diagonal swap. (Y-perm)',
+      description: 'Oriented. Recognition: No matching side colors on any face (Diagonal swap).',
     ),
 
     // ── H Cases ───────────────────────────────────────────────────────────
@@ -1098,7 +1098,7 @@ class AlgLibrary {
       subcategory: 'H',
       algorithm: "R U R' U R U' R' U R U2 R'",
       setupMoves: "R U2 R' U' R U R' U' R U' R'",
-      description: 'H-orientation, columns pattern.',
+      description: 'H-Orientation. Recognition: Side colors match vertically on the Left and Right faces ("Columns").',
     ),
     AlgCase(
       id: 'cmll_h_rows',
@@ -1107,7 +1107,7 @@ class AlgLibrary {
       subcategory: 'H',
       algorithm: "F R U R' U' R U R' U' R U R' U' F'",
       setupMoves: "F U R U' R' U R U' R' U R U' R' F'",
-      description: 'H-orientation, rows pattern.',
+      description: 'H-Orientation. Recognition: Side colors match horizontally on the Front and Back faces ("Rows").',
     ),
 
     // ── Pi Cases ──────────────────────────────────────────────────────────
@@ -1118,7 +1118,7 @@ class AlgLibrary {
       subcategory: 'Pi',
       algorithm: "R U2 R2 U' R2 U' R2 U2 R",
       setupMoves: "R' U2 R2 U R2 U R2 U2 R'",
-      description: 'Pi-orientation, headlights right.',
+      description: 'Pi-Orientation. Recognition: Headlights on the Right face.',
     ),
 
     // ── Sune Cases ────────────────────────────────────────────────────────
@@ -1129,7 +1129,7 @@ class AlgLibrary {
       subcategory: 'Sune',
       algorithm: "R U R' U R U2 R'",
       setupMoves: "R U2 R' U' R U' R'",
-      description: 'Standard Sune CMLL.',
+      description: 'Sune-Orientation. Recognition: Standard Sune, front-right sticker is yellow.',
     ),
     AlgCase(
       id: 'cmll_antisune_left',
@@ -1138,7 +1138,7 @@ class AlgLibrary {
       subcategory: 'Anti-Sune',
       algorithm: "R U2 R' U' R U' R'",
       setupMoves: "R U R' U R U2 R'",
-      description: 'Standard Anti-Sune CMLL.',
+      description: 'Anti-Sune Orientation. Recognition: Standard Anti-Sune, front-left sticker is yellow.',
     ),
 
     // ── U Cases ───────────────────────────────────────────────────────────
@@ -1149,7 +1149,7 @@ class AlgLibrary {
       subcategory: 'U',
       algorithm: "R2 D R' U2 R D' R' U2 R'",
       setupMoves: "R U2 R D R' U2 R D' R2",
-      description: 'U-orientation, headlights front.',
+      description: 'U-Orientation. Recognition: Matching colors on the Front face ("Headlights").',
     ),
 
     // ── T Cases ───────────────────────────────────────────────────────────
@@ -1160,7 +1160,7 @@ class AlgLibrary {
       subcategory: 'T',
       algorithm: "L' U' L U R U' R' F",
       setupMoves: "F' R U R' U' L' U L",
-      description: 'T-orientation variant.',
+      description: 'T-Orientation. Recognition: Side colors of unoriented corners match across the side.',
     ),
 
     // ── L Cases ───────────────────────────────────────────────────────────
@@ -1171,7 +1171,7 @@ class AlgLibrary {
       subcategory: 'L',
       algorithm: "R' F R B' R' F' R B",
       setupMoves: "B' R' F R B R' F' R",
-      description: 'L-orientation bowtie.',
+      description: 'L-Orientation. Recognition: Two oriented corners are diagonal to each other.',
     ),
   ];
 }

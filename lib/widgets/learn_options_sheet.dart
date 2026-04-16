@@ -7,6 +7,7 @@ class LearnOptionsSheet extends StatelessWidget {
   final VoidCallback onSelectLayerByLayerMethod;
   final VoidCallback onSelectCfopMethod;
   final VoidCallback onSelectRouxMethod;
+  final VoidCallback onSelectZzMethod;
 
   const LearnOptionsSheet({
     super.key,
@@ -14,6 +15,7 @@ class LearnOptionsSheet extends StatelessWidget {
     required this.onSelectLayerByLayerMethod,
     required this.onSelectCfopMethod,
     required this.onSelectRouxMethod,
+    required this.onSelectZzMethod,
   });
 
   @override
@@ -117,6 +119,18 @@ class LearnOptionsSheet extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       onSelectRouxMethod();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildOptionCard(
+                    icon: Icons.architecture,
+                    isAdvanced: true,
+                    isPremium: true,
+                    title: 'ZZ Method',
+                    description: 'The efficiency master: No rotations, fewer moves',
+                    onTap: () {
+                      Navigator.pop(context);
+                      onSelectZzMethod();
                     },
                   ),
                   const SizedBox(height: 40),

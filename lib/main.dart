@@ -8,6 +8,7 @@ import 'models/cube_move.dart';
 import 'widgets/layer_by_layer_guide_sheet.dart';
 import 'widgets/cfop_guide_screen.dart';
 import 'widgets/roux_guide_screen.dart';
+import 'widgets/zz_guide_screen.dart';
 import 'widgets/home_header.dart';
 import 'widgets/cube_interactive_view.dart';
 import 'widgets/solve_controls.dart';
@@ -77,6 +78,8 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
         _showCfopGuide(initialStepIndex: stepIndex);
       } else if (demoType == 'roux') {
         _showRouxGuide(initialStepIndex: stepIndex);
+      } else if (demoType == 'zz') {
+        _showZzGuide(initialStepIndex: stepIndex);
       } else {
         _showLayerByLayerGuide(initialStepIndex: stepIndex);
       }
@@ -214,6 +217,7 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
               onScrambleLengthChanged: (val) =>
                   _homeController.scrambleLength = val,
               onScramble: _homeController.scramble,
+              onRandomize: _homeController.randomize,
               onSolve: _homeController.solve,
               onSeek: _homeController.handleAnalysisSeek,
               onSeekStart: _homeController.handleAnalysisSeekStart,
@@ -268,6 +272,9 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
         },
         onSelectRouxMethod: () {
           _showRouxGuide(initialStepIndex: initialStepIndex);
+        },
+        onSelectZzMethod: () {
+          _showZzGuide(initialStepIndex: initialStepIndex);
         },
       ),
     );
@@ -508,6 +515,51 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
                 initialRotationY: initialRotationY,
                 targetRotationY: targetRotationY,
                 demoType: 'roux',
+                stickerLabels: stickerLabels,
+                targetPieces: targetPieces);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showZzGuide({int? initialStepIndex, double? scrollOffset}) {
+    if (!PremiumManager().canAccessFeature('zz_tutorial')) {
+      _showPremiumUpsell();
+      return;
+    }
+
+    _homeController.showingSolution = false;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ZzGuideScreen(
+          initialExpandedStepIndex:
+              initialStepIndex ?? _homeController.lastZzStepIndex ?? 0,
+          initialScrollOffset: scrollOffset ?? _homeController.lastZzScrollOffset ?? 0,
+          onTabChanged: (stepIndex) {
+            _homeController.updateZzProgress(stepIndex, 0);
+          },
+          onDemoRequested: (stepIndex, initialState,
+              {moves,
+              initialRotationX,
+              targetRotationX,
+              initialRotationY,
+              targetRotationY,
+              demoType,
+              stickerLabels,
+              targetPieces,
+              scrollOffset}) {
+            if (scrollOffset != null) {
+              _homeController.updateZzProgress(stepIndex, scrollOffset);
+            }
+            _onDemoRequested(stepIndex, initialState,
+                moves: moves,
+                initialRotationX: initialRotationX,
+                targetRotationX: targetRotationX,
+                initialRotationY: initialRotationY,
+                targetRotationY: targetRotationY,
+                demoType: 'zz',
                 stickerLabels: stickerLabels,
                 targetPieces: targetPieces);
           },

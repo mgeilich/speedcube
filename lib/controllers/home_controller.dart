@@ -60,6 +60,8 @@ class HomeController extends ChangeNotifier {
   double? _lastRouxScrollOffset;
   int? _lastCmllSubTabIndex;
   int? _lastLseSubTabIndex;
+  int? _lastZzStepIndex;
+  double? _lastZzScrollOffset;
 
   HomeController({required this.vsync}) {
     _animationController = CubeAnimationController(
@@ -128,6 +130,8 @@ class HomeController extends ChangeNotifier {
   double? get lastRouxScrollOffset => _lastRouxScrollOffset;
   int? get lastCmllSubTabIndex => _lastCmllSubTabIndex;
   int? get lastLseSubTabIndex => _lastLseSubTabIndex;
+  int? get lastZzStepIndex => _lastZzStepIndex;
+  double? get lastZzScrollOffset => _lastZzScrollOffset;
   SolveMethod get selectedSolveMethod => _selectedSolveMethod;
 
   // Setters
@@ -142,11 +146,7 @@ class HomeController extends ChangeNotifier {
   }
 
   set scrambleLength(int value) {
-    if (value > 20 && !PremiumManager().isPremium) {
-      onPremiumUpsellRequested?.call();
-      return;
-    }
-    _scrambleLength = value;
+    _scrambleLength = value.clamp(5, 20);
     notifyListeners();
   }
 
@@ -179,6 +179,12 @@ class HomeController extends ChangeNotifier {
     _lastRouxScrollOffset = scrollOffset;
     if (cmllSubIndex != null) _lastCmllSubTabIndex = cmllSubIndex;
     if (lseSubIndex != null) _lastLseSubTabIndex = lseSubIndex;
+    notifyListeners();
+  }
+
+  void updateZzProgress(int stepIndex, double scrollOffset) {
+    _lastZzStepIndex = stepIndex;
+    _lastZzScrollOffset = scrollOffset;
     notifyListeners();
   }
 
@@ -351,9 +357,6 @@ class HomeController extends ChangeNotifier {
   }
 
   void _onPremiumChanged() {
-    if (!PremiumManager().isPremium && _scrambleLength > 20) {
-      _scrambleLength = 20;
-    }
     notifyListeners();
   }
 
@@ -494,6 +497,41 @@ class HomeController extends ChangeNotifier {
     _analysisController.pause();
     _animationController.setSpeed(const Duration(milliseconds: 400));
     _animationController.queueMoves(newMoves);
+    notifyListeners();
+  }
+
+  void randomize() {
+    if (_animationController.isAnimating) {
+      _animationController.clearQueue();
+    }
+    
+    if (!PremiumManager().isPremium) {
+      onPremiumUpsellRequested?.call();
+      return;
+    }
+
+    // Generate a full, high-entropy scramble (25 moves)
+    final newMoves = CubeState.generateScramble(25);
+    final finalState = CubeState.solved().applyMoves(newMoves);
+    
+    // Apply instantly
+    _cubeState = finalState;
+    _baseCubeState = finalState;
+    _savedState = finalState;
+    
+    _moveHistory = [];
+    _moveIndex = 0;
+    _solutionStartIndex = 0;
+    _showingSolution = false;
+    _activeDemoStepIndex = null;
+    _isScrambling = false;
+    _isScanned = false; // It's a fresh random state, not scanned from AR
+
+    _analysisController.pause();
+    _animationController.clearQueue();
+    _moveDirectionQueue.clear();
+    
+    HapticService.selection(); // Subtle feedback for the "teleport"
     notifyListeners();
   }
 

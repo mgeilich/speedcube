@@ -27,6 +27,7 @@ class SolveControls extends StatelessWidget {
   final int scrambleLength;
   final Function(int) onScrambleLengthChanged;
   final VoidCallback onScramble;
+  final VoidCallback onRandomize;
   final Function({SolveMethod? method, bool showExplanations}) onSolve;
   final Function(SolveMethod) onMethodChanged;
   final SolveMethod selectedMethod;
@@ -55,6 +56,7 @@ class SolveControls extends StatelessWidget {
     required this.scrambleLength,
     required this.onScrambleLengthChanged,
     required this.onScramble,
+    required this.onRandomize,
     required this.onSolve,
     required this.onSeek,
     required this.onSeekStart,
@@ -635,6 +637,7 @@ class SolveControls extends StatelessWidget {
         scrambleLength: scrambleLength,
         onLengthChanged: onScrambleLengthChanged,
         onScramble: onScramble,
+        onRandomize: onRandomize,
         isScrambling: isScrambling,
         isAnimating: isAnimating,
       );
@@ -647,6 +650,7 @@ class SolveControls extends StatelessWidget {
             scrambleLength: scrambleLength,
             onLengthChanged: onScrambleLengthChanged,
             onScramble: onScramble,
+            onRandomize: onRandomize,
             isScrambling: isScrambling,
             isAnimating: isAnimating,
           ),
@@ -795,6 +799,10 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
                 padding: EdgeInsets.symmetric(vertical: 8),
                 child: Text('Roux', style: TextStyle(color: Colors.white, fontSize: 13)),
               ),
+              SolveMethod.zz: Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Text('ZZ', style: TextStyle(color: Colors.white, fontSize: 13)),
+              ),
               SolveMethod.kociemba: Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
                 child: Text('Kociemba', style: TextStyle(color: Colors.white, fontSize: 13)),
@@ -832,6 +840,8 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
         return 'Solve CFOP';
       case SolveMethod.roux:
         return 'Solve Roux';
+      case SolveMethod.zz:
+        return 'Solve ZZ';
     }
   }
 

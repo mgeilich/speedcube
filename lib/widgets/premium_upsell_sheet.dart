@@ -227,6 +227,13 @@ class _PremiumUpsellSheetState extends State<PremiumUpsellSheet> {
                     'Understand the purpose of every move.',
                     false,
                   ),
+                  _buildDivider(),
+                  _buildFeatureRow(
+                    Icons.shuffle_rounded,
+                    'Pro Randomizer',
+                    'Jump to a high-entropy random state instantly.',
+                    false,
+                  ),
                 ],
               ),
             ),

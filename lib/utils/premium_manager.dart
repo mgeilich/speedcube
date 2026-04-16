@@ -155,7 +155,8 @@ class PremiumManager extends ChangeNotifier {
       'lbl_solver',
       'detailed_explanations',
       'cfop_tutorial',
-      'roux_tutorial'
+      'roux_tutorial',
+      'zz_tutorial'
     ];
     return !gatedFeatures.contains(featureId);
   }

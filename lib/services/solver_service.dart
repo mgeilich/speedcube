@@ -5,6 +5,7 @@ import '../solver/kociemba_search.dart';
 import '../solver/lbl_solver.dart';
 import '../solver/cfop_solver.dart';
 import '../solver/roux_solver.dart';
+import '../solver/zz_solver.dart';
 import 'package:flutter/foundation.dart';
 import '../models/solve_method.dart';
 
@@ -39,6 +40,7 @@ class SolverService {
       case SolveMethod.lbl:
       case SolveMethod.cfop:
       case SolveMethod.roux:
+      case SolveMethod.zz:
         final result = await compute(_runSolver, _SolveParams(state, method));
 
         if (result != null) {
@@ -82,6 +84,8 @@ class SolverService {
         return CfopSolver.solve(params.state);
       case SolveMethod.roux:
         return RouxSolver.solve(params.state);
+      case SolveMethod.zz:
+        return ZzSolver.solve(params.state);
       default:
         return null;
     }
