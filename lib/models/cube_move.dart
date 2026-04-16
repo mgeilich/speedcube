@@ -155,6 +155,46 @@ class CubeMove {
     return CubeMove(face, turns, wide);
   }
 
+  /// Optimize a list of moves by combining adjacent moves on the same face.
+  static List<CubeMove> optimize(List<CubeMove> moves) {
+    if (moves.isEmpty) return [];
+
+    final result = <CubeMove>[];
+    for (final move in moves) {
+      if (result.isEmpty) {
+        // If the first move is identity (mod 4 == 0), don't even add it.
+        final turns = (move.turns % 4 + 4) % 4;
+        if (turns != 0) {
+          result.add(move.turns == turns ? move : CubeMove(move.face, turns, move.isWide));
+        }
+        continue;
+      }
+
+      final last = result.last;
+      if (last.face == move.face && last.isWide == move.isWide) {
+        result.removeLast();
+        int totalTurns = (last.turns + move.turns) % 4;
+        if (totalTurns < 0) totalTurns += 4;
+
+        if (totalTurns == 1) {
+          result.add(CubeMove(move.face, 1, move.isWide));
+        } else if (totalTurns == 2) {
+          result.add(CubeMove(move.face, 2, move.isWide));
+        } else if (totalTurns == 3) {
+          result.add(CubeMove(move.face, -1, move.isWide));
+        }
+        // If totalTurns == 0, they cancel out.
+      } else {
+        // Final check for the current move being identity before adding.
+        final turns = (move.turns % 4 + 4) % 4;
+        if (turns != 0) {
+          result.add(move.turns == turns ? move : CubeMove(move.face, turns, move.isWide));
+        }
+      }
+    }
+    return result;
+  }
+
   @override
   String toString() {
     String faceStr = face.name.toUpperCase();

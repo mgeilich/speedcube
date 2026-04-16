@@ -80,6 +80,7 @@ class MoveExplainer {
     CubeState after, {
     int? phase,
   }) {
+
     final currentPhase = phase ?? (moveIndex < totalMoves / 2 ? 1 : 2);
     final keyInfo = _identifyKeyMovement(before, after);
 
@@ -95,8 +96,11 @@ class MoveExplainer {
     }
 
     if (currentPhase == 1) {
+      // Default Kociemba behavior (legacy)
       final kBefore = KociembaCube.fromCubeState(before);
       final kAfter = KociembaCube.fromCubeState(after);
+      // ... (keep existing Kociemba logic if stageName is null)
+
 
       final flippedEdges = _findFlippedEdges(kBefore, kAfter);
       final movedToSlice = _findMovedToSlice(kBefore, kAfter);
@@ -171,7 +175,9 @@ class MoveExplainer {
     return "several pieces, including the ${pieces[0]} and ${pieces[1]}";
   }
 
+
   static List<int> _findFlippedEdges(KociembaCube before, KociembaCube after) {
+
     final flipped = <int>[];
     for (int i = 0; i < 12; i++) {
       if (before.eo[i] == 1 && after.eo[i] == 0) {
@@ -334,11 +340,14 @@ class MoveExplainer {
 
   static String _getEdgeNameFromColors(Set<CubeColor> colors) {
     final list = colors.toList();
+    // Sort colors to have a stable name (e.g., White/Yellow first)
+    list.sort((a, b) => a.index.compareTo(b.index));
     return "${_getColorName(list[0])}-${_getColorName(list[1])} edge";
   }
 
   static String _getCornerNameFromColors(Set<CubeColor> colors) {
     final list = colors.toList();
+    list.sort((a, b) => a.index.compareTo(b.index));
     return "${_getColorName(list[0])}-${_getColorName(list[1])}-${_getColorName(list[2])} corner";
   }
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import '../models/cube_state.dart';
 import '../models/cube_move.dart';
 import '../controllers/analysis_controller.dart';
@@ -791,135 +790,128 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final selectedMethod = widget.selectedMethod;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 280, // Match solve button width
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white12),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<SolveMethod>(
-              value: selectedMethod,
-              isExpanded: true,
-              dropdownColor: const Color(0xFF1E293B), // Match theme background
-              icon: const Icon(Icons.keyboard_arrow_down_rounded,
-                  color: Colors.white54),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-              items: SolveMethod.values.map((method) {
-                return DropdownMenuItem<SolveMethod>(
-                  value: method,
-                  child: Text(_getMethodDisplayName(method)),
-                );
-              }).toList(),
-              onChanged: (method) {
-                if (method != null) {
-                  HapticService.selection();
-                  widget.onMethodChanged(method);
-                }
-              },
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        _buildSolveButton(
-          icon: Icons.auto_fix_high,
-          label: _solveButtonLabel(selectedMethod),
-          onPressed: widget.isAnimating ? null : () => widget.onSolve(method: selectedMethod),
-          color: const Color(0xFF6366F1),
-          width: 280,
-        ),
-      ],
-    );
-  }
-
-  String _solveButtonLabel(SolveMethod method) {
+  String _getSolveButtonLabel(SolveMethod method) {
     switch (method) {
-      case SolveMethod.kociemba:
-        return 'Solve Kociemba';
       case SolveMethod.lbl:
-        return 'Solve Layer-by-Layer';
+        return 'SOLVE LBL';
       case SolveMethod.cfop:
-        return 'Solve CFOP';
+        return 'SOLVE CFOP';
       case SolveMethod.roux:
-        return 'Solve Roux';
+        return 'SOLVE ROUX';
       case SolveMethod.zz:
-        return 'Solve ZZ';
+        return 'SOLVE ZZ';
+      case SolveMethod.kociemba:
+        return 'SOLVE OPTIMAL';
     }
   }
 
-  Widget _buildSolveButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback? onPressed,
-    required Color color,
-    double? width,
-  }) {
-    final isDisabled = onPressed == null;
-    final buttonColor = isDisabled ? color.withValues(alpha: 0.3) : color;
+  @override
+  Widget build(BuildContext context) {
+    final selectedMethod = widget.selectedMethod;
+    final isDisabled = widget.isAnimating;
+    
+    const primaryColor = Color(0xFF6366F1);
+    final buttonColor = isDisabled ? primaryColor.withValues(alpha: 0.3) : primaryColor;
 
-    return GestureDetector(
-      onTap: onPressed != null
-          ? () {
-              HapticService.impactMedium();
-              onPressed();
-            }
-          : null,
-      child: Container(
-        width: width,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          gradient: isDisabled
-              ? null
-              : LinearGradient(
-                  colors: [buttonColor, buttonColor.withValues(alpha: 0.8)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+    return Container(
+      width: 300,
+      height: 54,
+      decoration: BoxDecoration(
+        gradient: isDisabled
+            ? null
+            : LinearGradient(
+                colors: [buttonColor, buttonColor.withValues(alpha: 0.8)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+        color: isDisabled ? buttonColor : null,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: isDisabled
+            ? null
+            : [
+                BoxShadow(
+                  color: buttonColor.withValues(alpha: 0.4),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
                 ),
-          color: isDisabled ? buttonColor : null,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: isDisabled
-              ? null
-              : [
-                  BoxShadow(
-                    color: buttonColor.withValues(alpha: 0.4),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white, size: 20),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                label,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
+              ],
+      ),
+      child: Row(
+        children: [
+          // Primary Solve Action
+          Expanded(
+            child: InkWell(
+              onTap: isDisabled ? null : () {
+                HapticService.impactMedium();
+                widget.onSolve(method: selectedMethod);
+              },
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                bottomLeft: Radius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.auto_fix_high, color: Colors.white, size: 20),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Text(
+                        _getSolveButtonLabel(selectedMethod),
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          
+          // Divider
+          Container(
+            width: 1,
+            height: 30,
+            color: Colors.white24,
+          ),
+          
+          // Method Selector (Chevron)
+          Theme(
+            data: Theme.of(context).copyWith(
+              cardColor: const Color(0xFF1E293B),
+            ),
+            child: PopupMenuButton<SolveMethod>(
+              initialValue: selectedMethod,
+              enabled: !isDisabled,
+              onSelected: (method) {
+                HapticService.selection();
+                widget.onMethodChanged(method);
+              },
+              padding: EdgeInsets.zero,
+              icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
+              itemBuilder: (context) => SolveMethod.values.map((method) {
+                return PopupMenuItem<SolveMethod>(
+                  value: method,
+                  child: Text(
+                    _getMethodDisplayName(method),
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
       ),
     );
   }
+
+
+
+
 }

@@ -454,9 +454,74 @@ class ZzSolver {
   }
 
   static List<LblStep> _optimizeSteps(List<LblStep> steps) {
+    if (steps.isEmpty) return [];
 
-    // Combine adjacent steps if they are really short or optimize move notation
-    return steps;
+    // 1. Flatten into (Move, OriginalStepIndex)
+    final flatMoves = <({CubeMove move, int stepIndex})>[];
+    for (int i = 0; i < steps.length; i++) {
+      for (final m in steps[i].moves) {
+        flatMoves.add((move: m, stepIndex: i));
+      }
+    }
+
+    // 2. Optimize the flat list while preserving the earliest step index
+    final optimizedFlat = <({CubeMove move, int stepIndex})>[];
+    for (final ms in flatMoves) {
+      if (optimizedFlat.isEmpty) {
+        final turns = (ms.move.turns % 4 + 4) % 4;
+        if (turns != 0) {
+          optimizedFlat.add((
+            move: turns == ms.move.turns ? ms.move : CubeMove(ms.move.face, turns, ms.move.isWide),
+            stepIndex: ms.stepIndex
+          ));
+        }
+        continue;
+      }
+
+      final last = optimizedFlat.last;
+      if (last.move.face == ms.move.face && last.move.isWide == ms.move.isWide) {
+        optimizedFlat.removeLast();
+        int totalTurns = (last.move.turns + ms.move.turns) % 4;
+        if (totalTurns < 0) totalTurns += 4;
+
+        if (totalTurns != 0) {
+          // Keep the earliest step index to preserve logical flow
+          optimizedFlat.add((
+            move: CubeMove(ms.move.face, totalTurns == 3 ? -1 : totalTurns, ms.move.isWide),
+            stepIndex: last.stepIndex
+          ));
+        }
+        // If totalTurns == 0, they cancel out.
+      } else {
+        final turns = (ms.move.turns % 4 + 4) % 4;
+        if (turns != 0) {
+          optimizedFlat.add((
+            move: turns == ms.move.turns ? ms.move : CubeMove(ms.move.face, turns, ms.move.isWide),
+            stepIndex: ms.stepIndex
+          ));
+        }
+      }
+    }
+
+    // 3. Group back into steps
+    final newSteps = <LblStep>[];
+    for (int i = 0; i < steps.length; i++) {
+      final stepMoves = optimizedFlat
+          .where((ms) => ms.stepIndex == i)
+          .map((ms) => ms.move)
+          .toList();
+      
+      if (stepMoves.isNotEmpty) {
+        newSteps.add(LblStep(
+          stageName: steps[i].stageName,
+          moves: stepMoves,
+          description: steps[i].description,
+          algorithmName: steps[i].algorithmName,
+        ));
+      }
+    }
+
+    return newSteps;
   }
 
   static List<List<CubeMove>> _generateAll24Rotations() {

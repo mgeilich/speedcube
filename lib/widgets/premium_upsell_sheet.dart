@@ -217,7 +217,7 @@ class _PremiumUpsellSheetState extends State<PremiumUpsellSheet> {
                   _buildFeatureRow(
                     Icons.psychology_rounded,
                     'Pro AR Solvers',
-                    'Unlock LBL, CFOP, and Kociemba algorithms.',
+                    'Unlock LBL, CFOP, Roux, and ZZ algorithms.',
                     false,
                   ),
                   _buildDivider(),
