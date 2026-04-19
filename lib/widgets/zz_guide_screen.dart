@@ -181,27 +181,30 @@ class _ZzGuideScreenState extends State<ZzGuideScreen>
         ),
         const SizedBox(height: 12),
         const Text(
-          'EOLine is the heart of the ZZ method. You solve two things at once: orient all 12 edges and solve the Front and Back bottom edges.',
-          style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.5),
-        ),
-        const SizedBox(height: 32),
-        _buildSectionHeader('1. Understanding Edge Orientation'),
-        const Text(
-          'A "bad edge" is one that requires an F or B move to solve. In ZZ, we fix all bad edges right at the start!',
-          style: TextStyle(color: Colors.white54, fontSize: 13, height: 1.5),
+          'To start, orient your cube with White on Top and Green in Front, then use F and B moves to turn all the bad edges into good edges.',
+          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, height: 1.5),
         ),
         const SizedBox(height: 24),
+        const SizedBox(height: 32),
         _buildIllustration(
-          'Good vs Bad Edges',
-          'Highlighting all oriented edges in ZZ.',
+          '1. Good vs. Bad Edges',
+          'A Good edge (G) can be moved into its slot with only <U, D, L, R> turns. A Bad edge (B) needs an F or B flip first.',
           _getBadEdgeState(),
-          highlightedStickers: _getOrientedStickers(),
-          dimNonHighlighted: true,
+          stickerLabels: _getBadEdgeLabels(_getBadEdgeState()),
           rotationX: 0.4,
           rotationY: 0.6,
         ),
+        const SizedBox(height: 24),
+        _buildProRule(),
+        const SizedBox(height: 24),
+        _buildDemoButtons([
+          DemoOption(
+            label: 'Show Master EO Solve (8 Edges)',
+            onTap: () => _requestDemo(0, _getBadEdgeState(), moves: _parseAlg("B' R' F'")),
+          ),
+        ]),
         const SizedBox(height: 32),
-        _buildSectionHeader('2. Solving the Line'),
+        _buildSectionHeader('3. Solving the Line'),
         const Text(
           'Once edges are oriented, solve the White-Green (DF) and White-Blue (DB) edges to form a line on the bottom.',
           style: TextStyle(color: Colors.white54, fontSize: 13, height: 1.5),
@@ -245,13 +248,6 @@ class _ZzGuideScreenState extends State<ZzGuideScreen>
           rotationX: 0.4,
           rotationY: 0.8,
         ),
-        const SizedBox(height: 24),
-        _buildDemoButtons([
-          DemoOption(
-            label: 'Show Left Block Build',
-            onTap: () => _requestDemo(1, _getLeftBlockDemoState(), moves: [CubeMove.u, CubeMove.lPrime, CubeMove.uPrime, CubeMove.l]),
-          ),
-        ]),
       ],
     );
   }
@@ -298,7 +294,12 @@ class _ZzGuideScreenState extends State<ZzGuideScreen>
         ),
         const SizedBox(height: 32),
         const Text('OCLL: Orient corners using Sune/Anti-Sune.'),
-        const Text('PLL: Permute alles using standard algorithms.'),
+        const Text('PLL: Permute pieces (solve final positions of corners and edges).'),
+        const SizedBox(height: 8),
+        const Text(
+          'Tip: Use guidance from previous tutorials (like CFOP) for specific PLL algorithms.',
+          style: TextStyle(color: Colors.white54, fontSize: 12, fontStyle: FontStyle.italic),
+        ),
       ],
     );
   }
@@ -316,7 +317,7 @@ class _ZzGuideScreenState extends State<ZzGuideScreen>
   }
 
   Widget _buildIllustration(String title, String subtitle, CubeState state, 
-      {double rotationX = 0, double rotationY = 0, List<MapEntry<CubeFace, int>>? highlightedStickers, bool dimNonHighlighted = false}) {
+      {double rotationX = 0, double rotationY = 0, List<MapEntry<CubeFace, int>>? highlightedStickers, bool dimNonHighlighted = false, Map<CubeFace, Map<int, String>>? stickerLabels}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -335,6 +336,7 @@ class _ZzGuideScreenState extends State<ZzGuideScreen>
                 rotationY: rotationY,
                 highlightedStickers: highlightedStickers,
                 dimNonHighlighted: dimNonHighlighted,
+                stickerLabels: stickerLabels,
               ),
               size: const Size(120, 120),
             ),
@@ -343,6 +345,62 @@ class _ZzGuideScreenState extends State<ZzGuideScreen>
       ],
     );
   }
+
+
+  Widget _buildProRule() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF8B5CF6).withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.search, color: Color(0xFF8B5CF6), size: 16),
+              SizedBox(width: 8),
+              Text(
+                'QUICK SCAN: HUNT FOR RED & ORANGE',
+                style: TextStyle(color: Color(0xFF8B5CF6), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'The easiest way to find a BAD piece is to look for the "side colors" (Red or Orange) in the wrong places:',
+            style: TextStyle(color: Colors.white70, fontSize: 12, height: 1.4),
+          ),
+          const SizedBox(height: 12),
+          _buildScanningPoint('TOP / BOTTOM face', 'If you see Red or Orange here, it\'s BAD.'),
+          const SizedBox(height: 8),
+          _buildScanningPoint('FRONT / BACK face', 'If you see Red or Orange here (in the middle layer), it\'s BAD.'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScanningPoint(String location, String check) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('• ', style: TextStyle(color: Color(0xFF8B5CF6), fontWeight: FontWeight.bold)),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(text: '$location: ', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                TextSpan(text: check, style: const TextStyle(color: Colors.white60, fontSize: 12)),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
 
   Widget _buildDemoButtons(List<DemoOption> options) {
     return Column(
@@ -374,8 +432,9 @@ class _ZzGuideScreenState extends State<ZzGuideScreen>
 
   /// Returns a state with several bad edges highlighted (conceptually)
   CubeState _getBadEdgeState() {
-    // Apply some moves that flip edges
-    return CubeState.solved().applyMoves(_parseAlg("F R B L"));
+    // A complex example: F setup some bad edges, then R moves them, and B flips more.
+    // Results in 8 scattered bad edges that require a multi-step solve.
+    return CubeState.solved().applyMoves(_parseAlg("F R B"));
   }
 
   /// Returns a state where exactly the EOLine is solved
@@ -395,21 +454,9 @@ class _ZzGuideScreenState extends State<ZzGuideScreen>
     return s;
   }
 
-  CubeState _getLeftBlockDemoState() {
-    // Scrambled except for EOLine, ready to solve LB
-    return CubeState.solved().applyMoves(_parseAlg("U L U' L'"));
-  }
 
   CubeState _getRightBlockSolvedState() {
     return CubeState.solved();
-  }
-
-  List<MapEntry<CubeFace, int>> _getOrientedStickers() {
-    return [
-      const MapEntry(CubeFace.u, 1), const MapEntry(CubeFace.u, 3), const MapEntry(CubeFace.u, 5), const MapEntry(CubeFace.u, 7),
-      const MapEntry(CubeFace.d, 1), const MapEntry(CubeFace.d, 3), const MapEntry(CubeFace.d, 5), const MapEntry(CubeFace.d, 7),
-      const MapEntry(CubeFace.f, 3), const MapEntry(CubeFace.f, 5), const MapEntry(CubeFace.b, 3), const MapEntry(CubeFace.b, 5),
-    ];
   }
 
   List<MapEntry<CubeFace, int>> _getLeftBlockStickers() {
@@ -440,6 +487,49 @@ class _ZzGuideScreenState extends State<ZzGuideScreen>
         const MapEntry(CubeFace.b, 3), const MapEntry(CubeFace.b, 6),
     ]);
     return res;
+  }
+
+  Map<CubeFace, Map<int, String>> _getBadEdgeLabels(CubeState s) {
+    final Map<CubeFace, Map<int, String>> labels = {};
+    
+    // Centers for orientation reference (assuming standard orientation)
+    final cU = s.getFace(CubeFace.u)[4];
+    final cD = s.getFace(CubeFace.d)[4];
+    final cF = s.getFace(CubeFace.f)[4];
+    final cB = s.getFace(CubeFace.b)[4];
+
+    final edges = [
+      (CubeFace.u, 1, CubeFace.b, 1), (CubeFace.u, 3, CubeFace.l, 1), (CubeFace.u, 5, CubeFace.r, 1), (CubeFace.u, 7, CubeFace.f, 1),
+      (CubeFace.d, 1, CubeFace.f, 7), (CubeFace.d, 7, CubeFace.b, 7), (CubeFace.d, 3, CubeFace.l, 7), (CubeFace.d, 5, CubeFace.r, 7),
+      (CubeFace.f, 3, CubeFace.l, 5), (CubeFace.f, 5, CubeFace.r, 3), (CubeFace.b, 3, CubeFace.r, 5), (CubeFace.b, 5, CubeFace.l, 3)
+    ];
+
+    for (final e in edges) {
+      final isOriented = _isEdgeOrientedZZ(s, e, cU, cD, cF, cB);
+      final label = isOriented ? 'G' : 'B';
+      
+      labels.putIfAbsent(e.$1, () => {})[e.$2] = label;
+      labels.putIfAbsent(e.$3, () => {})[e.$4] = label;
+    }
+
+    return labels;
+  }
+
+  bool _isEdgeOrientedZZ(CubeState s, (CubeFace, int, CubeFace, int) edge, CubeColor cU, CubeColor cD, CubeColor cF, CubeColor cB) {
+    final color1 = s.getFace(edge.$1)[edge.$2];
+    final color2 = s.getFace(edge.$3)[edge.$4];
+
+    bool isBadColor(CubeColor c) => c == CubeColor.red || c == CubeColor.orange;
+
+    // The Red/Orange Rule: BAD if these colors are on U, D, F, or B faces
+    if ((edge.$1 == CubeFace.u || edge.$1 == CubeFace.d || edge.$1 == CubeFace.f || edge.$1 == CubeFace.b) && isBadColor(color1)) {
+      return false;
+    }
+    if ((edge.$3 == CubeFace.u || edge.$3 == CubeFace.d || edge.$3 == CubeFace.f || edge.$3 == CubeFace.b) && isBadColor(color2)) {
+      return false;
+    }
+
+    return true;
   }
 
   List<CubeMove> _parseAlg(String alg) {
