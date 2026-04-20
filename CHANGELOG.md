@@ -2,6 +2,18 @@
 
 All notable changes to the SpeedCube AR project will be documented in this file.
 
+## [2026.3.0] - 2026-04-20
+
+### Added
+- **Roux Method Support**: Introduced a full solver and interactive tutorial for the Roux method, featuring efficient block-building and M-slice logic.
+- **ZZ Method Support**: Added a memory-efficient ZZ solver and specialized tutorial focusing on EOLine and color neutrality.
+- **Enhanced Solver Architecture**: Implemented a parent-pointer based BFS for all solvers, significantly reducing memory usage and allowing for larger search budgets without crashes.
+- **Tutorial UX Polish**: Optimized camera transitions and reorientation moves for Roux and ZZ guides to improve visual clarity.
+
+### Fixed
+- Resolved a performance regression in the BFS search that could lead to Out-Of-Memory errors on complex scrambles.
+- Corrected various small UI inconsistencies in the tutorial move-sequencing demos.
+
 ## [2026.2.0] - 2026-04-07
 
 ### Added
