@@ -156,7 +156,9 @@ class PremiumManager extends ChangeNotifier {
       'detailed_explanations',
       'cfop_tutorial',
       'roux_tutorial',
-      'zz_tutorial'
+      'zz_tutorial',
+      'petrus_tutorial',
+      'petrus_solver'
     ];
     return !gatedFeatures.contains(featureId);
   }

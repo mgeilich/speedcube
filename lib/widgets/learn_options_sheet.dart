@@ -8,6 +8,7 @@ class LearnOptionsSheet extends StatelessWidget {
   final VoidCallback onSelectCfopMethod;
   final VoidCallback onSelectRouxMethod;
   final VoidCallback onSelectZzMethod;
+  final VoidCallback onSelectPetrusMethod;
 
   const LearnOptionsSheet({
     super.key,
@@ -16,6 +17,7 @@ class LearnOptionsSheet extends StatelessWidget {
     required this.onSelectCfopMethod,
     required this.onSelectRouxMethod,
     required this.onSelectZzMethod,
+    required this.onSelectPetrusMethod,
   });
 
   @override
@@ -131,6 +133,18 @@ class LearnOptionsSheet extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       onSelectZzMethod();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildOptionCard(
+                    icon: Icons.view_in_ar_rounded,
+                    isAdvanced: true,
+                    isPremium: true,
+                    title: 'Petrus Method',
+                    description: 'Build blocks, orient edges, and solve efficiently',
+                    onTap: () {
+                      Navigator.pop(context);
+                      onSelectPetrusMethod();
                     },
                   ),
                   const SizedBox(height: 40),

@@ -542,7 +542,7 @@ class HomeController extends ChangeNotifier {
     final solveMethod = method ?? _selectedSolveMethod;
     if (_animationController.isAnimating) return;
 
-    if ((solveMethod == SolveMethod.lbl || solveMethod == SolveMethod.cfop) &&
+    if (solveMethod != SolveMethod.kociemba &&
         !PremiumManager().canAccessFeature('lbl_solver')) {
       return;
     }

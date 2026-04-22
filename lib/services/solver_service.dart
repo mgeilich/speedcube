@@ -6,6 +6,7 @@ import '../solver/lbl_solver.dart';
 import '../solver/cfop_solver.dart';
 import '../solver/roux_solver.dart';
 import '../solver/zz_solver.dart';
+import '../solver/petrus_solver.dart';
 import 'package:flutter/foundation.dart';
 import '../models/solve_method.dart';
 
@@ -37,6 +38,30 @@ class SolverService {
     SolveMethod method = SolveMethod.kociemba,
   }) async {
     switch (method) {
+      case SolveMethod.petrus:
+        final result = await PetrusSolver.solve(state);
+        
+        final List<CubeMove> moves = result.allMoves;
+        final List<String?> stageNames = [];
+        final List<String?> stageDescriptions = [];
+        final List<String?> algorithmNames = [];
+
+        for (final step in result.steps) {
+          for (int i = 0; i < step.moves.length; i++) {
+            stageNames.add(step.stageName);
+            stageDescriptions.add(step.description);
+            algorithmNames.add(step.algorithmName);
+          }
+        }
+
+        return SolveResult(
+          moves: moves,
+          phase1MoveCount: moves.length,
+          stageNames: stageNames,
+          stageDescriptions: stageDescriptions,
+          algorithmNames: algorithmNames,
+        );
+
       case SolveMethod.lbl:
       case SolveMethod.cfop:
       case SolveMethod.roux:

@@ -787,6 +787,8 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
         return 'ZZ (Speedcube)';
       case SolveMethod.kociemba:
         return 'Kociemba (Optimal)';
+      case SolveMethod.petrus:
+        return 'Petrus Method';
     }
   }
 
@@ -800,6 +802,8 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
         return 'SOLVE ROUX';
       case SolveMethod.zz:
         return 'SOLVE ZZ';
+      case SolveMethod.petrus:
+        return 'SOLVE PETRUS';
       case SolveMethod.kociemba:
         return 'SOLVE OPTIMAL';
     }

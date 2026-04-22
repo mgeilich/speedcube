@@ -9,6 +9,7 @@ import 'widgets/layer_by_layer_guide_sheet.dart';
 import 'widgets/cfop_guide_screen.dart';
 import 'widgets/roux_guide_screen.dart';
 import 'widgets/zz_guide_screen.dart';
+import 'widgets/petrus_guide_screen.dart';
 import 'widgets/home_header.dart';
 import 'widgets/cube_interactive_view.dart';
 import 'widgets/solve_controls.dart';
@@ -80,6 +81,8 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
         _showRouxGuide(initialStepIndex: stepIndex);
       } else if (demoType == 'zz') {
         _showZzGuide(initialStepIndex: stepIndex);
+      } else if (demoType == 'petrus') {
+        _showPetrusGuide(initialStepIndex: stepIndex);
       } else {
         _showLayerByLayerGuide(initialStepIndex: stepIndex);
       }
@@ -275,6 +278,9 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
         },
         onSelectZzMethod: () {
           _showZzGuide(initialStepIndex: initialStepIndex);
+        },
+        onSelectPetrusMethod: () {
+          _showPetrusGuide(initialStepIndex: initialStepIndex);
         },
       ),
     );
@@ -560,6 +566,46 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
                 initialRotationY: initialRotationY,
                 targetRotationY: targetRotationY,
                 demoType: 'zz',
+                stickerLabels: stickerLabels,
+                targetPieces: targetPieces);
+          },
+        ),
+      ),
+    );
+  }
+  void _showPetrusGuide({int? initialStepIndex, double? scrollOffset}) {
+    if (!PremiumManager().canAccessFeature('petrus_tutorial')) {
+      _showPremiumUpsell();
+      return;
+    }
+
+    _homeController.showingSolution = false;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PetrusGuideScreen(
+          initialExpandedStepIndex: initialStepIndex ?? 0,
+          initialScrollOffset: scrollOffset ?? 0,
+          onTabChanged: (stepIndex) {
+            // Optional: Store progress in HomeController
+          },
+          onDemoRequested: (stepIndex, initialState,
+              {moves,
+              initialRotationX,
+              targetRotationX,
+              initialRotationY,
+              targetRotationY,
+              demoType,
+              stickerLabels,
+              targetPieces,
+              scrollOffset}) {
+            _onDemoRequested(stepIndex, initialState,
+                moves: moves,
+                initialRotationX: initialRotationX,
+                targetRotationX: targetRotationX,
+                initialRotationY: initialRotationY,
+                targetRotationY: targetRotationY,
+                demoType: 'petrus',
                 stickerLabels: stickerLabels,
                 targetPieces: targetPieces);
           },

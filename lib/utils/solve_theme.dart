@@ -28,8 +28,10 @@ class SolveTheme {
         s.contains('oll') ||
         s.contains('eoline')) {
       return yellowGold;
-    } else if (s.contains('yellow corners') || s.contains('pll')) {
+    } else if (s.contains('yellow corners') || s.contains('pll') || s.contains('last layer')) {
       return amber;
+    } else if (s.contains('edge orientation')) {
+      return yellowGold;
     }
 
     return primaryIndigo;
