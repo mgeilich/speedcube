@@ -386,6 +386,8 @@ class _PetrusGuideScreenState extends State<PetrusGuideScreen>
           const SizedBox(height: 12),
           _buildTipPoint('CFOP Method', 'Use OLL (Orientation) and PLL (Permutation) for a fast finish.'),
           const SizedBox(height: 8),
+          _buildTipPoint('Winter Variation', 'Skip OLL entirely! Since edges are already oriented, you can solve all corners while inserting your last F2L pair.'),
+          const SizedBox(height: 8),
           _buildTipPoint('Layer-by-Layer', 'Follow the beginner steps for corner placement and orientation.'),
         ],
       ),

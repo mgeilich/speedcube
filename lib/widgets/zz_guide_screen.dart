@@ -300,7 +300,44 @@ class _ZzGuideScreenState extends State<ZzGuideScreen>
           'Tip: Use guidance from previous tutorials (like CFOP) for specific PLL algorithms.',
           style: TextStyle(color: Colors.white54, fontSize: 12, fontStyle: FontStyle.italic),
         ),
+        const SizedBox(height: 32),
+        _buildProTip(),
       ],
+    );
+  }
+
+  Widget _buildProTip() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF8B5CF6).withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.lightbulb_outline, color: Color(0xFF8B5CF6), size: 20),
+              SizedBox(width: 8),
+              Text(
+                'PRO TIP: WINTER VARIATION',
+                style: TextStyle(
+                    color: Color(0xFF8B5CF6),
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Since ZZ guarantees oriented edges by the time you reach the last slot, you are ALWAYS in a position to use Winter Variation. This allows you to solve the entire top face (skip OLL) while inserting your final F2L pair.',
+            style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+          ),
+        ],
+      ),
     );
   }
 

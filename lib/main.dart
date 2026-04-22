@@ -15,6 +15,7 @@ import 'widgets/cube_interactive_view.dart';
 import 'widgets/solve_controls.dart';
 import 'widgets/introduction_sheet.dart';
 import 'widgets/settings_sheet.dart';
+import 'widgets/alg_library_screen.dart';
 
 import 'widgets/ar_scan_screen.dart';
 import 'utils/premium_manager.dart';
@@ -184,6 +185,7 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
             HomeHeader(
               onScanPressed: _startScan,
               onLearnPressed: _showLearnMenu,
+              onLibraryPressed: _showAlgLibrary,
               onSettingsPressed: _showSettings,
             ),
             CubeInteractiveView(
@@ -611,6 +613,17 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
           },
         ),
       ),
+    );
+  }
+
+  void _showAlgLibrary() {
+    if (!PremiumManager().canAccessFeature('alg_library')) {
+      _showPremiumUpsell();
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AlgLibraryScreen()),
     );
   }
 }

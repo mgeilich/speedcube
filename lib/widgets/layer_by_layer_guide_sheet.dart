@@ -848,7 +848,44 @@ class _LayerByLayerGuideSheetState extends State<LayerByLayerGuideSheet>
             },
           ),
         ]),
+        const SizedBox(height: 32),
+        _buildLookingAheadTip(),
       ],
+    );
+  }
+
+  Widget _buildLookingAheadTip() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF10B981).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.auto_awesome, color: Color(0xFF10B981), size: 20),
+              SizedBox(width: 8),
+              Text(
+                'LOOKING AHEAD: WINTER VARIATION',
+                style: TextStyle(
+                    color: Color(0xFF10B981),
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'In more advanced methods (like CFOP or ZZ), you can skip the entire top face orientation step. "Winter Variation" is a set of algorithms that solves the yellow top while you are still finishing your last side pair!',
+            style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+          ),
+        ],
+      ),
     );
   }
 

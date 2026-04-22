@@ -158,7 +158,8 @@ class PremiumManager extends ChangeNotifier {
       'roux_tutorial',
       'zz_tutorial',
       'petrus_tutorial',
-      'petrus_solver'
+      'petrus_solver',
+      'alg_library'
     ];
     return !gatedFeatures.contains(featureId);
   }

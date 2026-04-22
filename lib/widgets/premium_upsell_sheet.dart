@@ -217,7 +217,7 @@ class _PremiumUpsellSheetState extends State<PremiumUpsellSheet> {
                   _buildFeatureRow(
                     Icons.psychology_rounded,
                     'Pro AR Solvers',
-                    'Unlock LBL, CFOP, Roux, and ZZ algorithms.',
+                    'Unlock LBL, CFOP, Roux, ZZ, and Petrus algorithms.',
                     false,
                   ),
                   _buildDivider(),
@@ -232,6 +232,13 @@ class _PremiumUpsellSheetState extends State<PremiumUpsellSheet> {
                     Icons.shuffle_rounded,
                     'Pro Randomizer',
                     'Jump to a high-entropy random state instantly.',
+                    false,
+                  ),
+                  _buildDivider(),
+                  _buildFeatureRow(
+                    Icons.menu_book_rounded,
+                    'Full Algorithm Library',
+                    'F2L, OLL, PLL, and Winter Variation.',
                     false,
                   ),
                 ],

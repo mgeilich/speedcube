@@ -6,12 +6,14 @@ import 'premium_upsell_sheet.dart';
 class HomeHeader extends StatelessWidget {
   final VoidCallback onScanPressed;
   final VoidCallback onLearnPressed;
+  final VoidCallback onLibraryPressed;
   final VoidCallback onSettingsPressed;
 
   const HomeHeader({
     super.key,
     required this.onScanPressed,
     required this.onLearnPressed,
+    required this.onLibraryPressed,
     required this.onSettingsPressed,
   });
 
@@ -97,6 +99,48 @@ class HomeHeader extends StatelessWidget {
                 icon: const Icon(Icons.school, color: Colors.white70, size: 24),
                 onPressed: onLearnPressed,
                 tooltip: 'Learn Mode',
+              ),
+              const SizedBox(width: 2),
+              // Library button
+              Stack(
+                children: [
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: const Icon(Icons.menu_book, color: Colors.white70, size: 24),
+                    onPressed: () {
+                      if (!kIsWeb && !PremiumManager().isPremium) {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          isScrollControlled: true,
+                          builder: (context) => const PremiumUpsellSheet(),
+                        );
+                        return;
+                      }
+                      onLibraryPressed();
+                    },
+                    tooltip: 'Algorithm Library',
+                  ),
+                  if (!kIsWeb && !PremiumManager().isPremium)
+                    Positioned(
+                      right: -2,
+                      bottom: -2,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF0F0F1A),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.lock,
+                          color: Color(0xFFF59E0B),
+                          size: 10,
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(width: 2),
               // Settings button

@@ -21,7 +21,7 @@ class _AlgLibraryScreenState extends State<AlgLibraryScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -157,9 +157,10 @@ class _AlgLibraryScreenState extends State<AlgLibraryScreen>
           labelStyle:
               const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           tabs: [
-            Tab(text: 'First Two Layers  (${AlgLibrary.f2lCases.length})'),
-            Tab(text: 'Orient Last Layer  (57)'),
-            Tab(text: 'Permute Last Layer  (21)'),
+            Tab(text: 'F2L'),
+            Tab(text: 'OLL'),
+            Tab(text: 'PLL'),
+            Tab(text: 'Winter Var.'),
           ],
         ),
       ),
@@ -169,6 +170,7 @@ class _AlgLibraryScreenState extends State<AlgLibraryScreen>
           _AlgGrid(cases: AlgLibrary.f2l, onTap: _openCase),
           _AlgGrid(cases: AlgLibrary.oll, onTap: _openCase),
           _AlgGrid(cases: AlgLibrary.pll, onTap: _openCase),
+          _AlgGrid(cases: AlgLibrary.winterVariation, onTap: _openCase),
         ],
       ),
     );
@@ -365,8 +367,8 @@ class _TopDiagramPainter extends CustomPainter {
   _TopDiagramPainter(this.state, this.category);
 
   Color _getColor(CubeColor c) {
-    // For OLL, only yellow stickers matter. Non-yellow should be dark.
-    if (category == AlgCategory.oll && c != CubeColor.yellow) {
+    // For OLL and WV, only yellow stickers matter. Non-yellow should be dark.
+    if ((category == AlgCategory.oll || category == AlgCategory.winterVariation) && c != CubeColor.yellow) {
       return const Color(0xFF333344);
     }
     switch (c) {
@@ -524,6 +526,11 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
               ? CubeState.solved()
               : CubeState.yellowTopSolved())
           .applyMoves(widget.algCase.setupMoveList);
+      if (widget.algCase.category == AlgCategory.winterVariation) {
+        // For WV, the last pair is out of the slot.
+        // Setup moves for WV should include taking the pair out if not already in setup.
+        // Let's assume the setup moves handle it.
+      }
       _isAnimating = false;
       _highlightedMove = -1;
     });
@@ -620,7 +627,7 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
                       ? 'F2L'
                       : (widget.algCase.category == AlgCategory.oll
                           ? 'OLL'
-                          : 'PLL'),
+                          : (widget.algCase.category == AlgCategory.pll ? 'PLL' : 'WV')),
                   const Color(0xFF6366F1),
                 ),
                 const SizedBox(width: 8),

@@ -1,7 +1,7 @@
 import 'cube_move.dart';
 
 /// Categories for algorithm cases
-enum AlgCategory { f2l, oll, pll, cmll }
+enum AlgCategory { f2l, oll, pll, cmll, winterVariation }
 
 /// A single algorithm case (OLL or PLL)
 class AlgCase {
@@ -42,12 +42,13 @@ class AlgCase {
 /// Static library of all OLL and PLL algorithm cases.
 /// All algorithms use only standard face notation: U D R L F B (with ' and 2).
 class AlgLibrary {
-  static const List<AlgCase> all = [...f2lCases, ...ollCases, ...pllCases, ...cmllCases];
+  static const List<AlgCase> all = [...f2lCases, ...ollCases, ...pllCases, ...cmllCases, ...winterVariationCases];
 
   static List<AlgCase> get f2l => f2lCases;
   static List<AlgCase> get oll => ollCases;
   static List<AlgCase> get pll => pllCases;
   static List<AlgCase> get cmll => cmllCases;
+  static List<AlgCase> get winterVariation => winterVariationCases;
 
   // ─────────────────────────────────────────────────────────────────────────
   // OLL CASES
@@ -1172,6 +1173,73 @@ class AlgLibrary {
       algorithm: "R' F R B' R' F' R B",
       setupMoves: "B' R' F R B R' F' R",
       description: 'L-Orientation. Recognition: Two oriented corners are diagonal to each other.',
+    ),
+  ];
+
+  static const List<AlgCase> winterVariationCases = [
+    AlgCase(
+      id: 'wv1',
+      name: 'WV 1',
+      category: AlgCategory.winterVariation,
+      subcategory: '0 Corners Oriented',
+      algorithm: "R U' R' U' R U' R' U2 R U R'",
+      setupMoves: "R U' R' U2 R U R' U R U R'",
+      description: 'Zero corners oriented. Recognition: No yellow stickers on top corners.',
+    ),
+    AlgCase(
+      id: 'wv2',
+      name: 'WV 2',
+      category: AlgCategory.winterVariation,
+      subcategory: '0 Corners Oriented',
+      algorithm: "U R U2 R' U' R U R'",
+      setupMoves: "R U' R' U R U2 R' U'",
+      description: 'Zero corners oriented. Recognition: Two stickers facing front, two facing back.',
+    ),
+    AlgCase(
+      id: 'wv7',
+      name: 'WV 7',
+      category: AlgCategory.winterVariation,
+      subcategory: '1 Corner Oriented',
+      algorithm: "L' U R U' R' L",
+      setupMoves: "L' R U R' U' L",
+      description: 'One corner oriented. Also known as the "Sledge-Sune" variant.',
+    ),
+    AlgCase(
+      id: 'wv12',
+      name: 'WV 12',
+      category: AlgCategory.winterVariation,
+      subcategory: '1 Corner Oriented',
+      algorithm: "R U' R' U R U2 R'",
+      setupMoves: "R U2 R' U' R U R'",
+      description: 'One corner oriented. Recognition: Sune-like pattern.',
+    ),
+    AlgCase(
+      id: 'wv19',
+      name: 'WV 19',
+      category: AlgCategory.winterVariation,
+      subcategory: '2 Corners Oriented',
+      algorithm: "R U2 R'",
+      setupMoves: "R U2 R'",
+      description: 'Two corners oriented. Recognition: The simplest WV case.',
+    ),
+    AlgCase(
+      id: 'wv22',
+      name: 'WV 22',
+      category: AlgCategory.winterVariation,
+      subcategory: '2 Corners Oriented',
+      algorithm: "R U R' U' R U' R'",
+      setupMoves: "R U R' U R U' R'",
+      description: 'Two corners oriented. Recognition: Headlights facing front.',
+    ),
+    AlgCase(
+      id: 'wv27',
+      name: 'WV 27',
+      category: AlgCategory.winterVariation,
+      subcategory: '3 Corners Oriented',
+      algorithm: "R U R'",
+      setupMoves: "R' U' R",
+      description: 'The "Solved" case: Simple insertion solves the OLL as well.',
+      isFree: true,
     ),
   ];
 }
