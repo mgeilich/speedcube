@@ -2,6 +2,19 @@
 
 All notable changes to the SpeedCube AR project will be documented in this file.
 
+## [2026.4.0] - 2026-04-23
+
+### Added
+- **Finalized Petrus Method Support**: Completed the Petrus method solver and interactive guide with 100% solve reliability and detailed block-building stage illustrations (2x2x2, 2x2x3, F2L, EO, LL).
+- **Winter Variation (WV) Algorithm Library**: Introduced a new advanced algorithm category to the library, featuring 27 WV cases to optimize Last Layer solves (Premium feature).
+- **Enhanced ZZ Method Tutorial**: Simplified the EOLine stage and clarified edge orientation rules for a better beginner learning experience.
+- **Roux Method Improvements**: Refined M-slice logic and block-building demonstrations for improved visual clarity during solves.
+
+### Fixed
+- **Premium Upsell Corrections**: Updated the premium features list to correctly reflect that the Layer-by-Layer (LBL) method is part of the free app.
+- **Solver Reliability**: Resolved various edge-case failures in the Petrus and ZZ solvers through architectural improvements and increased search budgets.
+- **UI Polish**: Fixed several camera transition and sticker highlighting issues in the interactive guides.
+
 ## [2026.3.0] - 2026-04-20
 
 ### Added
