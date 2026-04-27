@@ -2,6 +2,7 @@ import '../models/cube_state.dart';
 import '../models/cube_move.dart';
 import '../models/alg_library.dart';
 import '../models/solve_result.dart';
+import 'package:flutter/foundation.dart';
 
 /// A perspective defines which physical faces correspond to logical faces (U,D,L,R,F,B).
 /// Duplicated from LblSolver for independence.
@@ -47,10 +48,10 @@ class Perspective {
 class CfopSolver {
 
   /// Solve the cube using CFOP (Cross + F2L + OLL + PLL)
-  static LblSolveResult? solve(CubeState initial) {
+  static Future<LblSolveResult?> solve(CubeState initial, {void Function(String)? onProgress}) async {
     var s = initial;
     if (s.isSolved) {
-      return const LblSolveResult(steps: []);
+      return LblSolveResult(steps: []);
     }
 
     final steps = <LblStep>[];
@@ -67,7 +68,6 @@ class CfopSolver {
     s = initial.applyMoves(orientationMoves);
     
     // 2. Physically Move Green to Front (CubeFace.f)
-    // After moving white to bottom, yellow is at top. Green must be on sides.
     CubeFace greenFace = _findCenterFace(s, CubeColor.green);
     if (greenFace == CubeFace.b) { orientationMoves.add(CubeMove.y2); }
     else if (greenFace == CubeFace.r) { orientationMoves.add(CubeMove.y); }
@@ -85,7 +85,8 @@ class CfopSolver {
 
     // 1. Cross
     if (!isCrossSolved(s, p)) {
-      final crossMoves = _findAdvancedCross(s, p);
+      onProgress?.call("Solving Cross...");
+      final crossMoves = await compute(_findAdvancedCrossIsolate, _SolverInput(s, p));
       if (crossMoves.isNotEmpty) {
         steps.add(LblStep(
           stageName: 'Advanced Cross',
@@ -94,8 +95,7 @@ class CfopSolver {
         ));
         s = s.applyMoves(crossMoves);
       } else {
-        // Fallback to Daisy (shouldn't be needed)
-        final daisySteps = _whiteCross(s, p);
+        final daisySteps = await compute(_whiteCrossIsolate, _SolverInput(s, p));
         for (final step in daisySteps) {
           s = s.applyMoves(step.moves);
           steps.add(step);
@@ -104,36 +104,39 @@ class CfopSolver {
     }
 
     // 2. F2L
-    final s2 = _f2l(s, p);
+    onProgress?.call("Solving F2L...");
+    final s2 = await compute(_f2lIsolate, _SolverInput(s, p));
     for (final step in s2) {
       s = s.applyMoves(step.moves);
       steps.add(step);
     }
 
     // 3. OLL
-    final s3 = _oll(s, p);
+    onProgress?.call("Solving OLL...");
+    final s3 = await compute(_ollIsolate, _SolverInput(s, p));
     for (final step in s3) {
       s = s.applyMoves(step.moves);
       steps.add(step);
     }
 
     // 4. PLL
-    final s4 = _pll(s, p);
+    onProgress?.call("Solving PLL...");
+    final s4 = await compute(_pllIsolate, _SolverInput(s, p));
     for (final step in s4) {
       s = s.applyMoves(step.moves);
       steps.add(step);
     }
     
-    // Final check for tiny gaps or errors in beginner fallbacks
+    // Final check
     if (!s.isSolved) {
-      final align = _alignYellowEdges(s, p);
+      final align = await compute(_alignYellowEdgesIsolate, _SolverInput(s, p));
       for (final st in align) {
         s = s.applyMoves(st.moves);
         steps.add(st);
       }
     }
     if (!s.isSolved) {
-      final corners = _yellowCorners(s, p);
+      final corners = await compute(_yellowCornersIsolate, _SolverInput(s, p));
       for (final st in corners) {
         s = s.applyMoves(st.moves);
         steps.add(st);
@@ -142,6 +145,15 @@ class CfopSolver {
 
     return LblSolveResult(steps: optimizeSteps(steps));
   }
+
+  // Isolate wrappers
+  static List<CubeMove> _findAdvancedCrossIsolate(_SolverInput input) => _findAdvancedCross(input.state, input.perspective);
+  static List<LblStep> _whiteCrossIsolate(_SolverInput input) => _whiteCross(input.state, input.perspective);
+  static List<LblStep> _f2lIsolate(_SolverInput input) => _f2l(input.state, input.perspective);
+  static List<LblStep> _ollIsolate(_SolverInput input) => _oll(input.state, input.perspective);
+  static List<LblStep> _pllIsolate(_SolverInput input) => _pll(input.state, input.perspective);
+  static List<LblStep> _alignYellowEdgesIsolate(_SolverInput input) => _alignYellowEdges(input.state, input.perspective);
+  static List<LblStep> _yellowCornersIsolate(_SolverInput input) => _yellowCorners(input.state, input.perspective);
 
   // ─────────────────────────────────────────────────────────────────────────
   // CFOP STAGES
@@ -1150,4 +1162,10 @@ class _CrossSearchNode {
   final CubeState state;
   final List<CubeMove> moves;
   _CrossSearchNode(this.state, this.moves);
+}
+
+class _SolverInput {
+  final CubeState state;
+  final Perspective perspective;
+  _SolverInput(this.state, this.perspective);
 }

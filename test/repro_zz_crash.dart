@@ -3,7 +3,7 @@ import 'package:speedcube_ar/models/cube_state.dart';
 import 'package:speedcube_ar/models/cube_move.dart';
 import 'package:speedcube_ar/solver/zz_solver.dart';
 
-void main() {
+void main() async {
   // Scramble the cube (approx 20 moves)
   final scramble = "R U R' U' F R2 U' R' U' R U R' F' L U L' U' L' B L B'";
   print("Testing ZZ Solver with scramble: $scramble");
@@ -15,7 +15,7 @@ void main() {
   
   // Test ZZ Solver
   print("Running ZZ Solver...");
-  final result = ZzSolver.solve(state);
+  final result = await ZzSolver.solve(state);
   
   stopwatch.stop();
   

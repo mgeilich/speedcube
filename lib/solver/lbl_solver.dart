@@ -2,6 +2,7 @@ import 'package:logging/logging.dart';
 import '../models/cube_state.dart';
 import '../models/cube_move.dart';
 import '../models/solve_result.dart';
+import 'package:flutter/foundation.dart';
 
 /// A perspective defines which physical faces correspond to logical faces (U,D,L,R,F,B).
 class Perspective {
@@ -50,7 +51,7 @@ class LblSolver {
   static final _log = Logger('LblSolver');
 
   /// Solve the cube.
-  static LblSolveResult? solve(CubeState initial) {
+  static Future<LblSolveResult?> solve(CubeState initial, {void Function(String)? onProgress}) async {
     var s = initial;
     if (s.isSolved) {
       return LblSolveResult(steps: []);
@@ -62,8 +63,10 @@ class LblSolver {
     final whiteFace = _findCenterFace(s, CubeColor.white);
     final p = perspectiveFor(whiteFace);
 
-    steps.addAll(_whiteCross(s, p));
-    for (final step in steps) {
+    onProgress?.call("Solving White Cross...");
+    final s1 = await compute(_whiteCrossIsolate, _SolverInput(s, p));
+    steps.addAll(s1);
+    for (final step in s1) {
       s = s.applyMoves(step.moves);
     }
 
@@ -76,35 +79,40 @@ class LblSolver {
     final p2 = perspectiveFlipped(p);
 
     // Stage 2: First Layer Corners
-    final s2 = _firstLayerCorners(s, p2);
+    onProgress?.call("Solving First Layer Corners...");
+    final s2 = await compute(_firstLayerCornersIsolate, _SolverInput(s, p2));
     steps.addAll(s2);
     for (final step in s2) {
       s = s.applyMoves(step.moves);
     }
 
     // Stage 3: Second Layer Edges
-    final s3 = _secondLayerEdges(s, p2);
+    onProgress?.call("Solving Second Layer Edges...");
+    final s3 = await compute(_secondLayerEdgesIsolate, _SolverInput(s, p2));
     steps.addAll(s3);
     for (final step in s3) {
       s = s.applyMoves(step.moves);
     }
 
     // Stage 4: Yellow Cross (Orientation)
-    final s4 = _yellowCross(s, p2);
+    onProgress?.call("Solving Yellow Cross...");
+    final s4 = await compute(_yellowCrossIsolate, _SolverInput(s, p2));
     steps.addAll(s4);
     for (final step in s4) {
       s = s.applyMoves(step.moves);
     }
 
     // Stage 5: Align Yellow Edges (Edge Permutation)
-    final s5 = _alignYellowEdges(s, p2);
+    onProgress?.call("Aligning Yellow Edges...");
+    final s5 = await compute(_alignYellowEdgesIsolate, _SolverInput(s, p2));
     steps.addAll(s5);
     for (final step in s5) {
       s = s.applyMoves(step.moves);
     }
 
     // Stage 6: Yellow Corners (Permutation and Orientation)
-    final s6 = _yellowCorners(s, p2);
+    onProgress?.call("Solving Yellow Corners...");
+    final s6 = await compute(_yellowCornersIsolate, _SolverInput(s, p2));
     steps.addAll(s6);
     for (final step in s6) {
       s = s.applyMoves(step.moves);
@@ -112,6 +120,14 @@ class LblSolver {
 
     return LblSolveResult(steps: optimizeSteps(steps));
   }
+
+  // Isolate wrappers
+  static List<LblStep> _whiteCrossIsolate(_SolverInput input) => _whiteCross(input.state, input.perspective);
+  static List<LblStep> _firstLayerCornersIsolate(_SolverInput input) => _firstLayerCorners(input.state, input.perspective);
+  static List<LblStep> _secondLayerEdgesIsolate(_SolverInput input) => _secondLayerEdges(input.state, input.perspective);
+  static List<LblStep> _yellowCrossIsolate(_SolverInput input) => _yellowCross(input.state, input.perspective);
+  static List<LblStep> _alignYellowEdgesIsolate(_SolverInput input) => _alignYellowEdges(input.state, input.perspective);
+  static List<LblStep> _yellowCornersIsolate(_SolverInput input) => _yellowCorners(input.state, input.perspective);
 
   static CubeFace _findCenterFace(CubeState s, CubeColor c) {
     for (final f in CubeFace.physicalFaces) {
@@ -1312,4 +1328,10 @@ class LblSolver {
 
     return result;
   }
+}
+
+class _SolverInput {
+  final CubeState state;
+  final Perspective perspective;
+  _SolverInput(this.state, this.perspective);
 }

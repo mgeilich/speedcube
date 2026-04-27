@@ -2,26 +2,28 @@ import '../models/cube_state.dart';
 import '../models/cube_move.dart';
 import '../models/alg_library.dart';
 import '../models/solve_result.dart';
+import 'package:flutter/foundation.dart';
 
 /// A solver that implements the ZZ method (EOLine, ZZ-F2L, LL).
 class ZzSolver {
   
   /// Solve the cube using the ZZ method.
-  static LblSolveResult? solve(CubeState initial) {
+  static Future<LblSolveResult?> solve(CubeState initial, {void Function(String)? onProgress}) async {
     if (initial.isSolved) return const LblSolveResult(steps: []);
 
     // 1. Orientation Scoring
     final orientations = _generateAll24Rotations();
     orientations.sort((a, b) => _scoreZzOrientation(initial.applyMoves(b)).compareTo(_scoreZzOrientation(initial.applyMoves(a))));
     
+    onProgress?.call("Analyzing orientations...");
+
     // Pass 1: Try top 6 orientations with generous budget
     for (int i = 0; i < 6 && i < orientations.length; i++) {
         final rotation = orientations[i];
         final oriented = initial.applyMoves(rotation);
-        final result = _solveFromOrientation(oriented, rotation);
+        final result = await _solveFromOrientation(oriented, rotation, onProgress: onProgress);
         if (result != null) return result;
     }
-
 
     return null;
   }
@@ -50,7 +52,7 @@ class ZzSolver {
   }
 
 
-  static LblSolveResult? _solveFromOrientation(CubeState oriented, List<CubeMove> preMoves) {
+  static Future<LblSolveResult?> _solveFromOrientation(CubeState oriented, List<CubeMove> preMoves, {void Function(String)? onProgress}) async {
     final steps = <LblStep>[];
     if (preMoves.isNotEmpty) {
       steps.add(LblStep(
@@ -63,7 +65,8 @@ class ZzSolver {
     var s = oriented;
 
     // Stage 1a: EO (Edge Orientation)
-    final eoMoves = _findEO(s);
+    onProgress?.call("Orienting Edges...");
+    final eoMoves = await compute(_findEO, s);
     if (eoMoves == null) return null;
     if (eoMoves.isNotEmpty) {
       steps.add(LblStep(
@@ -75,7 +78,8 @@ class ZzSolver {
     }
 
     // Stage 1b: Line (DF/DB)
-    final lineMoves = _findLine(s);
+    onProgress?.call("Solving Line...");
+    final lineMoves = await compute(_findLine, s);
     if (lineMoves == null) return null;
     if (lineMoves.isNotEmpty) {
       steps.add(LblStep(
@@ -87,27 +91,31 @@ class ZzSolver {
     }
 
     // Stage 2: Left Block
-    final lbSteps = _solveBlock(s, isLeft: true);
+    onProgress?.call("Solving Left Block...");
+    final lbSteps = await compute(_solveLeftBlockIsolate, s);
     if (lbSteps == null) return null;
     steps.addAll(lbSteps);
     s = s.applyMoves(lbSteps.expand((st) => st.moves).toList());
 
     // Stage 3: Right Block
-    // When solving Right Block, we must preserve the Left Block
-    final rbSteps = _solveBlock(s, isLeft: false, preserveOtherBlock: true);
+    onProgress?.call("Solving Right Block...");
+    final rbSteps = await compute(_solveRightBlockIsolate, s);
     if (rbSteps == null) return null;
     steps.addAll(rbSteps);
     s = s.applyMoves(rbSteps.expand((st) => st.moves).toList());
 
     // Stage 4: Last Layer
-    final llSteps = _solveLL(s);
+    onProgress?.call("Solving Last Layer...");
+    final llSteps = await compute(_solveLL, s);
     if (llSteps == null) return null;
     steps.addAll(llSteps);
 
-
-
     return LblSolveResult(steps: _optimizeSteps(steps));
   }
+
+  // Isolate wrappers
+  static List<LblStep>? _solveLeftBlockIsolate(CubeState s) => _solveBlock(s, isLeft: true);
+  static List<LblStep>? _solveRightBlockIsolate(CubeState s) => _solveBlock(s, isLeft: false, preserveOtherBlock: true);
 
 
 

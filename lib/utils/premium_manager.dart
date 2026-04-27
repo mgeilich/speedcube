@@ -159,6 +159,8 @@ class PremiumManager extends ChangeNotifier {
       'zz_tutorial',
       'petrus_tutorial',
       'petrus_solver',
+      'heise_tutorial',
+      'heise_solver',
       'alg_library'
     ];
     return !gatedFeatures.contains(featureId);

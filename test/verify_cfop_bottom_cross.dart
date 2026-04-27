@@ -2,7 +2,7 @@
 import 'package:speedcube_ar/models/cube_state.dart';
 import 'package:speedcube_ar/solver/cfop_solver.dart';
 
-void main() {
+void main() async {
   print('Testing CFOP Solver with Bottom Cross...');
 
   int successCount = 0;
@@ -12,7 +12,7 @@ void main() {
     final scramble = CubeState.generateScramble(25);
     final initialState = CubeState.solved().applyMoves(scramble);
     
-    final result = CfopSolver.solve(initialState);
+    final result = await CfopSolver.solve(initialState);
     if (result == null) {
       print('Test ${i + 1}: FAILED (Solver returned null)');
       continue;

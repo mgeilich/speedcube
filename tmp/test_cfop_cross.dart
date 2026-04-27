@@ -2,7 +2,7 @@ import 'package:logging/logging.dart';
 import 'package:speedcube_ar/models/cube_state.dart';
 import 'package:speedcube_ar/solver/cfop_solver.dart';
 
-void main() {
+void main() async {
   // Initialize logging for the standalone script
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen((record) {
@@ -15,7 +15,7 @@ void main() {
   for (int i = 0; i < 5; i++) {
     log.info('--- Test #$i ---');
     var scramble = CubeState.generateScramble(20);
-    var solveResult = CfopSolver.solve(CubeState.solved().applyMoves(scramble));
+    var solveResult = await CfopSolver.solve(CubeState.solved().applyMoves(scramble));
     
     if (solveResult == null) {
       log.severe('FAILED: Solve result is null');

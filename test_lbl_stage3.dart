@@ -4,11 +4,11 @@ import 'lib/models/cube_state.dart';
 import 'lib/models/cube_move.dart';
 import 'lib/solver/lbl_solver.dart';
 
-void main() {
+void main() async {
   initLogging();
   final log = Logger('TestStage3');
 
-  final numTests = 20;
+  final numTests = 100;
   int crossPassedCount = 0;
   int firstLayerPassedCount = 0;
   int secondLayerPassedCount = 0;
@@ -17,7 +17,7 @@ void main() {
     final scrambleMoves = CubeState.generateScramble(20);
     final scrambled = CubeState.solved().applyMoves(scrambleMoves);
 
-    final result = LblSolver.solve(scrambled);
+    final result = await LblSolver.solve(scrambled);
     if (result == null) {
       log.severe('Test $i: FAIL - solver returned null');
       continue;

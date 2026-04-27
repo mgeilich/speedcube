@@ -7,7 +7,7 @@ import 'package:logging/logging.dart';
 final _log = Logger('RouxLogicTest');
 
 void main() {
-  test("Roux Solver Reliability Test - Complex Scrambles", () {
+  test("Roux Solver Reliability Test - Complex Scrambles", () async {
     _log.info("--- Testing Roux with Failing 20-move Scramble ---");
     final scrambleStr = "D' F D B D B' L' F B' R D F' D B F' R' L' D' F' R'";
     final scramble = scrambleStr.split(" ").map((s) => CubeMove.parse(s)).whereType<CubeMove>().toList();
@@ -16,7 +16,7 @@ void main() {
     var state = CubeState.solved().applyMoves(scramble);
     
     final stopwatch = Stopwatch()..start();
-    final result = RouxSolver.solve(state);
+    final result = await RouxSolver.solve(state);
     stopwatch.stop();
     
     if (result == null) {

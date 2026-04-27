@@ -1,23 +1,26 @@
 import '../models/cube_state.dart';
 import '../models/cube_move.dart';
 import '../models/solve_result.dart';
+import 'package:flutter/foundation.dart';
 
 /// A solver that implements the Roux method with 100% reliability.
 /// Uses piecewise decomposition with high budgets and orientation prioritization.
 class RouxSolver {
   /// Entry point for the Roux solver.
-  static LblSolveResult? solve(CubeState initial) {
+  static Future<LblSolveResult?> solve(CubeState initial, {void Function(String)? onProgress}) async {
     if (initial.isSolved) return const LblSolveResult(steps: []);
     
     // Sort orientations by "First Block promise" to find solutions faster.
     final orientations = generateAll24Rotations();
     orientations.sort((a, b) => _scoreOrientation(initial.applyMoves(b)).compareTo(_scoreOrientation(initial.applyMoves(a))));
 
+    onProgress?.call("Analyzing orientations...");
+
     // Pass 1: Try the top 6 orientations (likely best for Roux)
     for (int i = 0; i < 6 && i < orientations.length; i++) {
       final rotation = orientations[i];
       final state = initial.applyMoves(rotation);
-      final result = solveFromOrientation(state, rotation);
+      final result = await solveFromOrientation(state, rotation, onProgress: onProgress);
       if (result != null) return result;
     }
 
@@ -25,7 +28,7 @@ class RouxSolver {
     for (int i = 6; i < orientations.length; i++) {
       final rotation = orientations[i];
       final state = initial.applyMoves(rotation);
-      final result = solveFromOrientation(state, rotation);
+      final result = await solveFromOrientation(state, rotation, onProgress: onProgress);
       if (result != null) return result;
     }
 
@@ -52,14 +55,13 @@ class RouxSolver {
     if (s.getFace(CubeFace.l)[8] == l && s.getFace(CubeFace.d)[0] == d && s.getFace(CubeFace.f)[6] == f) score += 3; // DFL
     
     // Priority 4: Pair detection (e.g. BL edge and DBL corner are connected)
-    // This is a simple version: check if stickers match color
     if (s.getFace(CubeFace.l)[3] == s.getFace(CubeFace.l)[6]) score += 1;
     if (s.getFace(CubeFace.l)[5] == s.getFace(CubeFace.l)[8]) score += 1;
 
     return score;
   }
 
-  static LblSolveResult? solveFromOrientation(CubeState oriented, List<CubeMove> preMoves) {
+  static Future<LblSolveResult?> solveFromOrientation(CubeState oriented, List<CubeMove> preMoves, {void Function(String)? onProgress}) async {
     final steps = <LblStep>[];
     if (preMoves.isNotEmpty) {
       steps.add(LblStep(
@@ -72,25 +74,29 @@ class RouxSolver {
     var s = oriented;
 
     // 1. First Block (FB)
-    final fbSteps = findFBRealistic(s);
+    onProgress?.call("Solving First Block...");
+    final fbSteps = await compute(findFBRealistic, s);
     if (fbSteps == null) return null;
     steps.addAll(fbSteps);
     s = s.applyMoves(fbSteps.expand((st) => st.moves).toList());
 
     // 2. Second Block (SB)
-    final sbSteps = solveSBRealistic(s);
+    onProgress?.call("Solving Second Block...");
+    final sbSteps = await compute(solveSBRealistic, s);
     if (sbSteps == null) return null;
     steps.addAll(sbSteps);
     s = s.applyMoves(sbSteps.expand((st) => st.moves).toList());
 
     // 3. CMLL
-    final cmllMoves = findCMLL(s);
+    onProgress?.call("Solving CMLL...");
+    final cmllMoves = await compute(findCMLL, s);
     if (cmllMoves == null) return null;
     steps.add(LblStep(stageName: 'CMLL', moves: cmllMoves, description: 'Solve corners.'));
     s = s.applyMoves(cmllMoves);
 
     // 4. LSE
-    final lseSteps = solveLSE(s);
+    onProgress?.call("Solving LSE...");
+    final lseSteps = await compute(solveLSE, s);
     if (lseSteps == null) return null;
     steps.addAll(lseSteps);
 

@@ -216,6 +216,7 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
               analysisController: _homeController.analysisController,
               isScrambling: _homeController.isScrambling,
               isSolving: _homeController.isSolving,
+              solveStatus: _homeController.solveStatus,
               isAnimating: _homeController.animationController.isAnimating,
               cubeState: _homeController.cubeState,
               scrambleLength: _homeController.scrambleLength,

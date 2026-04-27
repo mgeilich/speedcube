@@ -3,7 +3,7 @@ import 'package:speedcube_ar/models/cube_state.dart';
 import 'package:speedcube_ar/models/cube_move.dart';
 import 'package:speedcube_ar/solver/lbl_solver.dart';
 
-void main() {
+void main() async {
   final numTests = 100;
   int passedCount = 0;
 
@@ -11,7 +11,7 @@ void main() {
     final scrambleMoves = CubeState.generateScramble(20);
     final scrambled = CubeState.solved().applyMoves(scrambleMoves);
 
-    final result = LblSolver.solve(scrambled);
+    final result = await LblSolver.solve(scrambled);
     if (result == null) {
       print('Test $i: FAIL - solver returned null');
       continue;

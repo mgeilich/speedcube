@@ -4,6 +4,7 @@ import '../models/solve_result.dart';
 import 'kociemba_coordinates.dart';
 import 'kociemba_search.dart';
 import 'dart:collection';
+import 'package:flutter/foundation.dart';
 
 class PetrusStep extends LblStep {
   const PetrusStep({
@@ -15,12 +16,13 @@ class PetrusStep extends LblStep {
 }
 
 class PetrusSolver {
-  static Future<LblSolveResult> solve(CubeState state) async {
+  static Future<LblSolveResult> solve(CubeState state, {void Function(String)? onProgress}) async {
     final steps = <LblStep>[];
-    final currentCube = KociembaCube.fromCubeState(state);
+    KociembaCube currentCube = KociembaCube.fromCubeState(state);
 
     // Stage 1: 2x2x2 Block
-    final s1Moves = solve2x2x2(currentCube);
+    onProgress?.call("Solving 2x2x2 Block...");
+    final s1Moves = await compute(_solve2x2x2Isolate, currentCube);
     if (s1Moves.isNotEmpty) {
       steps.add(LblStep(
         stageName: "2x2x2 Block",
@@ -33,7 +35,8 @@ class PetrusSolver {
     }
 
     // Stage 2: 2x2x3 Block
-    final s2Moves = solve2x2x3(currentCube);
+    onProgress?.call("Expanding 2x2x3...");
+    final s2Moves = await compute(_solve2x2x3Isolate, currentCube);
     if (s2Moves.isNotEmpty) {
       steps.add(LblStep(
         stageName: "2x2x3 Expansion",
@@ -46,7 +49,8 @@ class PetrusSolver {
     }
 
     // Stage 3: Edge Orientation
-    final s3Moves = solveEO(currentCube);
+    onProgress?.call("Orienting Edges...");
+    final s3Moves = await compute(_solveEOIsolate, currentCube);
     if (s3Moves.isNotEmpty) {
       steps.add(LblStep(
         stageName: "Edge Orientation",
@@ -59,7 +63,8 @@ class PetrusSolver {
     }
 
     // Stage 4: Finish F2L
-    final s4Moves = solveF2L(currentCube);
+    onProgress?.call("Completing F2L...");
+    final s4Moves = await compute(_solveF2LIsolate, currentCube);
     if (s4Moves.isNotEmpty) {
       steps.add(LblStep(
         stageName: "Finish F2L",
@@ -72,6 +77,7 @@ class PetrusSolver {
     }
 
     // Stage 5: Last Layer
+    onProgress?.call("Solving Last Layer...");
     final currentState = state.applyMoves(steps.expand((s) => s.moves).toList());
     final s5Moves = await solveLL(currentState);
     if (s5Moves.isNotEmpty) {
@@ -84,6 +90,12 @@ class PetrusSolver {
 
     return LblSolveResult(steps: steps);
   }
+
+  // Isolate wrappers
+  static List<CubeMove> _solve2x2x2Isolate(KociembaCube cube) => solve2x2x2(cube);
+  static List<CubeMove> _solve2x2x3Isolate(KociembaCube cube) => solve2x2x3(cube);
+  static List<CubeMove> _solveEOIsolate(KociembaCube cube) => solveEO(cube);
+  static List<CubeMove> _solveF2LIsolate(KociembaCube cube) => solveF2L(cube);
 
   static Future<List<CubeMove>> solveLL(CubeState state) async {
     if (state.isSolved) return [];

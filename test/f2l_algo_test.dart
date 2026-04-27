@@ -15,7 +15,7 @@ void main() {
   List<CubeMove> parse(String s) =>
       s.isEmpty ? [] : s.split(' ').map((m) => CubeMove.parse(m)!).toList();
   
-  test('Full CFOP Solver Verification (U-layer scramble)', () {
+  test('Full CFOP Solver Verification (U-layer scramble)', () async {
     log.info("Starting U-layer only CFOP test");
 
     // A simple T-perm scramble to verify PLL
@@ -25,7 +25,7 @@ void main() {
     
     expect(_isF2lSolved(testState), true, reason: "Scramble should keep F2L solved");
 
-    final result = CfopSolver.solve(testState);
+    final result = await CfopSolver.solve(testState);
     if (result == null) {
       fail("Solver returned null");
     }

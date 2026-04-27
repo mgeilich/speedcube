@@ -21,6 +21,7 @@ class SolveControls extends StatelessWidget {
   final AnalysisController analysisController;
   final bool isScrambling;
   final bool isSolving;
+  final String? solveStatus;
   final bool isAnimating;
   final CubeState cubeState;
   final int scrambleLength;
@@ -50,6 +51,7 @@ class SolveControls extends StatelessWidget {
     required this.analysisController,
     required this.isScrambling,
     required this.isSolving,
+    this.solveStatus,
     required this.isAnimating,
     required this.cubeState,
     required this.scrambleLength,
@@ -624,7 +626,7 @@ class SolveControls extends StatelessWidget {
     } else if (isSolving) {
       return _buildButton(
         icon: Icons.auto_fix_high,
-        label: 'Solving...',
+        label: solveStatus ?? 'Solving...',
         onPressed: null,
         color: const Color(0xFF22C55E),
         width: 280,
@@ -657,6 +659,8 @@ class SolveControls extends StatelessWidget {
           if (isPremium)
             PremiumSolverSelector(
               isAnimating: isAnimating,
+              isSolving: isSolving,
+              solveStatus: solveStatus,
               onSolve: onSolve,
               selectedMethod: selectedMethod,
               onMethodChanged: onMethodChanged,
@@ -758,6 +762,8 @@ class SolveControls extends StatelessWidget {
 
 class PremiumSolverSelector extends StatefulWidget {
   final bool isAnimating;
+  final bool isSolving;
+  final String? solveStatus;
   final Function({SolveMethod? method, bool showExplanations}) onSolve;
   final SolveMethod selectedMethod;
   final Function(SolveMethod) onMethodChanged;
@@ -765,6 +771,8 @@ class PremiumSolverSelector extends StatefulWidget {
   const PremiumSolverSelector({
     super.key,
     required this.isAnimating,
+    required this.isSolving,
+    this.solveStatus,
     required this.onSolve,
     required this.selectedMethod,
     required this.onMethodChanged,
@@ -789,6 +797,8 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
         return 'Kociemba (Optimal)';
       case SolveMethod.petrus:
         return 'Petrus Method';
+      case SolveMethod.heise:
+        return 'Heise Method (Efficient)';
     }
   }
 
@@ -806,16 +816,20 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
         return 'SOLVE PETRUS';
       case SolveMethod.kociemba:
         return 'SOLVE OPTIMAL';
+      case SolveMethod.heise:
+        return 'SOLVE HEISE';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final selectedMethod = widget.selectedMethod;
-    final isDisabled = widget.isAnimating;
+    final isSolving = widget.isSolving;
+    final isDisabled = widget.isAnimating || isSolving;
     
     const primaryColor = Color(0xFF6366F1);
-    final buttonColor = isDisabled ? primaryColor.withValues(alpha: 0.3) : primaryColor;
+    final activeColor = isSolving ? const Color(0xFF10B981) : primaryColor;
+    final buttonColor = isDisabled && !isSolving ? primaryColor.withValues(alpha: 0.3) : activeColor;
 
     return Container(
       width: 300,
@@ -862,7 +876,7 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
                     const SizedBox(width: 10),
                     Flexible(
                       child: Text(
-                        _getSolveButtonLabel(selectedMethod),
+                        isSolving ? (widget.solveStatus ?? 'Solving...') : _getSolveButtonLabel(selectedMethod),
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,

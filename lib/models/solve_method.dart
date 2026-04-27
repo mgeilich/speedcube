@@ -1,1 +1,1 @@
-enum SolveMethod { kociemba, lbl, cfop, roux, zz, petrus }
+enum SolveMethod { kociemba, lbl, cfop, roux, zz, petrus, heise }

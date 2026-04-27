@@ -33,6 +33,7 @@ class HomeController extends ChangeNotifier {
 
   bool _isScrambling = false;
   bool _isSolving = false;
+  String? _solveStatus;
   int? _activeDemoStepIndex;
   String? _activeDemoType;
   Map<CubeFace, Map<int, String>>? _stickerLabels;
@@ -111,6 +112,7 @@ class HomeController extends ChangeNotifier {
   int get solutionStartIndex => _solutionStartIndex;
   bool get showingSolution => _showingSolution;
   bool get isSolving => _isSolving;
+  String? get solveStatus => _solveStatus;
   bool get isScrambling => _isScrambling;
   int? get activeDemoStepIndex => _activeDemoStepIndex;
   bool get isDemo => _activeDemoStepIndex != null && _showingSolution;
@@ -562,6 +564,7 @@ class HomeController extends ChangeNotifier {
         : _cubeState;
 
     _isSolving = true;
+    _solveStatus = "Solving...";
     _cubeState = solveState;
     if (!_showingSolution) {
       _baseCubeState = solveState;
@@ -575,10 +578,15 @@ class HomeController extends ChangeNotifier {
       solveResult = await SolverService.solve(
         state: solveState,
         method: solveMethod,
+        onProgress: (status) {
+          _solveStatus = status;
+          notifyListeners();
+        },
       );
     } catch (e) {
       debugPrint("Solver failed: $e");
       _isSolving = false;
+      _solveStatus = null;
       notifyListeners();
       return;
     }
@@ -596,6 +604,7 @@ class HomeController extends ChangeNotifier {
 
       // Stop "solving" (computing) and show interactive playback controls
       _isSolving = false;
+      _solveStatus = null;
       _showingSolution = true;
 
       _analysisController.loadSolution(
