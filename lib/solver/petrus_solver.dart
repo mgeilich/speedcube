@@ -5,6 +5,7 @@ import 'kociemba_coordinates.dart';
 import 'kociemba_search.dart';
 import 'dart:collection';
 import 'package:flutter/foundation.dart';
+import 'heise_solver.dart';
 
 class PetrusStep extends LblStep {
   const PetrusStep({
@@ -16,8 +17,48 @@ class PetrusStep extends LblStep {
 }
 
 class PetrusSolver {
-  static Future<LblSolveResult> solve(CubeState state, {void Function(String)? onProgress}) async {
+  /// Entry point for the Petrus solver.
+  static Future<LblSolveResult> solve(CubeState initial, {void Function(String)? onProgress}) async {
+    if (initial.isSolved) return const LblSolveResult(steps: []);
+    
+    // 1. Analyze all 24 orientations and pick the one with the best 2x2x2 block
+    onProgress?.call("Analyzing orientations...");
+    final orientations = HeiseSolver.generateAll24Rotations();
+    
+    // Sort orientations by how close they are to a 2x2x2 block
+    orientations.sort((a, b) => _scorePetrusOrientation(initial.applyMoves(b)).compareTo(_scorePetrusOrientation(initial.applyMoves(a))));
+
+    // Pass 1: Try the top 4 orientations
+    for (int i = 0; i < 4 && i < orientations.length; i++) {
+      final rotation = orientations[i];
+      final state = initial.applyMoves(rotation);
+      final result = await _solveFromOrientation(state, rotation, onProgress: onProgress);
+      if (result != null) return result;
+    }
+
+    // Pass 2: Fallback
+    for (int i = 4; i < orientations.length; i++) {
+      final rotation = orientations[i];
+      final state = initial.applyMoves(rotation);
+      final result = await _solveFromOrientation(state, rotation, onProgress: onProgress);
+      if (result != null) return result;
+    }
+
+    return LblSolveResult(steps: []);
+  }
+
+  static Future<LblSolveResult?> _solveFromOrientation(CubeState state, List<CubeMove> rotation, {void Function(String)? onProgress}) async {
     final steps = <LblStep>[];
+
+    // 0. Initial Orientation
+    if (rotation.isNotEmpty) {
+      steps.add(LblStep(
+        stageName: "Orientation",
+        moves: rotation,
+        description: "Orienting the cube to the best starting position.",
+      ));
+    }
+
     KociembaCube currentCube = KociembaCube.fromCubeState(state);
 
     // Stage 1: 2x2x2 Block
@@ -32,6 +73,8 @@ class PetrusSolver {
       for (final m in s1Moves) {
         currentCube.applyMove(m.face, m.turns);
       }
+    } else if (!is2x2x2Solved(currentCube)) {
+      return null;
     }
 
     // Stage 2: 2x2x3 Block
@@ -46,6 +89,8 @@ class PetrusSolver {
       for (final m in s2Moves) {
         currentCube.applyMove(m.face, m.turns);
       }
+    } else if (!is2x2x3Solved(currentCube)) {
+      return null;
     }
 
     // Stage 3: Edge Orientation
@@ -78,7 +123,8 @@ class PetrusSolver {
 
     // Stage 5: Last Layer
     onProgress?.call("Solving Last Layer...");
-    final currentState = state.applyMoves(steps.expand((s) => s.moves).toList());
+    final rotationMoves = steps.expand((s) => s.moves).toList();
+    final currentState = state.applyMoves(rotationMoves);
     final s5Moves = await solveLL(currentState);
     if (s5Moves.isNotEmpty) {
       steps.add(LblStep(
@@ -86,9 +132,18 @@ class PetrusSolver {
         moves: s5Moves,
         description: "Solve the final layer using orientation and permutation.",
       ));
+    } else if (!state.applyMoves(rotationMoves).isSolved) {
+      return null;
     }
 
     return LblSolveResult(steps: steps);
+  }
+
+  // Scoring for Petrus
+  static int _scorePetrusOrientation(CubeState s) {
+    // Petrus also starts with a 2x2x2 block at DBL
+    // Reuse Heise scoring logic as it's identical for the first stage
+    return HeiseSolver.scoreHeiseOrientation(s);
   }
 
   // Isolate wrappers
@@ -109,6 +164,17 @@ class PetrusSolver {
   // ─────────────────────────────────────────────────────────────────────────
   // STAGES
   // ─────────────────────────────────────────────────────────────────────────
+
+  static bool is2x2x2Solved(KociembaCube c) =>
+      c.cp[6] == 6 && c.co[6] == 0 && 
+      c.ep[6] == 6 && c.eo[6] == 0 &&
+      c.ep[7] == 7 && c.eo[7] == 0 &&
+      c.ep[10] == 10 && c.eo[10] == 0;
+
+  static bool is2x2x3Solved(KociembaCube c) {
+    if (!is2x2x2Solved(c)) return false;
+    return c.cp[5] == 5 && c.co[5] == 0 && c.ep[5] == 5 && c.eo[5] == 0 && c.ep[9] == 9 && c.eo[9] == 0;
+  }
 
   static List<CubeMove> solve2x2x2(KociembaCube cube) {
     final moves = <CubeMove>[];
