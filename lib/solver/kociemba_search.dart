@@ -21,7 +21,7 @@ class KociembaSearch {
     await KociembaTables.init();
     final cube = KociembaCube.fromCubeState(state);
 
-    if (cube.isSolved) {
+    if (cube.isSolved && solveCorners) {
       return KociembaSolveResult(moves: [], phase1MoveCount: 0);
     }
 

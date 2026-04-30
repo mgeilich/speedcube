@@ -280,9 +280,6 @@ class HeiseSolver {
     final orientation = _getOrientationToStandard(state);
     final orientedState = state.applyMoves(orientation);
     
-    final startK = KociembaCube.fromCubeState(orientedState);
-    if (startK.isSolved) return [];
-
     // 1. Find a full Kociemba solution
     final search = KociembaSearch(timeLimitMs: 3000);
     final res = await search.solve(orientedState);
@@ -297,15 +294,14 @@ class HeiseSolver {
       if (ck.isEdgeSolved) break;
     }
 
+    List<CubeMove>? finalMoves;
+
     if (ck.isEdgeSolved) {
       final unsolved = ck.unsolvedCornerCount;
       if (unsolved == 3) {
-        return _reorientMoves(partialMoves, orientation);
-      }
-      
-      if (unsolved == 0) {
-        // Already solved! To make it educational for the tutorial, 
-        // we'll "back off" by applying one PURE corner commutator.
+        finalMoves = partialMoves;
+      } else if (unsolved == 0) {
+        // Already solved! "Back off" by applying a corner commutator.
         final candidates = _generateCommutatorCandidates();
         for (final a in candidates) {
           final aPrime = a.reversed.map((m) => CubeMove(m.face, -m.turns)).toList();
@@ -316,25 +312,32 @@ class HeiseSolver {
             final testK = KociembaCube(); // Starts solved
             for (final m in comm) { testK.applyMove(m.face, m.turns); }
             if (testK.isEdgeSolved && testK.unsolvedCornerCount == 3) {
-               return _reorientMoves([...partialMoves, ...comm], orientation);
+               finalMoves = [...partialMoves, ...comm];
+               break;
             }
           }
+          if (finalMoves != null) break;
         }
-      }
-
-      // 3. We have some corners left (but not 3). Try to reach exactly 3 using a commutator.
-      final candidates = _generateCommutatorCandidates();
-      for (final c in candidates) {
-        final testK = KociembaCube.clone(ck);
-        for (final m in c) { testK.applyMove(m.face, m.turns); }
-        if (testK.isEdgeSolved && testK.unsolvedCornerCount == 3) {
-          return _reorientMoves([...partialMoves, ...c], orientation);
+      } else {
+        // Try to reach exactly 3 using a commutator.
+        final candidates = _generateCommutatorCandidates();
+        for (final c in candidates) {
+          final testK = KociembaCube.clone(ck);
+          for (final m in c) { testK.applyMove(m.face, m.turns); }
+          if (testK.isEdgeSolved && testK.unsolvedCornerCount == 3) {
+            finalMoves = [...partialMoves, ...c];
+            break;
+          }
         }
       }
     }
 
-    // Fallback: just return the full solution
-    return _reorientMoves(res.moves, orientation);
+    // Fallback: just use the full solution
+    finalMoves ??= res.moves;
+
+    // Directify to avoid "solve-then-break" intermediate states
+    final directMoves = await _directify(finalMoves);
+    return _reorientMoves(directMoves, orientation);
   }
 
 
@@ -616,6 +619,24 @@ class HeiseSolver {
     if (centerColor == CubeColor.green) return CubeFace.f;
     if (centerColor == CubeColor.blue) return CubeFace.b;
     return face;
+  }
+
+  /// Returns the shortest move sequence that reaches the same state as the input moves.
+  /// This is used to avoid "solve-then-break" paths in the tutorial.
+  static Future<List<CubeMove>> _directify(List<CubeMove> moves) async {
+    if (moves.isEmpty) return [];
+    
+    // To find the shortest path to state T = Identity * moves,
+    // we solve the state T^-1 to identity.
+    // T^-1 = moves^-1(Identity).
+    final invMoves = moves.reversed.map((m) => m.inverse).toList();
+    final searchState = CubeState.solved().applyMoves(invMoves);
+    
+    final search = KociembaSearch(timeLimitMs: 2000);
+    final res = await search.solve(searchState);
+    
+    if (res == null) return CubeMove.optimize(moves);
+    return res.moves;
   }
 
   static final _urfMoves = [

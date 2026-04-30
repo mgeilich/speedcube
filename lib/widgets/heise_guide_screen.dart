@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'cube_renderer.dart';
 import '../models/cube_state.dart';
 import '../models/cube_move.dart';
+import '../models/solve_result.dart';
+import '../solver/heise_solver.dart';
 
 class DemoOption {
   final String label;
@@ -12,6 +14,11 @@ class DemoOption {
 
 /// Interactive guide for the Heise method.
 class HeiseGuideScreen extends StatefulWidget {
+  static void clearCache() {
+    _HeiseGuideScreenState._cachedSolveResult = null;
+    _HeiseGuideScreenState._cachedScrambledState = null;
+  }
+
   final int initialExpandedStepIndex;
   final double initialScrollOffset;
   final void Function(
@@ -45,6 +52,12 @@ class HeiseGuideScreen extends StatefulWidget {
 class _HeiseGuideScreenState extends State<HeiseGuideScreen> with TickerProviderStateMixin {
   late final ScrollController _scrollController;
   late final TabController _tabController;
+  
+  static LblSolveResult? _cachedSolveResult;
+  static CubeState? _cachedScrambledState;
+  
+  bool _isSolving = false;
+  String? _solveError;
 
   @override
   void initState() {
@@ -56,6 +69,42 @@ class _HeiseGuideScreenState extends State<HeiseGuideScreen> with TickerProvider
       initialIndex: widget.initialExpandedStepIndex != -1 ? widget.initialExpandedStepIndex : 0,
     );
     _tabController.addListener(_handleTabChange);
+    
+    if (_cachedSolveResult == null) {
+      _generateAndSolve();
+    }
+  }
+
+  Future<void> _generateAndSolve() async {
+    setState(() {
+      _isSolving = true;
+      _solveError = null;
+    });
+
+    try {
+      final scramble = CubeState.generateScramble(20);
+      final state = CubeState.solved().applyMoves(scramble);
+      final result = await HeiseSolver.solve(state);
+      
+      if (result.steps.isEmpty) {
+        throw Exception("Solver failed to find a solution.");
+      }
+
+      if (mounted) {
+        setState(() {
+          _cachedScrambledState = state;
+          _cachedSolveResult = result;
+          _isSolving = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isSolving = false;
+          _solveError = e.toString();
+        });
+      }
+    }
   }
 
   void _handleTabChange() {
@@ -142,9 +191,19 @@ class _HeiseGuideScreenState extends State<HeiseGuideScreen> with TickerProvider
       children: [
         const Text('Stage 1: The 2x2x2 Block', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
-        const Text('Build a 2x2x2 block anywhere. Standard orientation uses the Back-Down-Left (DBL) corner.', style: TextStyle(color: Colors.white70, fontSize: 14)),
+        const Text('Build a 2x2x2 block anywhere. The most common approach is building it around the Down-Back-Left (DBL) corner.', style: TextStyle(color: Colors.white70, fontSize: 14)),
         const SizedBox(height: 32),
-        _buildIllustration('2x2x2 Block', 'One corner and three edges solved.', CubeState.solved(), highlightedStickers: _get2x2x2Stickers(), dimNonHighlighted: true, rotationX: 0.4, rotationY: 0.8),
+        _buildIllustration(
+          '2x2x2 Block (DBL)', 
+          'The corner and three adjacent edges are solved.', 
+          CubeState.solved(), 
+          highlightedStickers: _get2x2x2Stickers(), 
+          dimNonHighlighted: true, 
+          rotationX: 0.4, 
+          rotationY: 0.8
+        ),
+        const SizedBox(height: 24),
+        _buildDemoSection("2x2x2 Block", "Watch 2x2x2 Demo"),
       ],
     );
   }
@@ -155,9 +214,19 @@ class _HeiseGuideScreenState extends State<HeiseGuideScreen> with TickerProvider
       children: [
         const Text('Stage 2: Expand to 2x2x3', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
-        const Text('Extend your block into a 2x2x3. This leaves only two faces free to rotate (usually U and R).', style: TextStyle(color: Colors.white70, fontSize: 14)),
+        const Text('Extend your block into a 2x2x3. This typically involves adding the Down-Front-Left pieces, leaving only two faces free to rotate (U and R).', style: TextStyle(color: Colors.white70, fontSize: 14)),
         const SizedBox(height: 32),
-        _buildIllustration('2x2x3 Block', 'Expanding the 2x2x2 to the front.', CubeState.solved(), highlightedStickers: _get2x2x3Stickers(), dimNonHighlighted: true, rotationX: 0.4, rotationY: 0.8),
+        _buildIllustration(
+          '2x2x3 Block (Left Side)', 
+          'Expanding the 2x2x2 toward the front.', 
+          CubeState.solved(), 
+          highlightedStickers: _get2x2x3Stickers(), 
+          dimNonHighlighted: true, 
+          rotationX: 0.4, 
+          rotationY: 0.8
+        ),
+        const SizedBox(height: 24),
+        _buildDemoSection("2x2x3 Block", "Watch 2x2x3 Demo"),
       ],
     );
   }
@@ -168,8 +237,19 @@ class _HeiseGuideScreenState extends State<HeiseGuideScreen> with TickerProvider
       children: [
         const Text('Stage 3: Two Squares', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
-        const Text('Build two 1x2 squares on the remaining faces. This is the most intuitive part of Heise.', style: TextStyle(color: Colors.white70, fontSize: 14)),
+        const Text('Build two 1x2 squares on the remaining faces (Front and Right). This is the most intuitive part of Heise.', style: TextStyle(color: Colors.white70, fontSize: 14)),
         const SizedBox(height: 32),
+        _buildIllustration(
+          'Two Squares', 
+          'Leaving only 5 edges and 5 corners unsolved.', 
+          CubeState.solved(), 
+          highlightedStickers: _getTwoSquaresStickers(), 
+          dimNonHighlighted: true, 
+          rotationX: 0.4, 
+          rotationY: -0.6
+        ),
+        const SizedBox(height: 24),
+        _buildDemoSection("Two Squares", "Watch Squares Demo"),
       ],
     );
   }
@@ -180,7 +260,19 @@ class _HeiseGuideScreenState extends State<HeiseGuideScreen> with TickerProvider
       children: [
         const Text('Stage 4: Edge Orientation', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
-        const Text('Orient all remaining edges. This simplifies the final placement of pieces.', style: TextStyle(color: Colors.white70, fontSize: 14)),
+        const Text('Orient all remaining edges. This simplifies the final placement of pieces and prevents parity issues.', style: TextStyle(color: Colors.white70, fontSize: 14)),
+        const SizedBox(height: 32),
+        _buildIllustration(
+          'Edge Orientation', 
+          'All edges correctly oriented relative to Top/Bottom.', 
+          CubeState.solved(), 
+          highlightedStickers: _getEOStickers(), 
+          dimNonHighlighted: true, 
+          rotationX: 0.5, 
+          rotationY: -0.5
+        ),
+        const SizedBox(height: 24),
+        _buildDemoSection("Edge Orientation", "Watch EO Demo"),
       ],
     );
   }
@@ -192,6 +284,18 @@ class _HeiseGuideScreenState extends State<HeiseGuideScreen> with TickerProvider
         const Text('Stage 5: Edges & Two Corners', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         const Text('Solve all edges and two more corners. This leaves exactly three corners unsolved.', style: TextStyle(color: Colors.white70, fontSize: 14)),
+        const SizedBox(height: 32),
+        _buildIllustration(
+          'Edges and Two Corners', 
+          'Leaving a 3-corner commutator finish.', 
+          CubeState.solved(), 
+          highlightedStickers: _getStage5Stickers(), 
+          dimNonHighlighted: true, 
+          rotationX: 0.5, 
+          rotationY: -0.5
+        ),
+        const SizedBox(height: 24),
+        _buildDemoSection("Two Pairs & Edges", "Watch Edges Demo"),
       ],
     );
   }
@@ -203,13 +307,6 @@ class _HeiseGuideScreenState extends State<HeiseGuideScreen> with TickerProvider
         const Text('Stage 6: The Commutator', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         const Text('The final 3 corners are solved using a commutator: A B A\' B\'.', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 24),
-        _buildDemoButtons([
-          DemoOption(
-            label: 'Show Commutator (A B A\' B\')',
-            onTap: () => _requestCommutatorDemo(),
-          ),
-        ]),
         const SizedBox(height: 32),
         _buildIllustration(
           'Target Pieces',
@@ -222,34 +319,82 @@ class _HeiseGuideScreenState extends State<HeiseGuideScreen> with TickerProvider
           rotationX: 0.4,
           rotationY: 0.6,
         ),
+        const SizedBox(height: 24),
+        _buildDemoSection("The Commutator Finish", "Watch Commutator Demo"),
       ],
     );
   }
 
-  void _requestCommutatorDemo() {
-    // Standard Niklas commutator as an example: R U' L' U R' U' L U
-    final moves = [
-      CubeMove(CubeFace.r, 1), CubeMove(CubeFace.u, -1),
-      CubeMove(CubeFace.l, -1), CubeMove(CubeFace.u, 1),
-      CubeMove(CubeFace.r, -1), CubeMove(CubeFace.u, -1),
-      CubeMove(CubeFace.l, 1), CubeMove(CubeFace.u, 1),
-    ];
-    
-    final moveLabels = {
-      0: 'A', 1: 'B', 2: 'A\'', 3: 'B\'',
-      4: 'A', 5: 'B', 6: 'A\'', 7: 'B\'',
-    };
+  void _requestStageDemo(String stageName) {
+    if (_cachedSolveResult == null || _cachedScrambledState == null) return;
+
+    CubeState stateBefore = _cachedScrambledState!;
+    List<CubeMove>? moves;
+    Map<int, String>? moveLabels;
+
+    for (final step in _cachedSolveResult!.steps) {
+      if (step.stageName == stageName) {
+        moves = step.moves;
+        
+        if (stageName == "The Commutator Finish" && moves.length >= 8) {
+           moveLabels = {
+            0: 'A', 1: 'B', 2: 'A\'', 3: 'B\'',
+            4: 'A', 5: 'B', 6: 'A\'', 7: 'B\'',
+          };
+        }
+        break;
+      }
+      stateBefore = stateBefore.applyMoves(step.moves);
+    }
+
+    if (moves == null) return;
 
     widget.onDemoRequested?.call(
-      5, 
-      CubeState.solved().applyMoves(moves.reversed.map((m) => CubeMove(m.face, -m.turns)).toList()),
+      _tabController.index,
+      stateBefore,
       moves: moves,
       moveLabels: moveLabels,
-      stickerLabels: {
-        CubeFace.u: {0: '1', 2: '2'},
-        CubeFace.f: {0: '3'},
-      }
     );
+  }
+
+  Widget _buildDemoSection(String stageName, String buttonLabel) {
+    if (_isSolving) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: const Row(
+          children: [
+            SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFF59E0B))),
+            SizedBox(width: 12),
+            Text('Generating demo solve...', style: TextStyle(color: Colors.white54, fontSize: 13)),
+          ],
+        ),
+      );
+    }
+
+    if (_solveError != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Could not generate demo: $_solveError', style: const TextStyle(color: Colors.redAccent, fontSize: 13)),
+          const SizedBox(height: 8),
+          TextButton.icon(
+            onPressed: _generateAndSolve,
+            icon: const Icon(Icons.refresh, size: 16, color: Color(0xFFF59E0B)),
+            label: const Text('Retry Demo Generation', style: TextStyle(color: Color(0xFFF59E0B), fontSize: 13, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      );
+    }
+
+    final hasStage = _cachedSolveResult?.steps.any((s) => s.stageName == stageName) ?? false;
+    if (!hasStage) return const SizedBox.shrink();
+
+    return _buildDemoButtons([
+      DemoOption(
+        label: buttonLabel,
+        onTap: () => _requestStageDemo(stageName),
+      ),
+    ]);
   }
 
   // --- Helpers ---
@@ -308,19 +453,73 @@ class _HeiseGuideScreenState extends State<HeiseGuideScreen> with TickerProvider
 
   List<MapEntry<CubeFace, int>> _get2x2x2Stickers() {
     return [
-      const MapEntry(CubeFace.l, 0), const MapEntry(CubeFace.l, 3), const MapEntry(CubeFace.l, 6),
-      const MapEntry(CubeFace.l, 1), const MapEntry(CubeFace.l, 4), const MapEntry(CubeFace.l, 7),
-      const MapEntry(CubeFace.d, 0), const MapEntry(CubeFace.d, 3), const MapEntry(CubeFace.d, 6),
-      const MapEntry(CubeFace.b, 2), const MapEntry(CubeFace.b, 5), const MapEntry(CubeFace.b, 8),
+      // Left face (bottom back quadrant)
+      const MapEntry(CubeFace.l, 3), const MapEntry(CubeFace.l, 4),
+      const MapEntry(CubeFace.l, 6), const MapEntry(CubeFace.l, 7),
+      // Down face (back left quadrant)
+      const MapEntry(CubeFace.d, 3), const MapEntry(CubeFace.d, 4),
+      const MapEntry(CubeFace.d, 6), const MapEntry(CubeFace.d, 7),
+      // Back face (down left quadrant)
+      const MapEntry(CubeFace.b, 4), const MapEntry(CubeFace.b, 5),
+      const MapEntry(CubeFace.b, 7), const MapEntry(CubeFace.b, 8),
     ];
   }
 
   List<MapEntry<CubeFace, int>> _get2x2x3Stickers() {
     final res = _get2x2x2Stickers();
     res.addAll([
-      const MapEntry(CubeFace.f, 0), const MapEntry(CubeFace.f, 3), const MapEntry(CubeFace.f, 6),
-      const MapEntry(CubeFace.u, 6), const MapEntry(CubeFace.u, 3), const MapEntry(CubeFace.u, 0),
+      // Front face expansion
+      const MapEntry(CubeFace.f, 3), const MapEntry(CubeFace.f, 4),
+      const MapEntry(CubeFace.f, 6), const MapEntry(CubeFace.f, 7),
+      // Extra Left stickers
+      const MapEntry(CubeFace.l, 5), const MapEntry(CubeFace.l, 8),
+      // Extra Down stickers
+      const MapEntry(CubeFace.d, 0), const MapEntry(CubeFace.d, 1),
     ]);
+    return res;
+  }
+
+  List<MapEntry<CubeFace, int>> _getTwoSquaresStickers() {
+    final res = _get2x2x3Stickers();
+    res.addAll([
+      // Front-Down-Right square
+      const MapEntry(CubeFace.f, 5), const MapEntry(CubeFace.f, 8),
+      const MapEntry(CubeFace.r, 6), const MapEntry(CubeFace.r, 7),
+      const MapEntry(CubeFace.d, 2), const MapEntry(CubeFace.d, 5),
+      // Back-Down-Right square
+      const MapEntry(CubeFace.b, 3), const MapEntry(CubeFace.b, 6),
+      const MapEntry(CubeFace.r, 5), const MapEntry(CubeFace.r, 8),
+      const MapEntry(CubeFace.d, 8),
+    ]);
+    return res;
+  }
+
+  List<MapEntry<CubeFace, int>> _getEOStickers() {
+    // Show all stickers from Stage 3 plus all edges highlighted
+    final res = _getTwoSquaresStickers();
+    // Top edges
+    res.addAll([
+      const MapEntry(CubeFace.u, 1), const MapEntry(CubeFace.u, 3),
+      const MapEntry(CubeFace.u, 5), const MapEntry(CubeFace.u, 7),
+      const MapEntry(CubeFace.f, 1), const MapEntry(CubeFace.r, 1),
+      const MapEntry(CubeFace.b, 1), const MapEntry(CubeFace.l, 1),
+    ]);
+    return res;
+  }
+
+  List<MapEntry<CubeFace, int>> _getStage5Stickers() {
+    // Everything except 3 corners (e.g., UFL, UFR, UBR)
+    final res = <MapEntry<CubeFace, int>>[];
+    for (final face in CubeFace.physicalFaces) {
+      for (int i = 0; i < 9; i++) {
+        // Skip some top corners
+        if (face == CubeFace.u && (i == 0 || i == 2 || i == 8)) continue;
+        if (face == CubeFace.l && i == 0) continue;
+        if (face == CubeFace.f && i == 2) continue;
+        if (face == CubeFace.r && i == 2) continue;
+        res.add(MapEntry(face, i));
+      }
+    }
     return res;
   }
 }

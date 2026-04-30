@@ -290,6 +290,7 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
           _showPetrusGuide(initialStepIndex: initialStepIndex);
         },
         onSelectHeiseMethod: () {
+          HeiseGuideScreen.clearCache();
           _showHeiseGuide(initialStepIndex: initialStepIndex);
         },
       ),
