@@ -9,7 +9,8 @@ class LearnOptionsSheet extends StatelessWidget {
   final VoidCallback onSelectRouxMethod;
   final VoidCallback onSelectZzMethod;
   final VoidCallback onSelectPetrusMethod;
-
+  final VoidCallback onSelectHeiseMethod;
+ 
   const LearnOptionsSheet({
     super.key,
     required this.onSelectIntroduction,
@@ -18,6 +19,7 @@ class LearnOptionsSheet extends StatelessWidget {
     required this.onSelectRouxMethod,
     required this.onSelectZzMethod,
     required this.onSelectPetrusMethod,
+    required this.onSelectHeiseMethod,
   });
 
   @override
@@ -145,6 +147,18 @@ class LearnOptionsSheet extends StatelessWidget {
                     onTap: () {
                       Navigator.pop(context);
                       onSelectPetrusMethod();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildOptionCard(
+                    icon: Icons.auto_awesome_mosaic_rounded,
+                    isAdvanced: true,
+                    isPremium: true,
+                    title: 'Heise Method',
+                    description: 'The intuitive challenge: No algorithms, just blocks and commutators',
+                    onTap: () {
+                      Navigator.pop(context);
+                      onSelectHeiseMethod();
                     },
                   ),
                   const SizedBox(height: 40),

@@ -13,8 +13,9 @@ class KociembaSearch {
 
   List<CubeMove>? _bestSolution;
   int _bestSolutionLength = 999;
+  final bool solveCorners;
 
-  KociembaSearch({this.timeLimitMs = 400, this.maxTotalDepth = 24});
+  KociembaSearch({this.timeLimitMs = 400, this.maxTotalDepth = 24, this.solveCorners = true});
 
   Future<KociembaSolveResult?> solve(CubeState state) async {
     await KociembaTables.init();
@@ -148,10 +149,26 @@ class KociembaSearch {
       int cp, int ep, int usp, int depth, List<int> moves, int lastFace) {
     int h1 = KociembaTables.cpUspPrun[cp * KociembaTables.nSlicePerm + usp];
     int h2 = KociembaTables.epUspPrun[ep * KociembaTables.nSlicePerm + usp];
-    int h = h1 > h2 ? h1 : h2;
 
-    if (h == 0) return true;
-    if (h > depth) return false;
+    if (solveCorners) {
+      final int h = h1 > h2 ? h1 : h2;
+      if (h == 0) return true;
+      if (h > depth) return false;
+    } else {
+      // Heise Stage 5: only care about edges — use h2 for pruning only.
+      // h1 (corners) is intentionally ignored so the search isn't killed.
+      if (h2 == 0) {
+        // All edges solved. Check that exactly 3 corners remain unsolved.
+        final cube = KociembaCube();
+        cube.cpRank = cp;
+        final unsolved = cube.unsolvedCornerCount;
+        // Accept 0 (fully solved) or 3 (commutator finish)
+        if (unsolved == 0 || unsolved == 3) return true;
+        // Wrong corner count; reject but keep searching.
+        return false;
+      }
+      if (h2 > depth) return false;
+    }
 
     for (int mIdx = 0; mIdx < 10; mIdx++) {
       int moveIdx = KociembaTables.phase2AvailableMoves[mIdx];

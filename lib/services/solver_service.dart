@@ -7,6 +7,7 @@ import '../solver/roux_solver.dart';
 import '../solver/zz_solver.dart';
 import '../solver/petrus_solver.dart';
 import '../solver/heise_solver.dart';
+import '../solver/kociemba_tables.dart';
 import '../models/solve_method.dart';
 
 class SolveResult {
@@ -31,6 +32,9 @@ class SolverService {
     SolveMethod method = SolveMethod.kociemba,
     void Function(String)? onProgress,
   }) async {
+    // Ensure tables are initialized before any solver starts
+    await KociembaTables.init();
+
     switch (method) {
       case SolveMethod.petrus:
         final result = await PetrusSolver.solve(state, onProgress: onProgress);

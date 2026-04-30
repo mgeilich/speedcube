@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import '../models/cube_state.dart';
 import '../models/cube_move.dart';
 
@@ -6,23 +7,37 @@ enum Corner { uRF, uFL, uLB, uBR, dFR, dLF, dBL, dRB }
 enum Edge { uR, uF, uL, uB, dR, dF, dL, dB, fR, fL, bL, bR }
 
 class KociembaCube {
-  final List<int> cp = List.generate(8, (i) => i);
-  final List<int> co = List.filled(8, 0);
-  final List<int> ep = List.generate(12, (i) => i);
-  final List<int> eo = List.filled(12, 0);
+  final Uint8List _data;
+  
+  // Shared static default centers to avoid allocating 500k maps during search
+  static final Map<CubeFace, CubeColor> defaultCenters = {
+    CubeFace.u: CubeColor.white,
+    CubeFace.d: CubeColor.yellow,
+    CubeFace.f: CubeColor.green,
+    CubeFace.b: CubeColor.blue,
+    CubeFace.r: CubeColor.red,
+    CubeFace.l: CubeColor.orange,
+  };
 
   final Map<CubeFace, CubeColor> centers;
 
   KociembaCube([Map<CubeFace, CubeColor>? centers])
-      : centers = centers ??
-            {
-              CubeFace.u: CubeColor.white,
-              CubeFace.d: CubeColor.yellow,
-              CubeFace.f: CubeColor.green,
-              CubeFace.b: CubeColor.blue,
-              CubeFace.r: CubeColor.red,
-              CubeFace.l: CubeColor.orange,
-            };
+      : _data = Uint8List(40),
+        centers = centers ?? defaultCenters {
+    // Initialize solved state
+    for (int i = 0; i < 8; i++) {
+      _data[i] = i; // cp
+    }
+    for (int i = 0; i < 12; i++) {
+      _data[i + 16] = i; // ep
+    }
+  }
+
+  // Helper views for the underlying data
+  Uint8List get cp => _data.buffer.asUint8List(_data.offsetInBytes + 0, 8);
+  Uint8List get co => _data.buffer.asUint8List(_data.offsetInBytes + 8, 8);
+  Uint8List get ep => _data.buffer.asUint8List(_data.offsetInBytes + 16, 12);
+  Uint8List get eo => _data.buffer.asUint8List(_data.offsetInBytes + 28, 12);
 
   String toCompactString() {
     return '${cp.join(',')}|${co.join(',')}|${ep.join(',')}|${eo.join(',')}';
@@ -30,41 +45,51 @@ class KociembaCube {
 
   bool get isSolved {
     for (int i = 0; i < 8; i++) {
-      if (cp[i] != i || co[i] != 0) {
-        return false;
-      }
+      if (_data[i] != i || _data[i + 8] != 0) return false;
     }
     for (int i = 0; i < 12; i++) {
-      if (ep[i] != i || eo[i] != 0) {
-        return false;
-      }
+      if (_data[i + 16] != i || _data[i + 28] != 0) return false;
     }
     return true;
   }
 
+  bool get isEdgeSolved {
+    for (int i = 0; i < 12; i++) {
+      if (_data[i + 16] != i || _data[i + 28] != 0) return false;
+    }
+    return true;
+  }
+
+  int get unsolvedCornerCount {
+    int count = 0;
+    for (int i = 0; i < 8; i++) {
+      if (_data[i] != i || _data[i + 8] != 0) count++;
+    }
+    return count;
+  }
+
   /// Number of misoriented edges (Phase 1 goal: reduce to 0)
-  int get badEdgeCount => eo.where((o) => o != 0).length;
+  int get badEdgeCount {
+    int count = 0;
+    for (int i = 0; i < 12; i++) {
+      if (_data[i + 28] != 0) count++;
+    }
+    return count;
+  }
 
   /// Number of middle-layer edges (8, 9, 10, 11) in the middle layer slots (8, 9, 10, 11).
   /// (Phase 1 goal: get all 4 into the slice)
   int get sliceCorrectCount {
     int count = 0;
     for (int i = 8; i < 12; i++) {
-      if (ep[i] >= 8) count++;
+      if (_data[i + 16] >= 8) count++;
     }
     return count;
   }
 
-  KociembaCube.clone(KociembaCube other) : centers = Map.from(other.centers) {
-    for (int i = 0; i < 8; i++) {
-      cp[i] = other.cp[i];
-      co[i] = other.co[i];
-    }
-    for (int i = 0; i < 12; i++) {
-      ep[i] = other.ep[i];
-      eo[i] = other.eo[i];
-    }
-  }
+  KociembaCube.clone(KociembaCube other) 
+      : _data = Uint8List.fromList(other._data),
+        centers = other.centers;
 
   static const List<CubeFace> allFaces = [
     CubeFace.u,
@@ -225,28 +250,28 @@ class KociembaCube {
   void _applySingleMove(CubeFace face) {
     switch (face) {
       case CubeFace.u:
-        _cycle4(cp, [0, 1, 2, 3], co, [0, 0, 0, 0], 3);
-        _cycle4(ep, [0, 1, 2, 3], eo, [0, 0, 0, 0], 2);
+        _cycle4(0, [0, 1, 2, 3], 8, [0, 0, 0, 0], 3);
+        _cycle4(16, [0, 1, 2, 3], 28, [0, 0, 0, 0], 2);
         break;
       case CubeFace.d:
-        _cycle4(cp, [4, 7, 6, 5], co, [0, 0, 0, 0], 3);
-        _cycle4(ep, [4, 7, 6, 5], eo, [0, 0, 0, 0], 2);
+        _cycle4(0, [4, 7, 6, 5], 8, [0, 0, 0, 0], 3);
+        _cycle4(16, [4, 7, 6, 5], 28, [0, 0, 0, 0], 2);
         break;
       case CubeFace.l:
-        _cycle4(cp, [1, 5, 6, 2], co, [1, 2, 1, 2], 3);
-        _cycle4(ep, [2, 9, 6, 10], eo, [0, 0, 0, 0], 2);
+        _cycle4(0, [1, 5, 6, 2], 8, [1, 2, 1, 2], 3);
+        _cycle4(16, [2, 9, 6, 10], 28, [0, 0, 0, 0], 2);
         break;
       case CubeFace.r:
-        _cycle4(cp, [0, 3, 7, 4], co, [2, 1, 2, 1], 3);
-        _cycle4(ep, [0, 11, 4, 8], eo, [0, 0, 0, 0], 2);
+        _cycle4(0, [0, 3, 7, 4], 8, [2, 1, 2, 1], 3);
+        _cycle4(16, [0, 11, 4, 8], 28, [0, 0, 0, 0], 2);
         break;
       case CubeFace.f:
-        _cycle4(cp, [0, 4, 5, 1], co, [1, 2, 1, 2], 3);
-        _cycle4(ep, [1, 8, 5, 9], eo, [1, 1, 1, 1], 2);
+        _cycle4(0, [0, 4, 5, 1], 8, [1, 2, 1, 2], 3);
+        _cycle4(16, [1, 8, 5, 9], 28, [1, 1, 1, 1], 2);
         break;
       case CubeFace.b:
-        _cycle4(cp, [2, 6, 7, 3], co, [1, 2, 1, 2], 3);
-        _cycle4(ep, [3, 10, 7, 11], eo, [1, 1, 1, 1], 2);
+        _cycle4(0, [2, 6, 7, 3], 8, [1, 2, 1, 2], 3);
+        _cycle4(16, [3, 10, 7, 11], 28, [1, 1, 1, 1], 2);
         break;
       default:
         break;
@@ -254,36 +279,36 @@ class KociembaCube {
   }
 
   void _cycle4(
-      List<int> p, List<int> idx, List<int> o, List<int> oChange, int mod) {
-    final tmpP = p[idx[3]];
-    final tmpO = o[idx[3]];
+      int pOffset, List<int> idx, int oOffset, List<int> oChange, int mod) {
+    final tmpP = _data[pOffset + idx[3]];
+    final tmpO = _data[oOffset + idx[3]];
     for (int i = 3; i > 0; i--) {
-      p[idx[i]] = p[idx[i - 1]];
-      o[idx[i]] = (o[idx[i - 1]] + oChange[i]) % mod;
+      _data[pOffset + idx[i]] = _data[pOffset + idx[i - 1]];
+      _data[oOffset + idx[i]] = (_data[oOffset + idx[i - 1]] + oChange[i]) % mod;
     }
-    p[idx[0]] = tmpP;
-    o[idx[0]] = (tmpO + oChange[0]) % mod;
+    _data[pOffset + idx[0]] = tmpP;
+    _data[oOffset + idx[0]] = (tmpO + oChange[0]) % mod;
   }
 
   void rotateY(int turns) {
     int count = (turns % 4 + 4) % 4;
     for (int i = 0; i < count; i++) {
-      _cycle4(cp, [0, 1, 2, 3], co, [0, 0, 0, 0], 3);
-      _cycle4(cp, [4, 5, 6, 7], co, [0, 0, 0, 0], 3);
-      _cycle4(ep, [0, 1, 2, 3], eo, [0, 0, 0, 0], 2);
-      _cycle4(ep, [4, 5, 6, 7], eo, [0, 0, 0, 0], 2);
-      _cycle4(ep, [8, 9, 10, 11], eo, [1, 1, 1, 1], 2);
+      _cycle4(0, [0, 1, 2, 3], 8, [0, 0, 0, 0], 3);
+      _cycle4(0, [4, 5, 6, 7], 8, [0, 0, 0, 0], 3);
+      _cycle4(16, [0, 1, 2, 3], 28, [0, 0, 0, 0], 2);
+      _cycle4(16, [4, 5, 6, 7], 28, [0, 0, 0, 0], 2);
+      _cycle4(16, [8, 9, 10, 11], 28, [1, 1, 1, 1], 2);
     }
   }
 
   void rotateX(int turns) {
     int count = (turns % 4 + 4) % 4;
     for (int i = 0; i < count; i++) {
-      _cycle4(cp, [0, 3, 7, 4], co, [2, 1, 2, 1], 3);
-      _cycle4(cp, [1, 2, 6, 5], co, [1, 2, 1, 2], 3);
-      _cycle4(ep, [0, 11, 4, 8], eo, [0, 0, 0, 0], 2);
-      _cycle4(ep, [1, 3, 7, 5], eo, [1, 1, 1, 1], 2);
-      _cycle4(ep, [2, 10, 6, 9], eo, [0, 0, 0, 0], 2);
+      _cycle4(0, [0, 3, 7, 4], 8, [2, 1, 2, 1], 3);
+      _cycle4(0, [1, 2, 6, 5], 8, [1, 2, 1, 2], 3);
+      _cycle4(16, [0, 11, 4, 8], 28, [0, 0, 0, 0], 2);
+      _cycle4(16, [1, 3, 7, 5], 28, [1, 1, 1, 1], 2);
+      _cycle4(16, [2, 10, 6, 9], 28, [0, 0, 0, 0], 2);
     }
   }
 
@@ -492,6 +517,25 @@ class KociembaCube {
     }
   }
 
+  // --- Serialization ---
+
+  List<int> toData() {
+    return [...cp, ...co, ...ep, ...eo];
+  }
+
+  factory KociembaCube.fromData(List<int> data) {
+    final res = KociembaCube();
+    for (int i = 0; i < 8; i++) {
+      res.cp[i] = data[i];
+      res.co[i] = data[i + 8];
+    }
+    for (int i = 0; i < 12; i++) {
+      res.ep[i] = data[i + 16];
+      res.eo[i] = data[i + 28];
+    }
+    return res;
+  }
+
   // --- Helpers ---
 
   int _getRank(List<int> p) {
@@ -551,6 +595,29 @@ class KociembaCube {
     final res = KociembaCube(centers);
     res.twist = tw;
     res.flip = fl;
+    res.slice = sl;
     return res;
+  }
+
+  @override
+  int get hashCode {
+    int result = 17;
+    for (int i = 0; i < 40; i++) {
+      result = 31 * result + _data[i];
+    }
+    return result;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! KociembaCube) return false;
+    if (hashCode != other.hashCode) return false;
+    
+    // Final safety check in case of hash collisions
+    for (int i = 0; i < 40; i++) {
+      if (_data[i] != other._data[i]) return false;
+    }
+    return true;
   }
 }

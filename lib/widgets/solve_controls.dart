@@ -69,7 +69,10 @@ class SolveControls extends StatelessWidget {
     required this.isScanned,
     required this.onMethodChanged,
     required this.selectedMethod,
+    this.moveLabels,
   });
+
+  final Map<int, String>? moveLabels;
 
   void _showPhase2Info(BuildContext context) {
     showDialog(
@@ -153,7 +156,9 @@ class SolveControls extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${moveIndex - solutionStartIndex}/${moveHistory.length - solutionStartIndex}',
+                          moveLabels != null && moveLabels!.containsKey(moveIndex - solutionStartIndex)
+                              ? moveLabels![moveIndex - solutionStartIndex]!
+                              : '${moveIndex - solutionStartIndex}/${moveHistory.length - solutionStartIndex}',
                           style: const TextStyle(
                             color: Colors.white54,
                             fontSize: 12,
@@ -798,7 +803,7 @@ class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
       case SolveMethod.petrus:
         return 'Petrus Method';
       case SolveMethod.heise:
-        return 'Heise Method (Efficient)';
+        return 'Heise Method';
     }
   }
 

@@ -4,8 +4,8 @@ import '../models/solve_result.dart';
 import 'kociemba_coordinates.dart';
 import 'kociemba_search.dart';
 import 'dart:collection';
+import 'kociemba_tables.dart';
 import 'package:flutter/foundation.dart';
-import 'heise_solver.dart';
 
 class PetrusStep extends LblStep {
   const PetrusStep({
@@ -23,7 +23,7 @@ class PetrusSolver {
     
     // 1. Analyze all 24 orientations and pick the one with the best 2x2x2 block
     onProgress?.call("Analyzing orientations...");
-    final orientations = HeiseSolver.generateAll24Rotations();
+    final orientations = _generateAll24Rotations();
     
     // Sort orientations by how close they are to a 2x2x2 block
     orientations.sort((a, b) => _scorePetrusOrientation(initial.applyMoves(b)).compareTo(_scorePetrusOrientation(initial.applyMoves(a))));
@@ -63,7 +63,8 @@ class PetrusSolver {
 
     // Stage 1: 2x2x2 Block
     onProgress?.call("Solving 2x2x2 Block...");
-    final s1Moves = await compute(_solve2x2x2Isolate, currentCube);
+    final s1Moves = await compute(_solve2x2x2Isolate, {'cube': currentCube, 'tables': KociembaTables.data});
+    if (s1Moves == null) return null;
     if (s1Moves.isNotEmpty) {
       steps.add(LblStep(
         stageName: "2x2x2 Block",
@@ -73,13 +74,12 @@ class PetrusSolver {
       for (final m in s1Moves) {
         currentCube.applyMove(m.face, m.turns);
       }
-    } else if (!is2x2x2Solved(currentCube)) {
-      return null;
     }
 
     // Stage 2: 2x2x3 Block
     onProgress?.call("Expanding 2x2x3...");
-    final s2Moves = await compute(_solve2x2x3Isolate, currentCube);
+    final s2Moves = await compute(_solve2x2x3Isolate, {'cube': currentCube, 'tables': KociembaTables.data});
+    if (s2Moves == null) return null;
     if (s2Moves.isNotEmpty) {
       steps.add(LblStep(
         stageName: "2x2x3 Expansion",
@@ -89,13 +89,12 @@ class PetrusSolver {
       for (final m in s2Moves) {
         currentCube.applyMove(m.face, m.turns);
       }
-    } else if (!is2x2x3Solved(currentCube)) {
-      return null;
     }
 
     // Stage 3: Edge Orientation
     onProgress?.call("Orienting Edges...");
-    final s3Moves = await compute(_solveEOIsolate, currentCube);
+    final s3Moves = await compute(_solveEOIsolate, {'cube': currentCube, 'tables': KociembaTables.data});
+    if (s3Moves == null) return null;
     if (s3Moves.isNotEmpty) {
       steps.add(LblStep(
         stageName: "Edge Orientation",
@@ -107,14 +106,15 @@ class PetrusSolver {
       }
     }
 
-    // Stage 4: Finish F2L
-    onProgress?.call("Completing F2L...");
-    final s4Moves = await compute(_solveF2LIsolate, currentCube);
+    // Stage 4: F2L Finish
+    onProgress?.call("Finishing F2L...");
+    final s4Moves = await compute(_solveF2LIsolate, {'cube': currentCube, 'tables': KociembaTables.data});
+    if (s4Moves == null) return null;
     if (s4Moves.isNotEmpty) {
-      steps.add(LblStep(
-        stageName: "Finish F2L",
+      steps.add(PetrusStep(
+        stageName: "F2L Finish",
         moves: s4Moves,
-        description: "Complete the first two layers without disturbing oriented edges.",
+        description: "Complete the remaining F2L slots.",
       ));
       for (final m in s4Moves) {
         currentCube.applyMove(m.face, m.turns);
@@ -123,16 +123,18 @@ class PetrusSolver {
 
     // Stage 5: Last Layer
     onProgress?.call("Solving Last Layer...");
-    final rotationMoves = steps.expand((s) => s.moves).toList();
-    final currentState = state.applyMoves(rotationMoves);
-    final s5Moves = await solveLL(currentState);
+    // Note: 'state' is already rotated. Build finalState by applying
+    // only the non-orientation steps (all steps except the first Orientation step).
+    final blockMoves = steps.skip(rotation.isEmpty ? 0 : 1).expand((s) => s.moves).toList();
+    final finalState = state.applyMoves(blockMoves);
+    final s5Moves = await solveLL(finalState);
     if (s5Moves.isNotEmpty) {
       steps.add(LblStep(
         stageName: "Last Layer",
         moves: s5Moves,
         description: "Solve the final layer using orientation and permutation.",
       ));
-    } else if (!state.applyMoves(rotationMoves).isSolved) {
+    } else if (!finalState.isSolved) {
       return null;
     }
 
@@ -142,23 +144,91 @@ class PetrusSolver {
   // Scoring for Petrus
   static int _scorePetrusOrientation(CubeState s) {
     // Petrus also starts with a 2x2x2 block at DBL
-    // Reuse Heise scoring logic as it's identical for the first stage
-    return HeiseSolver.scoreHeiseOrientation(s);
+    int score = 0;
+    final c = KociembaCube.fromCubeState(s);
+    
+    // Back-Down-Left 2x2x2 block
+    if (c.cp[6] == 6 && c.co[6] == 0) score += 10; // Corner
+    if (c.ep[6] == 6 && c.eo[6] == 0) score += 5;  // DL
+    if (c.ep[7] == 7 && c.eo[7] == 0) score += 5;  // DB
+    if (c.ep[10] == 10 && c.eo[10] == 0) score += 5; // BL
+    
+    return score;
   }
 
   // Isolate wrappers
-  static List<CubeMove> _solve2x2x2Isolate(KociembaCube cube) => solve2x2x2(cube);
-  static List<CubeMove> _solve2x2x3Isolate(KociembaCube cube) => solve2x2x3(cube);
-  static List<CubeMove> _solveEOIsolate(KociembaCube cube) => solveEO(cube);
-  static List<CubeMove> _solveF2LIsolate(KociembaCube cube) => solveF2L(cube);
+  static List<CubeMove>? _solve2x2x2Isolate(Map<String, dynamic> args) {
+    KociembaTables.data = args['tables'];
+    return solve2x2x2(args['cube']);
+  }
+  static List<CubeMove>? _solve2x2x3Isolate(Map<String, dynamic> args) {
+    KociembaTables.data = args['tables'];
+    return solve2x2x3(args['cube']);
+  }
+  static List<CubeMove>? _solveEOIsolate(Map<String, dynamic> args) {
+    KociembaTables.data = args['tables'];
+    return solveEO(args['cube']);
+  }
+  static List<CubeMove>? _solveF2LIsolate(Map<String, dynamic> args) {
+    KociembaTables.data = args['tables'];
+    return solveF2L(args['cube']);
+  }
 
   static Future<List<CubeMove>> solveLL(CubeState state) async {
     if (state.isSolved) return [];
+    await KociembaTables.init();
     
-    // Kociemba solver is incredibly reliable and fast for the last layer.
-    final search = KociembaSearch(timeLimitMs: 400);
-    final result = await search.solve(state);
-    return result?.moves ?? [];
+    // 1. Orient the cube to standard (White Top, Green Front)
+    final orientation = _getOrientationToStandard(state);
+    final orientedState = state.applyMoves(orientation);
+
+    // 2. Solve the Last Layer using Kociemba search
+    final search = KociembaSearch(timeLimitMs: 2000);
+    final result = await search.solve(orientedState);
+    if (result == null) return [];
+    
+    // 3. Return the orientation moves followed by the solution moves
+    return [...orientation, ...result.moves];
+  }
+
+  static List<CubeMove> _getOrientationToStandard(CubeState state) {
+    final orientationMoves = <CubeMove>[];
+    final whiteFace = _findCenterFace(state, CubeColor.white);
+    if (whiteFace == CubeFace.d) { orientationMoves.add(CubeMove.x2); }
+    else if (whiteFace == CubeFace.f) { orientationMoves.add(CubeMove.x); }
+    else if (whiteFace == CubeFace.b) { orientationMoves.add(CubeMove.xPrime); }
+    else if (whiteFace == CubeFace.l) { orientationMoves.add(CubeMove.z); }
+    else if (whiteFace == CubeFace.r) { orientationMoves.add(CubeMove.zPrime); }
+    
+    var orientedState = state.applyMoves(orientationMoves);
+    final greenFace = _findCenterFace(orientedState, CubeColor.green);
+    if (greenFace == CubeFace.b) { orientationMoves.add(CubeMove.y2); }
+    else if (greenFace == CubeFace.r) { orientationMoves.add(CubeMove.y); }
+    else if (greenFace == CubeFace.l) { orientationMoves.add(CubeMove.yPrime); }
+    
+    return orientationMoves;
+  }
+
+  static CubeFace _findCenterFace(CubeState s, CubeColor c) {
+    for (final f in CubeFace.physicalFaces) {
+      if (s.getFace(f)[4] == c) return f;
+    }
+    return CubeFace.u;
+  }
+
+  static List<List<CubeMove>> _generateAll24Rotations() {
+    final List<List<CubeMove>> res = [];
+    final downs = [<CubeMove>[], [CubeMove.x], [CubeMove.x2], [CubeMove.xPrime], [CubeMove.z], [CubeMove.zPrime]];
+    for (final d in downs) {
+      for (int i = 0; i < 4; i++) {
+        final r = List<CubeMove>.from(d);
+        if (i == 1) { r.add(CubeMove.y); }
+        else if (i == 2) { r.add(CubeMove.y2); }
+        else if (i == 3) { r.add(CubeMove.yPrime); }
+        res.add(r);
+      }
+    }
+    return res;
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -176,7 +246,7 @@ class PetrusSolver {
     return c.cp[5] == 5 && c.co[5] == 0 && c.ep[5] == 5 && c.eo[5] == 0 && c.ep[9] == 9 && c.eo[9] == 0;
   }
 
-  static List<CubeMove> solve2x2x2(KociembaCube cube) {
+  static List<CubeMove>? solve2x2x2(KociembaCube cube) {
     final moves = <CubeMove>[];
     final working = KociembaCube.clone(cube);
 
@@ -185,14 +255,14 @@ class PetrusSolver {
       c.cp[6] == 6 && c.co[6] == 0 && 
       c.ep[6] == 6 && c.eo[6] == 0 &&
       c.ep[7] == 7 && c.eo[7] == 0, 
-      _allMoves, 7);
+      _allMoves, 8);
     if (s1a != null) {
       moves.addAll(s1a);
       for (final m in s1a) {
         working.applyMove(m.face, m.turns);
       }
     } else {
-      return []; // Failed
+      return null; // Failed
     }
 
     // Step 1b: Solve bL edge while preserving 1a
@@ -201,17 +271,17 @@ class PetrusSolver {
       c.ep[6] == 6 && c.eo[6] == 0 &&
       c.ep[7] == 7 && c.eo[7] == 0 &&
       c.ep[10] == 10 && c.eo[10] == 0,
-      _allMoves, 7);
+      _allMoves, 8);
     if (s1b != null) {
       moves.addAll(s1b);
     } else {
-      return []; // Failed
+      return null; // Failed
     }
 
     return moves;
   }
 
-  static List<CubeMove> solve2x2x3(KociembaCube cube) {
+  static List<CubeMove>? solve2x2x3(KociembaCube cube) {
     bool isSolved(KociembaCube c) {
       if (!(c.cp[6] == 6 && c.co[6] == 0 && c.ep[6] == 6 && c.eo[6] == 0 &&
             c.ep[7] == 7 && c.eo[7] == 0 && c.ep[10] == 10 && c.eo[10] == 0)) {
@@ -220,10 +290,10 @@ class PetrusSolver {
       return c.cp[5] == 5 && c.co[5] == 0 && c.ep[5] == 5 && c.eo[5] == 0 && c.ep[9] == 9 && c.eo[9] == 0;
     }
     // Only U, R, F preserve the dBL 2x2x2
-    return _bfs(cube, isSolved, _urfMoves, 9) ?? [];
+    return _bfs(cube, isSolved, _urfMoves, 10);
   }
 
-  static List<CubeMove> solveEO(KociembaCube cube) {
+  static List<CubeMove>? solveEO(KociembaCube cube) {
     bool isSolved(KociembaCube c) {
       // Must preserve 2x2x3
       if (!(c.cp[6] == 6 && c.co[6] == 0 && c.ep[6] == 6 && c.eo[6] == 0 &&
@@ -241,10 +311,10 @@ class PetrusSolver {
       ..._urMoves,
       CubeMove(CubeFace.f, 1), CubeMove(CubeFace.f, -1),
       CubeMove(CubeFace.b, 1), CubeMove(CubeFace.b, -1),
-    ], 8) ?? [];
+    ], 8);
   }
 
-  static List<CubeMove> solveF2L(KociembaCube cube) {
+  static List<CubeMove>? solveF2L(KociembaCube cube) {
     final moves = <CubeMove>[];
     final working = KociembaCube.clone(cube);
 
@@ -253,14 +323,14 @@ class PetrusSolver {
       c.cp[7] == 7 && c.co[7] == 0 && 
       c.ep[11] == 11 && c.eo[11] == 0 &&
       c.ep[4] == 4 && c.eo[4] == 0, 
-      _urMoves, 10);
+      _urMoves, 11);
     if (s4a != null) {
       moves.addAll(s4a);
       for (final m in s4a) {
         working.applyMove(m.face, m.turns);
       }
     } else {
-      return []; // Failed
+      return null; // Failed
     }
 
     // Step 4b: Front-Right Slot (Corner 4, Edge 8)
@@ -275,7 +345,7 @@ class PetrusSolver {
     if (s4b != null) {
       moves.addAll(s4b);
     } else {
-      return []; // Failed
+      return null; // Failed
     }
 
     return moves;
@@ -300,12 +370,13 @@ class PetrusSolver {
     }
     final queue = Queue<_Node>();
     queue.add(_Node(KociembaCube.clone(start), []));
-    final visited = <String>{start.toCompactString()};
+    final visited = <int>{start.hashCode};
 
     final List<List<CubeMove>> moveSets = moves.map((m) => m is CubeMove ? [m] : m as List<CubeMove>).toList();
+    int nodeCount = 0;
 
     while (queue.isNotEmpty) {
-      if (visited.length > 2000000) {
+      if (nodeCount++ > 2000000) {
         return null; // Safety limit to prevent OOM
       }
       final node = queue.removeFirst();
@@ -323,9 +394,8 @@ class PetrusSolver {
           return [...node.path, ...ms];
         }
 
-        final key = next.toCompactString();
-        if (!visited.contains(key)) {
-          visited.add(key);
+        if (!visited.contains(next.hashCode)) {
+          visited.add(next.hashCode);
           queue.add(_Node(next, [...node.path, ...ms]));
         }
       }

@@ -38,6 +38,7 @@ class HomeController extends ChangeNotifier {
   String? _activeDemoType;
   Map<CubeFace, Map<int, String>>? _stickerLabels;
   Map<CubeFace, Map<int, String>>? _initialStickerLabels;
+  Map<int, String>? _moveLabels;
   CubeState? _initialCubeState;
 
   // Callback for when a demo finishes (used by main.dart to show guide)
@@ -63,6 +64,8 @@ class HomeController extends ChangeNotifier {
   int? _lastLseSubTabIndex;
   int? _lastZzStepIndex;
   double? _lastZzScrollOffset;
+  int? _lastHeiseStepIndex;
+  double? _lastHeiseScrollOffset;
 
   HomeController({required this.vsync}) {
     _animationController = CubeAnimationController(
@@ -134,6 +137,9 @@ class HomeController extends ChangeNotifier {
   int? get lastLseSubTabIndex => _lastLseSubTabIndex;
   int? get lastZzStepIndex => _lastZzStepIndex;
   double? get lastZzScrollOffset => _lastZzScrollOffset;
+  int? get lastHeiseStepIndex => _lastHeiseStepIndex;
+  double? get lastHeiseScrollOffset => _lastHeiseScrollOffset;
+  Map<int, String>? get moveLabels => _moveLabels;
   SolveMethod get selectedSolveMethod => _selectedSolveMethod;
 
   // Setters
@@ -187,6 +193,12 @@ class HomeController extends ChangeNotifier {
   void updateZzProgress(int stepIndex, double scrollOffset) {
     _lastZzStepIndex = stepIndex;
     _lastZzScrollOffset = scrollOffset;
+    notifyListeners();
+  }
+
+  void updateHeiseProgress(int stepIndex, double scrollOffset) {
+    _lastHeiseStepIndex = stepIndex;
+    _lastHeiseScrollOffset = scrollOffset;
     notifyListeners();
   }
 
@@ -680,11 +692,13 @@ class HomeController extends ChangeNotifier {
     Map<CubeFace, Map<int, String>>? stickerLabels,
     List<int>? targetPieces,
     List<String?>? moveDescriptions,
+    Map<int, String>? moveLabels,
   }) async {
     _cubeState = initialState;
     _activeDemoStepIndex = stepIndex;
     _activeDemoType = demoType;
     _stickerLabels = stickerLabels;
+    _moveLabels = moveLabels;
     _initialStickerLabels =
         stickerLabels?.map((face, labels) => MapEntry(face, Map.from(labels)));
     _initialCubeState = initialState;
@@ -721,6 +735,7 @@ class HomeController extends ChangeNotifier {
     _activeDemoStepIndex = null;
     _activeDemoType = null;
     _stickerLabels = null;
+    _moveLabels = null;
     _animationController.setSpeed(const Duration(milliseconds: 400));
     _animationController.clearQueue();
     _moveDirectionQueue.clear();

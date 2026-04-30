@@ -22,7 +22,7 @@ void main() async {
 
   print("\n--- Stage 1: 2x2x2 Block ---");
   final s1 = PetrusSolver.solve2x2x2(currentCube);
-  if (s1.isNotEmpty) {
+  if (s1 != null && s1.isNotEmpty) {
     print("Moves: \${s1.map((m) => m.toString()).join(' ')}");
     for (final m in s1) {
       currentCube.applyMove(m.face, m.turns);
@@ -34,7 +34,7 @@ void main() async {
 
   print("\n--- Stage 2: 2x2x3 Expansion ---");
   final s2 = PetrusSolver.solve2x2x3(currentCube);
-  if (s2.isNotEmpty) {
+  if (s2 != null && s2.isNotEmpty) {
     print("Moves: \${s2.map((m) => m.toString()).join(' ')}");
     for (final m in s2) {
       currentCube.applyMove(m.face, m.turns);
@@ -46,7 +46,7 @@ void main() async {
 
   print("\n--- Stage 3: Edge Orientation ---");
   final s3 = PetrusSolver.solveEO(currentCube);
-  if (s3.isNotEmpty) {
+  if (s3 != null && s3.isNotEmpty) {
     print("Moves: \${s3.map((m) => m.toString()).join(' ')}");
     for (final m in s3) {
       currentCube.applyMove(m.face, m.turns);
@@ -58,7 +58,7 @@ void main() async {
 
   print("\n--- Stage 4: Finish F2L ---");
   final s4 = PetrusSolver.solveF2L(currentCube);
-  if (s4.isNotEmpty) {
+  if (s4 != null && s4.isNotEmpty) {
     print("Moves: \${s4.map((m) => m.toString()).join(' ')}");
     for (final m in s4) {
       currentCube.applyMove(m.face, m.turns);
@@ -70,7 +70,7 @@ void main() async {
 
   print("\n--- Stage 5: Last Layer ---");
   // solveLL now takes a CubeState. We need to convert our working KociembaCube or just apply all moves to the start state.
-  final allMovesSoFar = [...s1, ...s2, ...s3, ...s4];
+  final allMovesSoFar = [...(s1 ?? []), ...(s2 ?? []), ...(s3 ?? []), ...(s4 ?? [])];
   final stateAfterF2L = state.applyMoves(allMovesSoFar);
   
   final s5 = await PetrusSolver.solveLL(stateAfterF2L);

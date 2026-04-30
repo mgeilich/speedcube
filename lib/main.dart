@@ -10,6 +10,7 @@ import 'widgets/cfop_guide_screen.dart';
 import 'widgets/roux_guide_screen.dart';
 import 'widgets/zz_guide_screen.dart';
 import 'widgets/petrus_guide_screen.dart';
+import 'widgets/heise_guide_screen.dart';
 import 'widgets/home_header.dart';
 import 'widgets/cube_interactive_view.dart';
 import 'widgets/solve_controls.dart';
@@ -84,6 +85,8 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
         _showZzGuide(initialStepIndex: stepIndex);
       } else if (demoType == 'petrus') {
         _showPetrusGuide(initialStepIndex: stepIndex);
+      } else if (demoType == 'heise') {
+        _showHeiseGuide(initialStepIndex: stepIndex);
       } else {
         _showLayerByLayerGuide(initialStepIndex: stepIndex);
       }
@@ -235,6 +238,7 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
               isScanned: _homeController.isScanned,
               selectedMethod: _homeController.selectedSolveMethod,
               onMethodChanged: _homeController.setSelectedSolveMethod,
+              moveLabels: _homeController.moveLabels,
             ),
           ],
         ),
@@ -284,6 +288,9 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
         },
         onSelectPetrusMethod: () {
           _showPetrusGuide(initialStepIndex: initialStepIndex);
+        },
+        onSelectHeiseMethod: () {
+          _showHeiseGuide(initialStepIndex: initialStepIndex);
         },
       ),
     );
@@ -397,7 +404,8 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
       double? targetRotationY,
       String? demoType,
       Map<CubeFace, Map<int, String>>? stickerLabels,
-      List<int>? targetPieces}) {
+      List<int>? targetPieces,
+      Map<int, String>? moveLabels}) {
     _homeController.handleDemoRequested(
       stepIndex,
       initialState,
@@ -409,6 +417,7 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
       demoType: demoType ?? 'beginner',
       stickerLabels: stickerLabels,
       targetPieces: targetPieces,
+      moveLabels: moveLabels,
     );
     // Dismiss the learn options / guide sheet
     Navigator.pop(context);
@@ -611,6 +620,49 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
                 demoType: 'petrus',
                 stickerLabels: stickerLabels,
                 targetPieces: targetPieces);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showHeiseGuide({int? initialStepIndex, double? scrollOffset}) {
+    if (!PremiumManager().canAccessFeature('heise_tutorial')) {
+      _showPremiumUpsell();
+      return;
+    }
+
+    _homeController.showingSolution = false;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HeiseGuideScreen(
+          initialExpandedStepIndex: initialStepIndex ?? 0,
+          initialScrollOffset: scrollOffset ?? 0,
+          onTabChanged: (stepIndex) {
+            // Optional: Store progress
+          },
+          onDemoRequested: (stepIndex, initialState,
+              {moves,
+              initialRotationX,
+              targetRotationX,
+              initialRotationY,
+              targetRotationY,
+              demoType,
+              stickerLabels,
+              targetPieces,
+              scrollOffset,
+              moveLabels}) {
+            _onDemoRequested(stepIndex, initialState,
+                moves: moves,
+                initialRotationX: initialRotationX,
+                targetRotationX: targetRotationX,
+                initialRotationY: initialRotationY,
+                targetRotationY: targetRotationY,
+                demoType: 'heise',
+                stickerLabels: stickerLabels,
+                targetPieces: targetPieces,
+                moveLabels: moveLabels);
           },
         ),
       ),
