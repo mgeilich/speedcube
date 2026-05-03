@@ -462,7 +462,7 @@ class HeiseSolver {
   static bool _isTwoSquaresSolved(KociembaCube c) {
     if (!_is2x2x3Solved(c)) return false;
     // Solve everything except FR slot and Last Layer.
-    final requiredEdges = [5, 6, 7, 9, 10, 11]; // DF, DL, DB, FL, BL, BR
+    final requiredEdges = [4, 5, 6, 7, 9, 10, 11]; // DR, DF, DL, DB, FL, BL, BR
     final requiredCorners = [5, 6, 7]; // DFL, DBL, DBR
     for (final e in requiredEdges) {
       if (c.ep[e] != e || c.eo[e] != 0) return false;

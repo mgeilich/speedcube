@@ -21,7 +21,7 @@ class _AlgLibraryScreenState extends State<AlgLibraryScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -161,6 +161,7 @@ class _AlgLibraryScreenState extends State<AlgLibraryScreen>
             Tab(text: 'OLL'),
             Tab(text: 'PLL'),
             Tab(text: 'Winter Var.'),
+            Tab(text: 'Comm.'),
           ],
         ),
       ),
@@ -171,6 +172,7 @@ class _AlgLibraryScreenState extends State<AlgLibraryScreen>
           _AlgGrid(cases: AlgLibrary.oll, onTap: _openCase),
           _AlgGrid(cases: AlgLibrary.pll, onTap: _openCase),
           _AlgGrid(cases: AlgLibrary.winterVariation, onTap: _openCase),
+          _AlgGrid(cases: AlgLibrary.commutators, onTap: _openCase),
         ],
       ),
     );
@@ -627,7 +629,11 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
                       ? 'F2L'
                       : (widget.algCase.category == AlgCategory.oll
                           ? 'OLL'
-                          : (widget.algCase.category == AlgCategory.pll ? 'PLL' : 'WV')),
+                          : (widget.algCase.category == AlgCategory.pll
+                              ? 'PLL'
+                              : (widget.algCase.category == AlgCategory.winterVariation
+                                  ? 'WV'
+                                  : 'Commutator'))),
                   const Color(0xFF6366F1),
                 ),
                 const SizedBox(width: 8),

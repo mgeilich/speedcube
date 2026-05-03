@@ -237,7 +237,7 @@ class _HeiseGuideScreenState extends State<HeiseGuideScreen> with TickerProvider
       children: [
         const Text('Stage 3: Two Squares', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
-        const Text('Build two 1x2 squares on the remaining faces (Front and Right). This is the most intuitive part of Heise.', style: TextStyle(color: Colors.white70, fontSize: 14)),
+        const Text('Build a 1x2x2 block (often called two squares) on the Back-Right. This completes the first two layers except for the Front-Right slot.', style: TextStyle(color: Colors.white70, fontSize: 14)),
         const SizedBox(height: 32),
         _buildIllustration(
           'Two Squares', 
@@ -482,14 +482,12 @@ class _HeiseGuideScreenState extends State<HeiseGuideScreen> with TickerProvider
   List<MapEntry<CubeFace, int>> _getTwoSquaresStickers() {
     final res = _get2x2x3Stickers();
     res.addAll([
-      // Front-Down-Right square
-      const MapEntry(CubeFace.f, 5), const MapEntry(CubeFace.f, 8),
-      const MapEntry(CubeFace.r, 6), const MapEntry(CubeFace.r, 7),
-      const MapEntry(CubeFace.d, 2), const MapEntry(CubeFace.d, 5),
-      // Back-Down-Right square
+      // Back-Down-Right 1x2x2 block (Two Squares)
       const MapEntry(CubeFace.b, 3), const MapEntry(CubeFace.b, 6),
       const MapEntry(CubeFace.r, 5), const MapEntry(CubeFace.r, 8),
       const MapEntry(CubeFace.d, 8),
+      // Down-Right edge
+      const MapEntry(CubeFace.d, 5), const MapEntry(CubeFace.r, 7),
     ]);
     return res;
   }

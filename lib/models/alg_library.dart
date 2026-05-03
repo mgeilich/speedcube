@@ -1,7 +1,7 @@
 import 'cube_move.dart';
 
 /// Categories for algorithm cases
-enum AlgCategory { f2l, oll, pll, cmll, winterVariation }
+enum AlgCategory { f2l, oll, pll, cmll, winterVariation, commutators }
 
 /// A single algorithm case (OLL or PLL)
 class AlgCase {
@@ -42,13 +42,14 @@ class AlgCase {
 /// Static library of all OLL and PLL algorithm cases.
 /// All algorithms use only standard face notation: U D R L F B (with ' and 2).
 class AlgLibrary {
-  static const List<AlgCase> all = [...f2lCases, ...ollCases, ...pllCases, ...cmllCases, ...winterVariationCases];
+  static const List<AlgCase> all = [...f2lCases, ...ollCases, ...pllCases, ...cmllCases, ...winterVariationCases, ...commutatorCases];
 
   static List<AlgCase> get f2l => f2lCases;
   static List<AlgCase> get oll => ollCases;
   static List<AlgCase> get pll => pllCases;
   static List<AlgCase> get cmll => cmllCases;
   static List<AlgCase> get winterVariation => winterVariationCases;
+  static List<AlgCase> get commutators => commutatorCases;
 
   // ─────────────────────────────────────────────────────────────────────────
   // OLL CASES
@@ -137,8 +138,8 @@ class AlgLibrary {
       name: 'OLL 24 (T)',
       category: AlgCategory.oll,
       subcategory: 'Cross',
-      algorithm: "R U R' U R U2 R' U2 R U2 R' U' R U' R'",
-      setupMoves: "R U R' U R U2 R' U2 R U2 R' U' R U' R'",
+      algorithm: "Rw U R' U' Rw' F R F'",
+      setupMoves: "F R' F' Rw U R U' Rw'",
       description: 'T-Pattern: Two "headlights" on the side faces.',
     ),
     AlgCase(
@@ -203,20 +204,20 @@ class AlgLibrary {
       name: 'OLL 5',
       category: AlgCategory.oll,
       subcategory: 'Square',
-      algorithm: "L' U2 L U L' U L",
-      setupMoves: "L' U' L U' L U2 L'",
+      algorithm: "Rw U R' U R U2 Rw'",
+      setupMoves: "Rw U2 R' U' R U' Rw'",
       description:
-          'Square: a 1×2 block of yellow in the back-left corner. A left-hand Sune variant — only 7 moves.',
+          'Square: a 1×2 block of yellow in the back-left corner. A wide Sune variant — only 7 moves.',
     ),
     AlgCase(
       id: 'oll6',
       name: 'OLL 6',
       category: AlgCategory.oll,
       subcategory: 'Square',
-      algorithm: "R U2 R' U' R U' R'",
-      setupMoves: "R U R' U R U2 R'",
+      algorithm: "Rw U2 R' U' R U' Rw'",
+      setupMoves: "Rw U R' U R U2 Rw'",
       description:
-          'Square: a 1×2 block of yellow in the back-right corner. The right-hand Sune — same as OLL 26. Mirror of OLL 5.',
+          'Square: a 1×2 block of yellow in the back-right corner. A wide Anti-Sune variant. Mirror of OLL 5.',
     ),
 
     // ── C-shape ───────────────────────────────────────────────────────────
@@ -1239,6 +1240,39 @@ class AlgLibrary {
       algorithm: "R U R'",
       setupMoves: "R' U' R",
       description: 'The "Solved" case: Simple insertion solves the OLL as well.',
+      isFree: true,
+    ),
+  ];
+
+  static const List<AlgCase> commutatorCases = [
+    AlgCase(
+      id: 'comm_3_same',
+      name: '3 on Same Face',
+      category: AlgCategory.commutators,
+      subcategory: '3 Corners on Same Face',
+      algorithm: "R U' L' U R' U' L U",
+      setupMoves: "U' L' U R U' L U R'",
+      description: 'Cycles three corners on the U face (UFL, UBR, UFR). Also known as the Niklas algorithm.',
+      isFree: true,
+    ),
+    AlgCase(
+      id: 'comm_2_same',
+      name: '2 on Same Face',
+      category: AlgCategory.commutators,
+      subcategory: '2 Corners on Same Face',
+      algorithm: "R' D' R U R' D R U'",
+      setupMoves: "U R' D' R U' R' D R",
+      description: 'Cycles two corners on the U face and one on the D face (UFL, UFR, DFR). Uses a standard 8-move commutator.',
+      isFree: true,
+    ),
+    AlgCase(
+      id: 'comm_diff',
+      name: 'Scattered Corners',
+      category: AlgCategory.commutators,
+      subcategory: 'Each on a Different Face',
+      algorithm: "L2 R' D' R U R' D R U' L2",
+      setupMoves: "L2 U R' D' R U' R' D R L2",
+      description: 'Cycles visually scattered corners (UFL, DFR, DBL). Uses L2 setup moves before a standard 8-move commutator.',
       isFree: true,
     ),
   ];
