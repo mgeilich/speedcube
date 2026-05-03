@@ -713,7 +713,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'Corners Only',
       algorithm: "R B' R' F R B R' F' R B R' F R B' R' F'",
-      setupMoves: "F R B' R' F' R B R' F R B' R' F' R B R'",
+      setupMoves: "F R B R' F' R B' R' F R B' R' F' R B R'",
       description:
           'Corners Only: diagonal swap of all 4 corners. No corner stays in place. A 16-move algorithm — one of the hardest PLLs.',
     ),
@@ -771,7 +771,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'Adjacent Corner Swap',
       algorithm: "L' U' L F L' U' L U L F' L2 U L",
-      setupMoves: "L' U' L2 F L' U L U' L' F' L U L'",
+      setupMoves: "L' U' L2 F L' U' L' U L F' L' U L",
       description:
           'Adjacent Corner Swap: two adjacent corners swap, plus two edges cycle. A 13-move left-hand algorithm.',
     ),
@@ -791,7 +791,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'Adjacent Corner Swap',
       algorithm: "R U R' U' R' F R2 U' R' U' R U R' F'",
-      setupMoves: "F R' F' R U R U' R' U R U' R' F R F'",
+      setupMoves: "F R U' R' U R U R2 F' R U R U' R'",
       description:
           'Adjacent Corner Swap: two adjacent corners swap AND two adjacent edges swap. One of the most common PLLs. 14 moves.',
       isFree: true,
@@ -802,7 +802,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'Adjacent Corner Swap',
       algorithm: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R",
-      setupMoves: "R' U' R U' R U R2 F' R2 U R U R' F R U R'",
+      setupMoves: "R' U' R U' R' U R U R2 F' R U R U' R' F U R",
       description:
           'Adjacent Corner Swap: two adjacent corners swap, plus a 3-cycle of edges. One of the longest PLL algorithms at 18 moves.',
     ),
@@ -815,7 +815,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'Diagonal Corner Swap',
       algorithm: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
-      setupMoves: "F R' F' R U R U' R' F R U' R' U' R U R' F'",
+      setupMoves: "F R' F' R U R U' R' F R U' R' U R U R' F'",
       description:
           'Diagonal Corner Swap: two diagonally opposite corners swap, plus two edges cycle. A 17-move algorithm. Very common.',
     ),
@@ -825,7 +825,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'Diagonal Corner Swap',
       algorithm: "R' U R' U' B' R' B2 U' B' U B' R B R",
-      setupMoves: "R' B' R B' U B R2 B' R U' R U R'",
+      setupMoves: "R' B' R' B U' B U B2 R B U R U' R",
       description:
           'Diagonal Corner Swap: two diagonally opposite corners swap, plus two edges swap. A 14-move algorithm.',
     ),
@@ -838,7 +838,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'G-perms',
       algorithm: "R2 U R' U R' U' R U' R2 D U' R' U R D'",
-      setupMoves: "D R' U' R U D' R2 U R' U' R U R' U' R2",
+      setupMoves: "D R' U' R U D' R2 U R' U R U' R U' R2",
       description:
           'G-perm: 4-cycle of corners + 3-cycle of edges. Uses a D-move — unusual for PLL. One of 4 related G-perm cases.',
     ),
@@ -848,7 +848,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'G-perms',
       algorithm: "R' U' R U D' R2 U R' U R U' R U' R2 D",
-      setupMoves: "D' R2 U R' U R U' R U R2 D U R U' R'",
+      setupMoves: "D' R2 U R' U R' U' R U' R2 D U' R' U R",
       description:
           'G-perm: 4-cycle of corners + 3-cycle of edges (reverse direction). Mirror of Ga-perm in terms of corner cycle.',
     ),
@@ -858,7 +858,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'G-perms',
       algorithm: "R2 U' R U' R U R' U R2 D' U R U' R' D",
-      setupMoves: "D R' U R' U' R2 U' R U' R U R2 D' U' R2",
+      setupMoves: "D' R U R' U' D R2 U' R U' R' U R' U R2",
       description:
           'G-perm: 4-cycle of corners + 3-cycle of edges. Inverse of Ga-perm. The D\' instead of D is the key difference.',
     ),
@@ -868,7 +868,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'G-perms',
       algorithm: "R U R' U' D R2 U' R U' R' U R' U R2 D'",
-      setupMoves: "D' R2 U' R U R' U R U R2 D U' R' U R",
+      setupMoves: "D R2 U' R U' R U R' U R2 D' U R U' R'",
       description:
           'G-perm: 4-cycle of corners + 3-cycle of edges. Inverse of Gb-perm. The 4 G-perms are all related by rotation.',
     ),
@@ -881,7 +881,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'R-perms',
       algorithm: "R U' R' U' R U R D R' U' R D' R' U2 R'",
-      setupMoves: "R U2 R' D R U R' D' R U R' U R U' R'",
+      setupMoves: "R U2 R D R' U R D' R' U' R' U R U R'",
       description:
           'R-perm: 3-cycle of corners + 3-cycle of edges. The D-move in the middle is the key. One of two R-perm cases.',
     ),
@@ -891,7 +891,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'R-perms',
       algorithm: "R' U2 R U2 R' F R U R' U' R' F' R2 U'",
-      setupMoves: "U R2 F R F' R U2 R' U2 R U' R' F R F'",
+      setupMoves: "U R2 F R U R U' R' F' R U2 R' U2 R",
       description:
           'R-perm: mirror of Ra-perm. 3-cycle of corners + 3-cycle of edges in the opposite direction.',
     ),
@@ -904,7 +904,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'N-perms',
       algorithm: "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'",
-      setupMoves: "R U R' U2 R U R2 F' R U R' U' R' F R U' R' U' R U' R'",
+      setupMoves: "R U R' U2 R U R2 F' R U R U' R' F R U' R' U' R U' R'",
       description:
           'N-perm: double diagonal swap of both corners AND edges. No piece stays in place. One of the longest PLLs at 22 moves.',
     ),
@@ -914,7 +914,7 @@ class AlgLibrary {
       category: AlgCategory.pll,
       subcategory: 'N-perms',
       algorithm: "R' U R U' R' F' U' F R U R' F R' F' R U' R",
-      setupMoves: "R' U R F' R U' R' F U R' U' R U R' U R",
+      setupMoves: "R' U R' F R F' R U' R' F' U F R U R' U' R",
       description:
           'N-perm: mirror of Na-perm. Double diagonal swap of corners and edges. Also one of the longest PLLs.',
     ),
