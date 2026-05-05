@@ -687,7 +687,7 @@ class AlgLibrary {
     // Only the 4 corners need to be permuted; edges are already solved.
     AlgCase(
       id: 'pll_aa',
-      name: 'Aa-perm',
+      name: 'Aa-perm\n(3 Corners CCW)',
       category: AlgCategory.pll,
       subcategory: 'Corners Only',
       algorithm: "R' F R' B2 R F' R' B2 R2",
@@ -698,7 +698,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_ab',
-      name: 'Ab-perm',
+      name: 'Ab-perm\n(3 Corners CW)',
       category: AlgCategory.pll,
       subcategory: 'Corners Only',
       algorithm: "R2 B2 R F R' B2 R F' R",
@@ -709,7 +709,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_e',
-      name: 'E-perm',
+      name: 'E-perm\n(Diagonal Corners)',
       category: AlgCategory.pll,
       subcategory: 'Corners Only',
       algorithm: "R B' R' F R B R' F' R B R' F R B' R' F'",
@@ -722,7 +722,7 @@ class AlgLibrary {
     // Only the 4 edges need to be permuted; corners are already solved.
     AlgCase(
       id: 'pll_ua',
-      name: 'Ua-perm',
+      name: 'Ua-perm\n(3 Edges CCW)',
       category: AlgCategory.pll,
       subcategory: 'Edges Only',
       algorithm: "R U' R U R U R U' R' U' R2",
@@ -733,7 +733,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_ub',
-      name: 'Ub-perm',
+      name: 'Ub-perm\n(3 Edges CW)',
       category: AlgCategory.pll,
       subcategory: 'Edges Only',
       algorithm: "R2 U' R' U' R U R U R U' R",
@@ -744,7 +744,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_z',
-      name: 'Z-perm',
+      name: 'Z-perm\n(Adjacent Edges)',
       category: AlgCategory.pll,
       subcategory: 'Edges Only',
       algorithm: "R' U' R2 U R U R' U' R U R U' R U' R'",
@@ -754,7 +754,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_h',
-      name: 'H-perm',
+      name: 'H-perm\n(Opposite Edges)',
       category: AlgCategory.pll,
       subcategory: 'Edges Only',
       algorithm: "R2 U2 R U2 R2 U2 R2 U2 R U2 R2",
@@ -767,7 +767,7 @@ class AlgLibrary {
     // Two adjacent corners swap, plus some edges move.
     AlgCase(
       id: 'pll_ja',
-      name: 'Ja-perm',
+      name: 'Ja-perm\n(Adj. Swap L)',
       category: AlgCategory.pll,
       subcategory: 'Adjacent Corner Swap',
       algorithm: "L' U' L F L' U' L U L F' L2 U L",
@@ -777,7 +777,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_jb',
-      name: 'Jb-perm',
+      name: 'Jb-perm\n(Adj. Swap R)',
       category: AlgCategory.pll,
       subcategory: 'Adjacent Corner Swap',
       algorithm: "R U R' F' R U R' U' R' F R2 U' R'",
@@ -787,7 +787,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_t',
-      name: 'T-perm',
+      name: 'T-perm\n(Adjacent Swap)',
       category: AlgCategory.pll,
       subcategory: 'Adjacent Corner Swap',
       algorithm: "R U R' U' R' F R2 U' R' U' R U R' F'",
@@ -798,7 +798,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_f',
-      name: 'F-perm',
+      name: 'F-perm\n(Adj Swap, Opp Edge)',
       category: AlgCategory.pll,
       subcategory: 'Adjacent Corner Swap',
       algorithm: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R",
@@ -811,7 +811,7 @@ class AlgLibrary {
     // Two diagonally opposite corners swap.
     AlgCase(
       id: 'pll_y',
-      name: 'Y-perm',
+      name: 'Y-perm\n(Diagonal Swap)',
       category: AlgCategory.pll,
       subcategory: 'Diagonal Corner Swap',
       algorithm: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
@@ -821,7 +821,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_v',
-      name: 'V-perm',
+      name: 'V-perm\n(Diag. Swap, Adj Edges)',
       category: AlgCategory.pll,
       subcategory: 'Diagonal Corner Swap',
       algorithm: "R' U R' U' B' R' B2 U' B' U B' R B R",
@@ -834,7 +834,7 @@ class AlgLibrary {
     // 4-cycle of corners + 3-cycle of edges. Named Ga, Gb, Gc, Gd.
     AlgCase(
       id: 'pll_ga',
-      name: 'Ga-perm',
+      name: 'Ga-perm\n(G-Cycle A)',
       category: AlgCategory.pll,
       subcategory: 'G-perms',
       algorithm: "R2 U R' U R' U' R U' R2 D U' R' U R D'",
@@ -844,7 +844,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_gb',
-      name: 'Gb-perm',
+      name: 'Gb-perm\n(G-Cycle B)',
       category: AlgCategory.pll,
       subcategory: 'G-perms',
       algorithm: "R' U' R U D' R2 U R' U R U' R U' R2 D",
@@ -854,7 +854,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_gc',
-      name: 'Gc-perm',
+      name: 'Gc-perm\n(G-Cycle C)',
       category: AlgCategory.pll,
       subcategory: 'G-perms',
       algorithm: "R2 U' R U' R U R' U R2 D' U R U' R' D",
@@ -864,7 +864,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_gd',
-      name: 'Gd-perm',
+      name: 'Gd-perm\n(G-Cycle D)',
       category: AlgCategory.pll,
       subcategory: 'G-perms',
       algorithm: "R U R' U' D R2 U' R U' R' U R' U R2 D'",
@@ -877,7 +877,7 @@ class AlgLibrary {
     // 3-cycle of corners + 3-cycle of edges on the right side.
     AlgCase(
       id: 'pll_ra',
-      name: 'Ra-perm',
+      name: 'Ra-perm\n(R-Cycle A)',
       category: AlgCategory.pll,
       subcategory: 'R-perms',
       algorithm: "R U' R' U' R U R D R' U' R D' R' U2 R'",
@@ -887,7 +887,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_rb',
-      name: 'Rb-perm',
+      name: 'Rb-perm\n(R-Cycle B)',
       category: AlgCategory.pll,
       subcategory: 'R-perms',
       algorithm: "R' U2 R U2 R' F R U R' U' R' F' R2 U'",
@@ -900,7 +900,7 @@ class AlgLibrary {
     // Double swap of non-adjacent pieces — the hardest PLL cases.
     AlgCase(
       id: 'pll_na',
-      name: 'Na-perm',
+      name: 'Na-perm\n(Diag. Swap A)',
       category: AlgCategory.pll,
       subcategory: 'N-perms',
       algorithm: "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'",
@@ -910,7 +910,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_nb',
-      name: 'Nb-perm',
+      name: 'Nb-perm\n(Diag. Swap B)',
       category: AlgCategory.pll,
       subcategory: 'N-perms',
       algorithm: "R' U R U' R' F' U' F R U R' F R' F' R U' R",

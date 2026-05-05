@@ -34,6 +34,9 @@ class _PremiumUpsellSheetState extends State<PremiumUpsellSheet> {
         _isLoading = false; // Stop loading if error from stream
       });
       manager.clearError();
+    } else if (mounted) {
+      // Rebuild to update UI when products load (e.g. price)
+      setState(() {});
     }
   }
 
@@ -238,7 +241,7 @@ class _PremiumUpsellSheetState extends State<PremiumUpsellSheet> {
                   _buildFeatureRow(
                     Icons.menu_book_rounded,
                     'Full Algorithm Library',
-                    'F2L, OLL, PLL, and Winter Variation.',
+                    'F2L, OLL, PLL, Winter Variation, and Commutators.',
                     false,
                   ),
                 ],
@@ -298,9 +301,9 @@ class _PremiumUpsellSheetState extends State<PremiumUpsellSheet> {
                           strokeWidth: 2,
                         ),
                       )
-                    : const Text(
-                        'Unlock Full Access',
-                        style: TextStyle(
+                    : Text(
+                        'Unlock Full Access${PremiumManager().products.isNotEmpty ? ' - ${PremiumManager().products.first.price}' : ''}',
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,

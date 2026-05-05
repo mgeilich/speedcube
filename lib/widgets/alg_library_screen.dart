@@ -307,12 +307,13 @@ class _AlgCaseCard extends StatelessWidget {
                     child: Text(
                       algCase.name,
                       textAlign: TextAlign.center,
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white70,
-                        fontSize: 10,
+                        fontSize: 9,
                         fontWeight: FontWeight.w600,
+                        height: 1.1,
                       ),
                     ),
                   ),
@@ -451,7 +452,7 @@ class _TopDiagramPainter extends CustomPainter {
       );
     }
 
-    // L face left column (indices 0,3,6) → left strip
+    // L face top row (indices 0,1,2) → left strip (from B to F)
     for (int row = 0; row < 3; row++) {
       drawCell(
         Rect.fromLTWH(
@@ -460,11 +461,11 @@ class _TopDiagramPainter extends CustomPainter {
           sideStripSize - 3,
           cellSize - 1,
         ),
-        state.l[row * 3],
+        state.l[row],
       );
     }
 
-    // R face right column (indices 2,5,8) → right strip
+    // R face top row (indices 0,1,2) → right strip (from B to F)
     for (int row = 0; row < 3; row++) {
       drawCell(
         Rect.fromLTWH(
@@ -473,7 +474,7 @@ class _TopDiagramPainter extends CustomPainter {
           sideStripSize - 3,
           cellSize - 1,
         ),
-        state.r[row * 3 + 2],
+        state.r[2 - row],
       );
     }
   }
