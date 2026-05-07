@@ -2,6 +2,18 @@
 
 All notable changes to the SpeedCube AR project will be documented in this file.
 
+## [2026.5.1] - 2026-05-07
+
+### Added
+- **Heise Method Support**: Integrated a full solver and interactive guide for the Heise Method, including block-building and commutator finish logic.
+- **Solver Statistics Refactor**: Moved per-stage move statistics to a dedicated popup sheet to maximize vertical space for move explanations.
+- **Enhanced UI Controls**: Added a prominent "STATS" button with haptic feedback and improved the prominence of active solve stages.
+- **Move Rationale Improvements**: Expanded the depth of move-by-move explanations for all methods.
+
+### Fixed
+- Optimized vertical layout in the solver UI to prevent overlapping text on smaller devices.
+- Corrected minor visual inconsistencies in the CFOP XCross tutorial.
+
 ## [2026.4.0] - 2026-04-23
 
 ### Added
