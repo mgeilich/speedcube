@@ -21,7 +21,7 @@ class _AlgLibraryScreenState extends State<AlgLibraryScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -155,26 +155,159 @@ class _AlgLibraryScreenState extends State<AlgLibraryScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white38,
           labelStyle:
-              const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-          tabs: [
-            Tab(text: 'F2L'),
-            Tab(text: 'OLL'),
-            Tab(text: 'PLL'),
-            Tab(text: 'Winter Var.'),
-            Tab(text: 'Comm.'),
+              const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          tabs: const [
+            Tab(text: 'CFOP'),
+            Tab(text: 'Advanced'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _AlgGrid(cases: AlgLibrary.f2l, onTap: _openCase),
-          _AlgGrid(cases: AlgLibrary.oll, onTap: _openCase),
-          _AlgGrid(cases: AlgLibrary.pll, onTap: _openCase),
-          _AlgGrid(cases: AlgLibrary.winterVariation, onTap: _openCase),
-          _AlgGrid(cases: AlgLibrary.commutators, onTap: _openCase),
+          _SubCategoryPage(
+            groups: const [
+              ('F2L', Icons.layers_rounded),
+              ('OLL', Icons.wb_sunny_rounded),
+              ('PLL', Icons.swap_horiz_rounded),
+            ],
+            caseSets: [
+              AlgLibrary.f2l,
+              AlgLibrary.oll,
+              AlgLibrary.pll,
+            ],
+            onTap: _openCase,
+          ),
+          _SubCategoryPage(
+            groups: const [
+              ('COLL', Icons.star_rounded),
+              ('Winter Var.', Icons.ac_unit_rounded),
+              ('Commutators', Icons.sync_alt_rounded),
+            ],
+            caseSets: [
+              AlgLibrary.coll,
+              AlgLibrary.winterVariation,
+              AlgLibrary.commutators,
+            ],
+            onTap: _openCase,
+          ),
         ],
       ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sub-category page with chip selector
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _SubCategoryPage extends StatefulWidget {
+  final List<(String label, IconData icon)> groups;
+  final List<List<AlgCase>> caseSets;
+  final void Function(AlgCase) onTap;
+
+  const _SubCategoryPage({
+    required this.groups,
+    required this.caseSets,
+    required this.onTap,
+  });
+
+  @override
+  State<_SubCategoryPage> createState() => _SubCategoryPageState();
+}
+
+class _SubCategoryPageState extends State<_SubCategoryPage> {
+  int _selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Sub-category chip selector
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+          child: Row(
+            children: List.generate(widget.groups.length, (i) {
+              final (label, icon) = widget.groups[i];
+              final isSelected = i == _selectedIndex;
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: i == 0 ? 0 : 4,
+                    right: i == widget.groups.length - 1 ? 0 : 4,
+                  ),
+                  child: GestureDetector(
+                    onTap: () => setState(() => _selectedIndex = i),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0xFF6366F1).withValues(alpha: 0.15)
+                            : Colors.white.withValues(alpha: 0.04),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected
+                              ? const Color(0xFF6366F1).withValues(alpha: 0.6)
+                              : Colors.white.withValues(alpha: 0.08),
+                          width: isSelected ? 1.5 : 1,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            icon,
+                            size: 20,
+                            color: isSelected
+                                ? const Color(0xFF818CF8)
+                                : Colors.white38,
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            label,
+                            style: TextStyle(
+                              color: isSelected
+                                  ? Colors.white
+                                  : Colors.white54,
+                              fontSize: 12,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${widget.caseSets[i].length} cases',
+                            style: TextStyle(
+                              color: isSelected
+                                  ? Colors.white38
+                                  : Colors.white24,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+
+        // Content area
+        Expanded(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: _AlgGrid(
+              key: ValueKey(_selectedIndex),
+              cases: widget.caseSets[_selectedIndex],
+              onTap: widget.onTap,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -187,7 +320,7 @@ class _AlgGrid extends StatelessWidget {
   final List<AlgCase> cases;
   final void Function(AlgCase) onTap;
 
-  const _AlgGrid({required this.cases, required this.onTap});
+  const _AlgGrid({super.key, required this.cases, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -356,7 +489,10 @@ class _MiniTopDiagram extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = CubeState.yellowTopSolved().applyMoves(algCase.setupMoveList);
+    final baseState = (algCase.category == AlgCategory.f2l)
+        ? CubeState.solved()
+        : CubeState.yellowTopSolved();
+    final state = baseState.applyMoves(algCase.setupMoveList);
     return CustomPaint(
       size: const Size(52, 52),
       painter: _TopDiagramPainter(state, algCase.category),
@@ -626,15 +762,14 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
             child: Row(
               children: [
                 _badge(
-                  widget.algCase.category == AlgCategory.f2l
-                      ? 'F2L'
-                      : (widget.algCase.category == AlgCategory.oll
-                          ? 'OLL'
-                          : (widget.algCase.category == AlgCategory.pll
-                              ? 'PLL'
-                              : (widget.algCase.category == AlgCategory.winterVariation
-                                  ? 'WV'
-                                  : 'Commutator'))),
+                  switch (widget.algCase.category) {
+                    AlgCategory.f2l => 'F2L',
+                    AlgCategory.oll => 'OLL',
+                    AlgCategory.pll => 'PLL',
+                    AlgCategory.coll => 'COLL',
+                    AlgCategory.winterVariation => 'WV',
+                    _ => 'Commutator',
+                  },
                   const Color(0xFF6366F1),
                 ),
                 const SizedBox(width: 8),

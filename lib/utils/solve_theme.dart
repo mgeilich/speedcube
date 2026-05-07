@@ -16,8 +16,11 @@ class SolveTheme {
     final s = stageName.toLowerCase();
     if (s.contains('cross') ||
         s.contains('white layer') ||
+        s.contains('white cross') ||
         s.contains('start')) {
       return Colors.white;
+    } else if (s.contains('first layer') || s.contains('orientation')) {
+      return const Color(0xFF38BDF8); // sky blue
     } else if (s.contains('second layer') ||
         s.contains('middle layer') ||
         s.contains('f2l') ||
@@ -28,10 +31,17 @@ class SolveTheme {
         s.contains('oll') ||
         s.contains('eoline')) {
       return yellowGold;
-    } else if (s.contains('yellow corners') || s.contains('pll') || s.contains('last layer')) {
+    } else if (s.contains('yellow corners') ||
+        s.contains('pll') ||
+        s.contains('last layer') ||
+        s.contains('align')) {
       return amber;
     } else if (s.contains('edge orientation')) {
       return yellowGold;
+    } else if (s.contains('commutator')) {
+      return const Color(0xFF34D399); // emerald
+    } else if (s.contains('final')) {
+      return checkGreen;
     }
 
     return primaryIndigo;

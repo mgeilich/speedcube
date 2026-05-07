@@ -26,6 +26,10 @@ class CfopGuideScreen extends StatefulWidget {
     String? demoType,
     Map<CubeFace, Map<int, String>>? stickerLabels,
     List<int>? targetPieces,
+    List<String?>? moveDescriptions,
+    Map<int, String>? moveLabels,
+    List<MapEntry<CubeFace, int>>? highlightedStickers,
+    bool? dimNonHighlighted,
     double? scrollOffset,
     int? ollSubIndex,
     int? pllSubIndex,
@@ -321,6 +325,162 @@ class _CfopGuideScreenState extends State<CfopGuideScreen>
                 targetRotationY: 0.6,
               );
             },
+          ),
+        ]),
+        const SizedBox(height: 32),
+        const Text(
+          'Extended Cross (XCross)',
+          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          'An XCross is a technique where you solve the cross and the first F2L pair simultaneously. This is the ultimate move-saver for the beginning of a solve, often reducing the first two stages by 4-6 moves.',
+          style: TextStyle(color: Colors.white54, fontSize: 14, height: 1.5),
+        ),
+        const SizedBox(height: 24),
+        const Text(
+          'Strategy: How to Plan',
+          style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          '1. Inspection: During your 15-second inspection, look for any F2L pairs that are already joined or can be easily joined.\n2. Preservation: Plan your cross moves so they do not disturb existing pairs.\n3. Modification: If a pair can be formed during a cross move, slightly modify your sequence to "catch" the pieces.',
+          style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.5),
+        ),
+        const SizedBox(height: 24),
+        
+        // Example 1: Preservation
+        _buildIllustration(
+          'Case 1: Pair Preservation',
+          'Identify an existing pair and solve the cross without breaking it.',
+          _getXCrossPreserveState(),
+          highlightedStickers: [
+            const MapEntry(CubeFace.d, 1), const MapEntry(CubeFace.d, 3),
+            const MapEntry(CubeFace.d, 5), const MapEntry(CubeFace.d, 7),
+            const MapEntry(CubeFace.b, 8), const MapEntry(CubeFace.r, 6), const MapEntry(CubeFace.d, 8), // Pair
+          ],
+          rotationX: -0.4,
+          rotationY: 0.6,
+        ),
+        _buildDemoButtons([
+          DemoOption(
+            label: 'Show Case 1',
+            onTap: () => widget.onDemoRequested?.call(
+              0,
+              _getXCrossPreserveState(),
+              moves: [
+                CubeMove.l2,
+                CubeMove.f,
+                CubeMove.r,
+                CubeMove.d2,
+              ],
+              highlightedStickers: [
+                const MapEntry(CubeFace.d, 1), const MapEntry(CubeFace.d, 3),
+                const MapEntry(CubeFace.d, 5), const MapEntry(CubeFace.d, 7),
+                const MapEntry(CubeFace.b, 8), const MapEntry(CubeFace.r, 6), const MapEntry(CubeFace.d, 8),
+              ],
+              dimNonHighlighted: true,
+              moveDescriptions: [
+                'Identify: Blue-Orange pair is already joined in the top layer.',
+                'Solve Green edge while keeping the pair safe.',
+                'Solve Red edge; the pair is still untouched.',
+                'Final D2 move aligns the cross and inserts the pair simultaneously!'
+              ],
+              initialRotationX: -0.4,
+              targetRotationX: -0.4,
+              initialRotationY: 0.6,
+              targetRotationY: 0.6,
+            ),
+          ),
+        ]),
+        const SizedBox(height: 32),
+
+        // Example 2: Natural Join
+        _buildIllustration(
+          'Case 2: Natural Join',
+          'Pieces pair up naturally during standard cross movements.',
+          _getXCrossNaturalJoinState(),
+          highlightedStickers: [
+            const MapEntry(CubeFace.d, 1), const MapEntry(CubeFace.d, 3),
+            const MapEntry(CubeFace.d, 5), const MapEntry(CubeFace.d, 7),
+            const MapEntry(CubeFace.f, 2), const MapEntry(CubeFace.r, 0), // Corner/Edge to join
+          ],
+          rotationX: -0.4,
+          rotationY: 0.6,
+        ),
+        _buildDemoButtons([
+          DemoOption(
+            label: 'Show Case 2',
+            onTap: () => widget.onDemoRequested?.call(
+              0,
+              _getXCrossNaturalJoinState(),
+              moves: [
+                CubeMove.u,
+                CubeMove.r,
+                CubeMove.d,
+              ],
+              highlightedStickers: [
+                const MapEntry(CubeFace.d, 1), const MapEntry(CubeFace.d, 3),
+                const MapEntry(CubeFace.d, 5), const MapEntry(CubeFace.d, 7),
+                const MapEntry(CubeFace.f, 2), const MapEntry(CubeFace.r, 0),
+              ],
+              dimNonHighlighted: true,
+              moveDescriptions: [
+                'Inspection: Red-Green corner is at UFR, edge is at UB.',
+                'U move positions the edge to be "caught".',
+                'R move solves the Red cross edge AND pairs the F2L pieces!',
+                'D move completes the cross and the XCross block.'
+              ],
+              initialRotationX: -0.4,
+              targetRotationX: -0.4,
+              initialRotationY: 0.6,
+              targetRotationY: 0.6,
+            ),
+          ),
+        ]),
+        const SizedBox(height: 32),
+
+        // Example 3: Keyhole
+        _buildIllustration(
+          'Case 3: Keyhole Logic',
+          'Use the movement of a cross edge to insert a corner into its slot.',
+          _getXCrossKeyholeState(),
+          highlightedStickers: [
+            const MapEntry(CubeFace.d, 1), const MapEntry(CubeFace.d, 3),
+            const MapEntry(CubeFace.d, 5), const MapEntry(CubeFace.d, 7),
+            const MapEntry(CubeFace.f, 8), const MapEntry(CubeFace.r, 6), const MapEntry(CubeFace.d, 2), // The slot
+          ],
+          rotationX: -0.4,
+          rotationY: 0.6,
+        ),
+        _buildDemoButtons([
+          DemoOption(
+            label: 'Show Case 3',
+            onTap: () => widget.onDemoRequested?.call(
+              0,
+              _getXCrossKeyholeState(),
+              moves: [
+                CubeMove.d,
+                CubeMove.r,
+                CubeMove.dPrime,
+              ],
+              highlightedStickers: [
+                const MapEntry(CubeFace.d, 1), const MapEntry(CubeFace.d, 3),
+                const MapEntry(CubeFace.d, 5), const MapEntry(CubeFace.d, 7),
+                const MapEntry(CubeFace.f, 8), const MapEntry(CubeFace.r, 6), const MapEntry(CubeFace.d, 2),
+              ],
+              dimNonHighlighted: true,
+              moveDescriptions: [
+                'Identify: Red-Green corner is solved, but the edge is missing.',
+                'D move opens the "Keyhole" (the empty slot).',
+                'R move inserts the missing Red-Green edge.',
+                'D\' move restores the cross and completes the block!'
+              ],
+              initialRotationX: -0.4,
+              targetRotationX: -0.4,
+              initialRotationY: 0.6,
+              targetRotationY: 0.6,
+            ),
           ),
         ]),
       ],
@@ -1105,6 +1265,7 @@ class _CfopGuideScreenState extends State<CfopGuideScreen>
                   rotationX: rotationX,
                   rotationY: rotationY,
                   highlightedStickers: highlightedStickers,
+                  dimNonHighlighted: highlightedStickers != null,
                 ),
                 size: const Size(100, 100),
               ),
@@ -1325,6 +1486,47 @@ class _CfopGuideScreenState extends State<CfopGuideScreen>
     state.u[5] = CubeColor.orange;
     state.r[1] = CubeColor.green;
     return state;
+  }
+
+
+  CubeState _getXCrossPreserveState() {
+    // Blue-Orange pair at FR, cross mostly solved except Blue and Red
+    // Background noise to avoid looking like a fully solved cube
+    final base = CubeState.yellowTopSolved().applyMoves([
+      CubeMove.u, CubeMove.r2, CubeMove.fPrime, CubeMove.b, CubeMove.uPrime,
+    ]);
+    // Setup: D2 R' F' L2 (relative to solved)
+    return base.applyMoves([
+      CubeMove.d2,
+      CubeMove.rPrime,
+      CubeMove.fPrime,
+      CubeMove.l2,
+    ]);
+  }
+
+  CubeState _getXCrossNaturalJoinState() {
+    final base = CubeState.yellowTopSolved().applyMoves([
+      CubeMove.u2, CubeMove.l, CubeMove.f, CubeMove.b2, CubeMove.rPrime,
+    ]);
+    // Setup: D' R' U'
+    return base.applyMoves([
+      CubeMove.dPrime,
+      CubeMove.rPrime,
+      CubeMove.uPrime,
+    ]);
+  }
+
+  CubeState _getXCrossKeyholeState() {
+    final base = CubeState.yellowTopSolved().applyMoves([
+      CubeMove.uPrime, CubeMove.f2, CubeMove.r, CubeMove.lPrime, CubeMove.b,
+    ]);
+    // Red-Green corner solved, edge at U slot
+    // Setup: D R' D'
+    return base.applyMoves([
+      CubeMove.d,
+      CubeMove.rPrime,
+      CubeMove.dPrime,
+    ]);
   }
 
   List<CubeMove> _parseAlg(String notation) {

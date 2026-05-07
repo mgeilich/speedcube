@@ -241,7 +241,7 @@ class _PremiumUpsellSheetState extends State<PremiumUpsellSheet> {
                   _buildFeatureRow(
                     Icons.menu_book_rounded,
                     'Full Algorithm Library',
-                    'F2L, OLL, PLL, Winter Variation, and Commutators.',
+                    'F2L, OLL, PLL, COLL, Winter Variation, and Commutators.',
                     false,
                   ),
                 ],

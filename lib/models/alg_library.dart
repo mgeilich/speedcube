@@ -1,7 +1,7 @@
 import 'cube_move.dart';
 
 /// Categories for algorithm cases
-enum AlgCategory { f2l, oll, pll, cmll, winterVariation, commutators }
+enum AlgCategory { f2l, oll, pll, cmll, winterVariation, coll, commutators }
 
 /// A single algorithm case (OLL or PLL)
 class AlgCase {
@@ -42,13 +42,14 @@ class AlgCase {
 /// Static library of all OLL and PLL algorithm cases.
 /// All algorithms use only standard face notation: U D R L F B (with ' and 2).
 class AlgLibrary {
-  static const List<AlgCase> all = [...f2lCases, ...ollCases, ...pllCases, ...cmllCases, ...winterVariationCases, ...commutatorCases];
+  static const List<AlgCase> all = [...f2lCases, ...ollCases, ...pllCases, ...cmllCases, ...winterVariationCases, ...collCases, ...commutatorCases];
 
   static List<AlgCase> get f2l => f2lCases;
   static List<AlgCase> get oll => ollCases;
   static List<AlgCase> get pll => pllCases;
   static List<AlgCase> get cmll => cmllCases;
   static List<AlgCase> get winterVariation => winterVariationCases;
+  static List<AlgCase> get coll => collCases;
   static List<AlgCase> get commutators => commutatorCases;
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -382,7 +383,7 @@ class AlgLibrary {
       algorithm: "L F' L' F U F U' F'",
       setupMoves: "F U F' U' F' L F L'",
       description:
-          'S-shape: two opposite edges oriented diagonally. An 8-move algorithm mixing L and F triggers.',
+          'S-shape: two opposite edges oriented diagonally, forming a Z-like pattern. Recognized by the 1×2 yellow bar on the front-right. If your Z doesn\'t match, try rotating the cube.',
     ),
     AlgCase(
       id: 'oll57',
@@ -392,7 +393,7 @@ class AlgLibrary {
       algorithm: "R U R' U' L' U R U' R' L",
       setupMoves: "L' U R U' R' L U R U' R'",
       description:
-          'S-shape: uses both R and L moves — unusual for OLL. The L at the end is the key move that orients the last corner.',
+          'S-shape: also called the "Z-shape". Uses both R and L moves — unusual for OLL. Similar to OLL 28 but with different corner orientations on the sides.',
     ),
 
     // ── Z-shape ───────────────────────────────────────────────────────────
@@ -405,7 +406,7 @@ class AlgLibrary {
       algorithm: "R U R' U' R U' R' F' U' F R U R'",
       setupMoves: "R' U' R F' U F R U R' U R U' R'",
       description:
-          'Z-shape: a 13-move algorithm. The F\' U\' F in the middle is a reverse trigger that flips two corners.',
+          'Z-shape: a 13-move algorithm. Recognized by the Z on top and headlights on the side. If side stickers don\'t match OLL 30, it\'s likely this case or a rotation.',
     ),
     AlgCase(
       id: 'oll30',
@@ -415,7 +416,7 @@ class AlgLibrary {
       algorithm: "F U R U2 R' U' R U2 R' U' F'",
       setupMoves: "F U R U2 R' U R U2 R' U' F'",
       description:
-          'Z-shape: mirror of OLL 29. An 11-move algorithm. The U2 moves inside the F … F\' wrapper are the key rhythm.',
+          'Z-shape: mirror of OLL 29. Recognized by the Z on top and no side headlights in the front position. Every Z-shape is covered by OLL 28, 29, 30, or 57.',
     ),
 
     // ── Knight Move ───────────────────────────────────────────────────────
@@ -1241,6 +1242,392 @@ class AlgLibrary {
       setupMoves: "R' U' R",
       description: 'The "Solved" case: Simple insertion solves the OLL as well.',
       isFree: true,
+    ),
+  ];
+
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // COLL CASES (40 total)
+  // COLL = Corners of the Last Layer. Used when OLL edges are already
+  // oriented (yellow cross on top). Solves corner orientation AND
+  // permutation in one step, often leaving an easier PLL (edges only).
+  // ─────────────────────────────────────────────────────────────────────────
+  static const List<AlgCase> collCases = [
+    // ── Sune ─────────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'coll_sune1',
+      name: 'COLL S1',
+      category: AlgCategory.coll,
+      subcategory: 'Sune',
+      algorithm: "R U R' U R U2 R'",
+      setupMoves: "R U2 R' U' R U' R'",
+      description: 'Standard Sune. Corners already permuted — this is the "skip" case. Leaves a PLL skip or edges-only PLL.',
+      isFree: true,
+    ),
+    AlgCase(
+      id: 'coll_sune2',
+      name: 'COLL S2',
+      category: AlgCategory.coll,
+      subcategory: 'Sune',
+      algorithm: "R U R' U R U' R D R' U' R D' R2",
+      setupMoves: "R2 D R' U R D' R' U R' U' R U' R'",
+      description: 'Sune shape, adjacent corner swap. Solves corners in 13 moves, leaving an edges-only PLL.',
+    ),
+    AlgCase(
+      id: 'coll_sune3',
+      name: 'COLL S3',
+      category: AlgCategory.coll,
+      subcategory: 'Sune',
+      algorithm: "L' U R U' L U2 R U2 R'",
+      setupMoves: "R U2 R' U2 L' U R U' L",
+      description: 'Sune shape with L-R interplay. 9 moves — efficient for an adjacent swap case.',
+    ),
+    AlgCase(
+      id: 'coll_sune4',
+      name: 'COLL S4',
+      category: AlgCategory.coll,
+      subcategory: 'Sune',
+      algorithm: "R U R' U R U' R D R' U' R D' R2",
+      setupMoves: "R2 D R' U R D' R' U R' U' R U' R'",
+      description: 'Sune shape, diagonal corner swap variant. D-layer moves distinguish this from S2.',
+    ),
+    AlgCase(
+      id: 'coll_sune5',
+      name: 'COLL S5',
+      category: AlgCategory.coll,
+      subcategory: 'Sune',
+      algorithm: "R U' L' U R' U' L",
+      setupMoves: "L' U R U' L U R'",
+      description: 'Sune shape, Niklas-style. Only 7 moves — one of the shortest COLL algorithms.',
+    ),
+    AlgCase(
+      id: 'coll_sune6',
+      name: 'COLL S6',
+      category: AlgCategory.coll,
+      subcategory: 'Sune',
+      algorithm: "F' R U2 R' U2 R' F2 R U R U' R' F'",
+      setupMoves: "F R U R' U' R' F2 R U2 R' U2 R F",
+      description: 'Sune shape with F-face work. 13 moves — handles the diagonal swap case.',
+    ),
+
+    // ── Anti-Sune ────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'coll_as1',
+      name: 'COLL AS1',
+      category: AlgCategory.coll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R U2 R' U' R U' R'",
+      setupMoves: "R U R' U R U2 R'",
+      description: 'Standard Anti-Sune. Corners already permuted — the "skip" case. Mirror of S1.',
+      isFree: true,
+    ),
+    AlgCase(
+      id: 'coll_as2',
+      name: 'COLL AS2',
+      category: AlgCategory.coll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R2 D R' U R D' R' U R' U' R U' R'",
+      setupMoves: "R U R' U R U' R D R' U' R D' R2",
+      description: 'Anti-Sune, adjacent corner swap. Uses D-move for the corner cycle.',
+    ),
+    AlgCase(
+      id: 'coll_as3',
+      name: 'COLL AS3',
+      category: AlgCategory.coll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R2 D R' U2 R D' R2 U' R U' R'",
+      setupMoves: "R U R' U R2 D R' U2 R D' R2",
+      description: 'Anti-Sune, 11 moves. R2 D setup into a corner cycle.',
+    ),
+    AlgCase(
+      id: 'coll_as4',
+      name: 'COLL AS4',
+      category: AlgCategory.coll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R' U' R U' R' U R' D' R U2 R' D R2",
+      setupMoves: "R2 D' R U2 R' D R U' R U R' U R",
+      description: 'Anti-Sune with D-layer work. 13 moves — handles the adjacent swap.',
+    ),
+    AlgCase(
+      id: 'coll_as5',
+      name: 'COLL AS5',
+      category: AlgCategory.coll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R' U L U' R U L'",
+      setupMoves: "L' U' R U L U' R'",
+      description: 'Anti-Sune, Niklas-style inverse. Only 7 moves — mirror of S5.',
+    ),
+    AlgCase(
+      id: 'coll_as6',
+      name: 'COLL AS6',
+      category: AlgCategory.coll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R U' R' U2 R U' R' U2 R' D' R U R' D R",
+      setupMoves: "R' D' R U' R' D R U2 R U R' U2 R U R'",
+      description: 'Anti-Sune, diagonal swap. 15 moves — the longest Anti-Sune COLL.',
+    ),
+
+    // ── H (All Corners Oriented) ─────────────────────────────────────────
+    AlgCase(
+      id: 'coll_h1',
+      name: 'COLL H1',
+      category: AlgCategory.coll,
+      subcategory: 'H',
+      algorithm: "R U R' U R U' R' U R U2 R'",
+      setupMoves: "R U2 R' U' R U R' U' R U' R'",
+      description: 'H orientation (all corners yellow on top). Adjacent corner swap — 11 moves.',
+    ),
+    AlgCase(
+      id: 'coll_h2',
+      name: 'COLL H2',
+      category: AlgCategory.coll,
+      subcategory: 'H',
+      algorithm: "F R U R' U' R U R' U' R U R' U' F'",
+      setupMoves: "F U R U' R' U R U' R' U R U' R' F'",
+      description: 'H orientation. Triple sexy inside F...F\'. 14 moves — handles 4-corner cycle.',
+    ),
+    AlgCase(
+      id: 'coll_h3',
+      name: 'COLL H3',
+      category: AlgCategory.coll,
+      subcategory: 'H',
+      algorithm: "R U R' U R U L' U R' U' L",
+      setupMoves: "L' U R U' L U' R' U' R U' R'",
+      description: 'H orientation with L-R interplay. 11 moves — one of the faster H cases.',
+    ),
+    AlgCase(
+      id: 'coll_h4',
+      name: 'COLL H4',
+      category: AlgCategory.coll,
+      subcategory: 'H',
+      algorithm: "F R U' R' U R U2 R' U' R U R' U' F'",
+      setupMoves: "F U R U' R' U R U2 R' U R U' R' F'",
+      description: 'H orientation, diagonal swap. F-face wrapper with a modified Sune inside. 14 moves.',
+    ),
+
+    // ── T ────────────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'coll_t1',
+      name: 'COLL T1',
+      category: AlgCategory.coll,
+      subcategory: 'T',
+      algorithm: "R U2 R' U' R U' R2 U2 R U R' U R",
+      setupMoves: "R' U' R U' R' U2 R2 U R' U R U2 R'",
+      description: 'T orientation, corners permuted. 13 moves — the T "skip" case.',
+    ),
+    AlgCase(
+      id: 'coll_t2',
+      name: 'COLL T2',
+      category: AlgCategory.coll,
+      subcategory: 'T',
+      algorithm: "R' U R U2 R' L' U R U' L",
+      setupMoves: "L' U R' U' L R U2 R' U' R",
+      description: 'T orientation with L-R transition. 10 moves — efficient adjacent swap.',
+    ),
+    AlgCase(
+      id: 'coll_t3',
+      name: 'COLL T3',
+      category: AlgCategory.coll,
+      subcategory: 'T',
+      algorithm: "L' U' L U' L' U L U L F' L' F",
+      setupMoves: "F' L F L' U' L' U L U' L' U L",
+      description: 'T orientation, left-hand trigger. 12 moves — ends with a sledgehammer.',
+    ),
+    AlgCase(
+      id: 'coll_t4',
+      name: 'COLL T4',
+      category: AlgCategory.coll,
+      subcategory: 'T',
+      algorithm: "F R U R' U' R U' R' U' R U R' F'",
+      setupMoves: "F R U' R' U R U R' U R U' R' F'",
+      description: 'T orientation inside F wrapper. 13 moves — handles the 4-corner cycle.',
+    ),
+    AlgCase(
+      id: 'coll_t5',
+      name: 'COLL T5',
+      category: AlgCategory.coll,
+      subcategory: 'T',
+      algorithm: "R' F R U' R' U' R U R' F' R U R' U' R' F R F'",
+      setupMoves: "F R' F' R U R U' R' F R' F' R U' R' U R",
+      description: 'T orientation, diagonal swap. 18 moves — one of the longest COLL cases.',
+    ),
+    AlgCase(
+      id: 'coll_t6',
+      name: 'COLL T6',
+      category: AlgCategory.coll,
+      subcategory: 'T',
+      algorithm: "R U R' U' R' F R2 U' R' U' R U R' F'",
+      setupMoves: "F R U' R' U R U R2 F' R U R U' R'",
+      description: 'T orientation, T-perm variant. 14 moves — familiar muscle memory for T-perm users.',
+    ),
+
+    // ── U ────────────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'coll_u1',
+      name: 'COLL U1',
+      category: AlgCategory.coll,
+      subcategory: 'U',
+      algorithm: "R' U' R U' R' U2 R2 U R' U R U2 R'",
+      setupMoves: "R U2 R' U' R U' R2 U2 R U R' U R",
+      description: 'U orientation, corners permuted. 13 moves — the U "skip" case.',
+    ),
+    AlgCase(
+      id: 'coll_u2',
+      name: 'COLL U2',
+      category: AlgCategory.coll,
+      subcategory: 'U',
+      algorithm: "R' U' R U' R' U R' D' R U2 R' D R2",
+      setupMoves: "R2 D' R U2 R' D R U' R' U R U R",
+      description: 'U orientation with D-layer moves. 13 moves — adjacent swap.',
+    ),
+    AlgCase(
+      id: 'coll_u3',
+      name: 'COLL U3',
+      category: AlgCategory.coll,
+      subcategory: 'U',
+      algorithm: "R2 D R' U2 R D' R' U2 R'",
+      setupMoves: "R U2 R D R' U2 R D' R2",
+      description: 'U orientation, 9-move case. Compact D-layer algorithm — very efficient.',
+    ),
+    AlgCase(
+      id: 'coll_u4',
+      name: 'COLL U4',
+      category: AlgCategory.coll,
+      subcategory: 'U',
+      algorithm: "F R U' R' U R U R' U R U' R' F'",
+      setupMoves: "F R U R' U' R U' R' U' R U R' F'",
+      description: 'U orientation inside F wrapper. 13 moves — handles the four-corner cycle.',
+    ),
+    AlgCase(
+      id: 'coll_u5',
+      name: 'COLL U5',
+      category: AlgCategory.coll,
+      subcategory: 'U',
+      algorithm: "R2 D' R U2 R' D R U2 R",
+      setupMoves: "R' U2 R' D' R U2 R' D R2",
+      description: 'U orientation, inverse of U3. 9 moves — mirror of the compact D-layer case.',
+    ),
+    AlgCase(
+      id: 'coll_u6',
+      name: 'COLL U6',
+      category: AlgCategory.coll,
+      subcategory: 'U',
+      algorithm: "R' U2 R F U' R' U' R U F'",
+      setupMoves: "F' U' R' U R U' F R U2 R'",
+      description: 'U orientation with F-trigger. 10 moves — elegant and quick.',
+    ),
+
+    // ── Pi ───────────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'coll_pi1',
+      name: 'COLL Pi1',
+      category: AlgCategory.coll,
+      subcategory: 'Pi',
+      algorithm: "R U2 R2 U' R2 U' R2 U2 R",
+      setupMoves: "R' U2 R2 U R2 U R2 U2 R'",
+      description: 'Pi orientation, corners permuted. 9 moves — the Pi "skip" case.',
+      isFree: true,
+    ),
+    AlgCase(
+      id: 'coll_pi2',
+      name: 'COLL Pi2',
+      category: AlgCategory.coll,
+      subcategory: 'Pi',
+      algorithm: "R' F2 R U2 R U2 R' F2 U' R U' R'",
+      setupMoves: "R U R' U F2 R U2 R' U2 R' F2 R",
+      description: 'Pi orientation with F2 moves. 11 moves — handles adjacent swap.',
+    ),
+    AlgCase(
+      id: 'coll_pi3',
+      name: 'COLL Pi3',
+      category: AlgCategory.coll,
+      subcategory: 'Pi',
+      algorithm: "R' U' F' R U R' U' R' F R2 U2 R' U2 R",
+      setupMoves: "R' U2 R U2 R2 F' R U R U' R' F U R",
+      description: 'Pi orientation, 14 moves. Uses F-trigger for the corner cycle.',
+    ),
+    AlgCase(
+      id: 'coll_pi4',
+      name: 'COLL Pi4',
+      category: AlgCategory.coll,
+      subcategory: 'Pi',
+      algorithm: "R U R' U' R' F R2 U R' U' R U R' U' F'",
+      setupMoves: "F U R U' R' U R U' R2 F' R U R U' R'",
+      description: 'Pi orientation, Jb-perm style. 15 moves — T-perm muscle memory helps.',
+    ),
+    AlgCase(
+      id: 'coll_pi5',
+      name: 'COLL Pi5',
+      category: AlgCategory.coll,
+      subcategory: 'Pi',
+      algorithm: "R U' L' U R' U L U L' U L",
+      setupMoves: "L' U' L U' L' U' R U L U' R'",
+      description: 'Pi orientation with L-R interplay. 11 moves — fluid and intuitive.',
+    ),
+    AlgCase(
+      id: 'coll_pi6',
+      name: 'COLL Pi6',
+      category: AlgCategory.coll,
+      subcategory: 'Pi',
+      algorithm: "R U D' R U R' D R2 U' R' U' R2 U2 R",
+      setupMoves: "R' U2 R2 U R U R2 D' R U' R' D U' R'",
+      description: 'Pi orientation with D-layer. 13 moves — handles the diagonal swap.',
+    ),
+
+    // ── L ────────────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'coll_l1',
+      name: 'COLL L1',
+      category: AlgCategory.coll,
+      subcategory: 'L',
+      algorithm: "R U2 R' U' R U R' U' R U R' U' R U' R'",
+      setupMoves: "R U R' U R U R' U R U' R' U R U2 R'",
+      description: 'L orientation, corners permuted. 15 moves — the L "skip" case.',
+    ),
+    AlgCase(
+      id: 'coll_l2',
+      name: 'COLL L2',
+      category: AlgCategory.coll,
+      subcategory: 'L',
+      algorithm: "R' U2 R' D' R U2 R' D R2",
+      setupMoves: "R2 D' R U2 R' D R U2 R",
+      description: 'L orientation, 9-move case. Compact D-layer algorithm — highly efficient.',
+    ),
+    AlgCase(
+      id: 'coll_l3',
+      name: 'COLL L3',
+      category: AlgCategory.coll,
+      subcategory: 'L',
+      algorithm: "R U2 R D R' U2 R D' R2",
+      setupMoves: "R2 D R' U2 R D' R' U2 R'",
+      description: 'L orientation, inverse of L2. 9 moves — mirror of the compact D-layer case.',
+    ),
+    AlgCase(
+      id: 'coll_l4',
+      name: 'COLL L4',
+      category: AlgCategory.coll,
+      subcategory: 'L',
+      algorithm: "R' U' R U' R' U R U R' F R U R' U' R' F' R2",
+      setupMoves: "R2 F R U R U' R' F' R U' R' U R' U R U R",
+      description: 'L orientation, diagonal swap. 17 moves — uses F-trigger for corner cycle.',
+    ),
+    AlgCase(
+      id: 'coll_l5',
+      name: 'COLL L5',
+      category: AlgCategory.coll,
+      subcategory: 'L',
+      algorithm: "F R U' R' U' R U2 R' U' F'",
+      setupMoves: "F U R U2 R' U R U R' F'",
+      description: 'L orientation inside F wrapper. 10 moves — elegant solution.',
+    ),
+    AlgCase(
+      id: 'coll_l6',
+      name: 'COLL L6',
+      category: AlgCategory.coll,
+      subcategory: 'L',
+      algorithm: "R' U' R U R' F' R U R' U' R' F R2",
+      setupMoves: "R2 F' R U R U' R' F R' U' R U R",
+      description: 'L orientation, adjacent swap. 13 moves — Jb-perm related muscle memory.',
     ),
   ];
 

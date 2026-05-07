@@ -16,6 +16,8 @@ class CubeInteractiveView extends StatelessWidget {
   final GestureDragEndCallback onPanEnd;
   final VoidCallback? onExit;
   final bool showingSolution;
+  final List<MapEntry<CubeFace, int>>? highlightedStickers;
+  final bool dimNonHighlighted;
 
 
   const CubeInteractiveView({
@@ -31,6 +33,8 @@ class CubeInteractiveView extends StatelessWidget {
     required this.onPanEnd,
     this.onExit,
     this.showingSolution = false,
+    this.highlightedStickers,
+    this.dimNonHighlighted = false,
   });
 
   @override
@@ -78,10 +82,10 @@ class CubeInteractiveView extends StatelessWidget {
                             animatingMove: animatingMove,
                             animationProgress: animationProgress,
                             highlightedFace: null,
-                            highlightedStickers: null,
+                            highlightedStickers: highlightedStickers,
                             availableStickers: null,
                             stickerLabels: stickerLabels,
-                            dimNonHighlighted: false,
+                            dimNonHighlighted: dimNonHighlighted,
                           ),
                           size: Size.infinite,
                         ),

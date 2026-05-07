@@ -9,6 +9,7 @@ import '../utils/solve_theme.dart';
 import '../utils/haptic_service.dart';
 import 'analysis_timeline.dart';
 import 'premium_upsell_sheet.dart';
+import 'solve_stats_sheet.dart';
 import 'tape_deck_controls.dart';
 import 'scramble_settings_panel.dart';
 
@@ -155,6 +156,7 @@ class SolveControls extends StatelessWidget {
                             ),
                           ),
                         ),
+                        const SizedBox(width: 12),
                         Text(
                           moveLabels != null && moveLabels!.containsKey(moveIndex - solutionStartIndex)
                               ? moveLabels![moveIndex - solutionStartIndex]!
@@ -164,6 +166,45 @@ class SolveControls extends StatelessWidget {
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'monospace',
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () {
+                            HapticService.impactLight();
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              isScrollControlled: true,
+                              builder: (_) => SolveStatsSheet(controller: analysisController),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                width: 1,
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.bar_chart_rounded, color: Colors.white70, size: 14),
+                                SizedBox(width: 4),
+                                Text(
+                                  'STATS',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -201,10 +242,10 @@ class SolveControls extends StatelessWidget {
                   const SizedBox(height: 12),
                 ],
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
 
                 // Move Explanation Area
-                if (showExplanations && !isDemo)
+                if (showExplanations)
                   Expanded(
                     child: AnimatedBuilder(
                       animation: analysisController,
@@ -214,7 +255,7 @@ class SolveControls extends StatelessWidget {
 
                         final bool isPremium = PremiumManager().isPremium;
 
-                        if (!isPremium && move != null) {
+                        if (!isPremium && move != null && !isDemo) {
                           // PRO Teaser for non-premium users
                           return Container(
                             margin: const EdgeInsets.symmetric(horizontal: 20),

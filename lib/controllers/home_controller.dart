@@ -25,6 +25,8 @@ class HomeController extends ChangeNotifier {
   bool _isScanned = false;
 
   List<CubeMove> _moveHistory = [];
+  List<MapEntry<CubeFace, int>>? _highlightedStickers;
+  bool _dimNonHighlighted = false;
   int _moveIndex = 0;
   int _solutionStartIndex = 0;
   bool _showingSolution = false;
@@ -111,6 +113,8 @@ class HomeController extends ChangeNotifier {
   double get rotationY => _rotationY;
   List<CubeMove> get moveHistory => _moveHistory;
   int get solvesCompleted => _solvesCompleted;
+  List<MapEntry<CubeFace, int>>? get highlightedStickers => _highlightedStickers;
+  bool get dimNonHighlighted => _dimNonHighlighted;
   int get moveIndex => _moveIndex;
   int get solutionStartIndex => _solutionStartIndex;
   bool get showingSolution => _showingSolution;
@@ -691,6 +695,8 @@ class HomeController extends ChangeNotifier {
     String? demoType,
     Map<CubeFace, Map<int, String>>? stickerLabels,
     List<int>? targetPieces,
+    List<MapEntry<CubeFace, int>>? highlightedStickers,
+    bool dimNonHighlighted = false,
     List<String?>? moveDescriptions,
     Map<int, String>? moveLabels,
   }) async {
@@ -698,6 +704,8 @@ class HomeController extends ChangeNotifier {
     _activeDemoStepIndex = stepIndex;
     _activeDemoType = demoType;
     _stickerLabels = stickerLabels;
+    _highlightedStickers = highlightedStickers;
+    _dimNonHighlighted = dimNonHighlighted;
     _moveLabels = moveLabels;
     _initialStickerLabels =
         stickerLabels?.map((face, labels) => MapEntry(face, Map.from(labels)));

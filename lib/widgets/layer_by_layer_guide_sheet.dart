@@ -25,6 +25,8 @@ class LayerByLayerGuideSheet extends StatefulWidget {
     String? demoType,
     Map<CubeFace, Map<int, String>>? stickerLabels,
     List<int>? targetPieces,
+    List<MapEntry<CubeFace, int>>? highlightedStickers,
+    bool? dimNonHighlighted,
   })? onDemoRequested;
   final VoidCallback? onKociembaRequested;
   final void Function(int index)? onTabChanged;

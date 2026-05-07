@@ -206,6 +206,8 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
               onPanUpdate: _onPanUpdate,
               onPanEnd: _onPanEnd,
               showingSolution: _homeController.showingSolution,
+              highlightedStickers: _homeController.highlightedStickers,
+              dimNonHighlighted: _homeController.dimNonHighlighted,
               onExit: _homeController.isDemo
                   ? _homeController.cancelDemo
                   : _homeController.resetToSaved,
@@ -318,7 +320,9 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
             targetRotationY,
             demoType,
             stickerLabels,
-            targetPieces}) {
+            targetPieces,
+            highlightedStickers,
+            dimNonHighlighted}) {
           _onDemoRequested(stepIndex, initialState,
               moves: moves,
               initialRotationX: initialRotationX,
@@ -327,7 +331,9 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
               targetRotationY: targetRotationY,
               demoType: 'beginner',
               stickerLabels: stickerLabels,
-              targetPieces: targetPieces);
+              targetPieces: targetPieces,
+              highlightedStickers: highlightedStickers,
+              dimNonHighlighted: dimNonHighlighted ?? false);
         },
       ),
     );
@@ -369,6 +375,10 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
               demoType,
               stickerLabels,
               targetPieces,
+              highlightedStickers,
+              dimNonHighlighted,
+              moveDescriptions,
+              moveLabels,
               scrollOffset,
               ollSubIndex,
               pllSubIndex,
@@ -390,7 +400,11 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
                 targetRotationY: targetRotationY,
                 demoType: 'advanced',
                 stickerLabels: stickerLabels,
-                targetPieces: targetPieces);
+                targetPieces: targetPieces,
+                highlightedStickers: highlightedStickers,
+                dimNonHighlighted: dimNonHighlighted ?? false,
+                moveDescriptions: moveDescriptions,
+                moveLabels: moveLabels);
           },
         ),
       ),
@@ -406,6 +420,9 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
       String? demoType,
       Map<CubeFace, Map<int, String>>? stickerLabels,
       List<int>? targetPieces,
+      List<MapEntry<CubeFace, int>>? highlightedStickers,
+      bool dimNonHighlighted = false,
+      List<String?>? moveDescriptions,
       Map<int, String>? moveLabels}) {
     _homeController.handleDemoRequested(
       stepIndex,
@@ -418,6 +435,9 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
       demoType: demoType ?? 'beginner',
       stickerLabels: stickerLabels,
       targetPieces: targetPieces,
+      highlightedStickers: highlightedStickers,
+      dimNonHighlighted: dimNonHighlighted,
+      moveDescriptions: moveDescriptions,
       moveLabels: moveLabels,
     );
     // Dismiss the learn options / guide sheet

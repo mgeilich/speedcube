@@ -64,6 +64,53 @@ class AnalysisController extends ChangeNotifier {
   /// Returns 1 if current move is in Phase 1, 2 if in Phase 2
   int get currentPhase => _currentIndex <= _phase1MoveCount ? 1 : 2;
 
+  /// Per-stage move count breakdown, ordered by first appearance in the solution.
+  /// For Kociemba solves (no stage names), returns Phase 1 / Phase 2 breakdown.
+  List<({String name, int count})> get stageBreakdown {
+    final result = <({String name, int count})>[];
+    final seen = <String>{};
+
+    if (_moveStageNames.isEmpty) return result;
+
+    // Check if this is a pure Kociemba solve (all null stage names)
+    final allNull = _moveStageNames.every((s) => s == null);
+    if (allNull && _solution.isNotEmpty) {
+      if (_phase1MoveCount > 0) {
+        result.add((name: 'Phase 1', count: _phase1MoveCount));
+      }
+      final phase2 = _solution.length - _phase1MoveCount;
+      if (phase2 > 0) {
+        result.add((name: 'Phase 2', count: phase2));
+      }
+      return result;
+    }
+
+    // Group consecutive moves by stage name
+    for (int i = 0; i < _moveStageNames.length; i++) {
+      final name = _moveStageNames[i] ?? 'Kociemba';
+      // Normalize: strip method prefix for display (e.g. "CFOP F2L" -> "F2L")
+      final displayName = _normalizeStage(name);
+
+      if (!seen.contains(displayName)) {
+        seen.add(displayName);
+        final count = _moveStageNames.where((s) => _normalizeStage(s ?? 'Kociemba') == displayName).length;
+        result.add((name: displayName, count: count));
+      }
+    }
+    return result;
+  }
+
+  /// Strips common method prefixes for cleaner display.
+  static String _normalizeStage(String raw) {
+    // Remove method prefixes like "CFOP ", "Roux ", etc.
+    final prefixes = ['CFOP ', 'Roux ', 'ZZ ', 'Petrus ', 'Heise '];
+    for (final p in prefixes) {
+      if (raw.startsWith(p)) return raw.substring(p.length);
+    }
+    // Also strip " (Fallback)" suffixes
+    return raw.replaceAll(RegExp(r'\s*\(Fallback\)'), '');
+  }
+
   /// Load a new solution and calculate states
   void loadSolution(
     List<CubeMove> solution,
