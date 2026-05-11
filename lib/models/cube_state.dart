@@ -201,21 +201,21 @@ class CubeState {
         _cycle(s, [0, 2, 8, 6]); _cycle(s, [1, 5, 7, 3]);
         _cycle(s, [18, 36, 45, 9]); _cycle(s, [19, 37, 46, 10]); _cycle(s, [20, 38, 47, 11]);
         break;
-      case CubeFace.r:
-        _cycle(s, [9, 11, 17, 15]); _cycle(s, [10, 14, 16, 12]);
-        _cycle(s, [2, 51, 35, 20]); _cycle(s, [5, 48, 32, 23]); _cycle(s, [8, 45, 29, 26]);
-        break;
-      case CubeFace.f:
-        _cycle(s, [18, 20, 26, 24]); _cycle(s, [19, 23, 25, 21]);
-        _cycle(s, [6, 9, 29, 44]); _cycle(s, [7, 12, 28, 41]); _cycle(s, [8, 15, 27, 38]);
-        break;
       case CubeFace.d:
         _cycle(s, [27, 29, 35, 33]); _cycle(s, [28, 32, 34, 30]);
         _cycle(s, [24, 15, 51, 42]); _cycle(s, [25, 16, 52, 43]); _cycle(s, [26, 17, 53, 44]);
         break;
+      case CubeFace.r:
+        _cycle(s, [9, 11, 17, 15]); _cycle(s, [10, 14, 16, 12]);
+        _cycle(s, [2, 51, 29, 20]); _cycle(s, [5, 48, 32, 23]); _cycle(s, [8, 45, 35, 26]);
+        break;
       case CubeFace.l:
         _cycle(s, [36, 38, 44, 42]); _cycle(s, [37, 41, 43, 39]);
         _cycle(s, [0, 18, 27, 53]); _cycle(s, [3, 21, 30, 50]); _cycle(s, [6, 24, 33, 47]);
+        break;
+      case CubeFace.f:
+        _cycle(s, [18, 20, 26, 24]); _cycle(s, [19, 23, 25, 21]);
+        _cycle(s, [6, 9, 29, 44]); _cycle(s, [7, 12, 28, 41]); _cycle(s, [8, 15, 27, 38]);
         break;
       case CubeFace.b:
         _cycle(s, [45, 47, 53, 51]); _cycle(s, [46, 50, 52, 48]);

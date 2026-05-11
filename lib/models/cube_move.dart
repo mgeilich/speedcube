@@ -108,7 +108,8 @@ class CubeMove {
   static CubeMove? parse(String notation) {
     if (notation.isEmpty) return null;
 
-    String cleanNotation = notation.trim();
+    // Remove parentheses and trim
+    String cleanNotation = notation.replaceAll('(', '').replaceAll(')', '').trim();
     if (cleanNotation.isEmpty) return null;
 
     final faceChar = cleanNotation[0].toUpperCase();

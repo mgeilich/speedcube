@@ -244,7 +244,7 @@ class AlgLibrary {
       category: AlgCategory.oll,
       subcategory: 'Cross',
       algorithm: "R U2 R' U' R U R' U' R U R'",
-      setupMoves: "R' U' R U R' U' R U R' U2 R",
+      setupMoves: "R U' R' U R U' R' U R U2 R'",
       description: 'H-Pattern: All 4 corners face sideways.',
     ),
     AlgCase(
@@ -454,7 +454,7 @@ class AlgLibrary {
       category: AlgCategory.oll,
       subcategory: 'P-shape',
       algorithm: "f R U R' U' f'",
-      setupMoves: "f R U R' U' f'",
+      setupMoves: "f U R U' R' f'",
       description: 'P-shape: mirror of OLL 43.',
     ),
     AlgCase(
@@ -518,7 +518,7 @@ class AlgLibrary {
       category: AlgCategory.oll,
       subcategory: 'I-shape',
       algorithm: "f R U R' U' R U R' U' f'",
-      setupMoves: "f R U R' U' R U R' U' f'",
+      setupMoves: "f U R U' R' U R U' R' f'",
       description: 'I-shape: double sexy move in f wrapper.',
     ),
     AlgCase(
@@ -727,7 +727,7 @@ class AlgLibrary {
       algorithm: "R' U R' U' B' R' B2 U' B' U B' R B R",
       setupMoves: "R' B' R' B U' B U B2 R B U R U' R",
       description:
-          'Diagonal Corner Swap: two diagonally opposite corners swap, plus two edges swap. A 14-move algorithm.',
+          'Diagonal Corner Swap: two diagonally opposite corners swap, plus two edges swap. A 17-move algorithm.',
     ),
 
     // ── G-perms ───────────────────────────────────────────────────────────
