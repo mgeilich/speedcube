@@ -4,6 +4,7 @@ import '../models/cube_move.dart';
 import '../models/cube_state.dart';
 import '../animation/cube_animation_controller.dart';
 import '../utils/premium_manager.dart';
+import '../utils/trigger_detector.dart';
 import 'cube_renderer.dart';
 
 /// Full-screen algorithm library browser (OLL + PLL)
@@ -665,11 +666,6 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
               ? CubeState.solved()
               : CubeState.yellowTopSolved())
           .applyMoves(widget.algCase.setupMoveList);
-      if (widget.algCase.category == AlgCategory.winterVariation) {
-        // For WV, the last pair is out of the slot.
-        // Setup moves for WV should include taking the pair out if not already in setup.
-        // Let's assume the setup moves handle it.
-      }
       _isAnimating = false;
       _highlightedMove = -1;
     });
@@ -698,7 +694,6 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
     });
 
     final moves = widget.algCase.algorithmMoves;
-    // Play moves one at a time with highlight tracking
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted && _animGeneration == myGen) {
         _playStep(moves, 0, myGen);
@@ -718,9 +713,8 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
     }
     setState(() => _highlightedMove = index);
     _animController.queueMoves([moves[index]]);
-    // Wait for this move's animation to finish, then proceed
     final moveDuration = const Duration(milliseconds: 450) +
-        const Duration(milliseconds: 80); // slight overlap buffer
+        const Duration(milliseconds: 80);
     Future.delayed(moveDuration, () {
       _playStep(moves, index + 1, gen);
     });
@@ -745,7 +739,6 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
       ),
       child: Column(
         children: [
-          // Drag handle
           Container(
             width: 40,
             height: 4,
@@ -755,8 +748,6 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
-          // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
             child: Row(
@@ -786,8 +777,6 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
               ],
             ),
           ),
-
-          // 3D Cube (drag to rotate)
           Expanded(
             flex: 3,
             child: Padding(
@@ -800,7 +789,6 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
                     setState(() {
                       _rotationY += delta.dx * 0.01;
                       _rotationX += delta.dy * 0.01;
-                      // Clamp vertical tilt so cube doesn't flip upside-down
                       _rotationX = _rotationX.clamp(-0.4, 1.4);
                     });
                     _lastPanPosition = d.localPosition;
@@ -824,67 +812,36 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
               ),
             ),
           ),
-
-          // Algorithm area (scrollable if needed)
           Expanded(
             flex: 2,
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Column(
                 children: [
-                  // Algorithm move badges
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
                     child: Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
+                      spacing: 8,
+                      runSpacing: 8,
                       alignment: WrapAlignment.center,
-                      children: moves.asMap().entries.map((e) {
-                        final isActive = _highlightedMove == e.key;
-                        return AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 7, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: isActive
-                                ? const Color(0xFF6366F1).withValues(alpha: 0.85)
-                                : const Color(0xFF6366F1).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: isActive
-                                  ? const Color(0xFF6366F1)
-                                  : const Color(0xFF6366F1)
-                                      .withValues(alpha: 0.3),
-                              width: isActive ? 2 : 1,
-                            ),
-                            boxShadow: isActive
-                                ? [
-                                    BoxShadow(
-                                      color: const Color(0xFF6366F1)
-                                          .withValues(alpha: 0.4),
-                                      blurRadius: 6,
-                                    )
-                                  ]
-                                : null,
-                          ),
-                          child: Text(
-                            e.value.toString(),
-                            style: TextStyle(
-                              color: isActive
-                                  ? Colors.white
-                                  : const Color(0xFF818CF8),
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'monospace',
-                              fontSize: 12,
-                            ),
-                          ),
-                        );
+                      children: TriggerDetector.detect(moves).map((match) {
+                        if (match.isTrigger) {
+                          return _TriggerGroupBadge(
+                            match: match,
+                            moves: moves,
+                            highlightedIndex: _highlightedMove,
+                          );
+                        } else {
+                          final index = match.moveIndices.first;
+                          return _MoveBadge(
+                            move: moves[index],
+                            isActive: _highlightedMove == index,
+                          );
+                        }
                       }).toList(),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Description
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Text(
@@ -898,8 +855,6 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
               ),
             ),
           ),
-
-          // Action buttons
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
             child: Row(
@@ -967,6 +922,101 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
           fontWeight: FontWeight.bold,
           letterSpacing: 0.5,
         ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Trigger / Move Badges
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _MoveBadge extends StatelessWidget {
+  final CubeMove move;
+  final bool isActive;
+
+  const _MoveBadge({required this.move, required this.isActive});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: isActive
+            ? const Color(0xFF6366F1).withValues(alpha: 0.85)
+            : const Color(0xFF6366F1).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: isActive
+              ? const Color(0xFF6366F1)
+              : const Color(0xFF6366F1).withValues(alpha: 0.3),
+          width: isActive ? 2 : 1,
+        ),
+      ),
+      child: Text(
+        move.toString(),
+        style: TextStyle(
+          color: isActive ? Colors.white : const Color(0xFF818CF8),
+          fontWeight: FontWeight.bold,
+          fontFamily: 'monospace',
+          fontSize: 13,
+        ),
+      ),
+    );
+  }
+}
+
+class _TriggerGroupBadge extends StatelessWidget {
+  final TriggerMatch match;
+  final List<CubeMove> moves;
+  final int highlightedIndex;
+
+  const _TriggerGroupBadge({
+    required this.match,
+    required this.moves,
+    required this.highlightedIndex,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasActive = match.moveIndices.contains(highlightedIndex);
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: hasActive ? const Color(0xFF6366F1).withValues(alpha: 0.3) : Colors.white10,
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(
+              match.name.toUpperCase(),
+              style: TextStyle(
+                color: hasActive ? const Color(0xFFFACC15) : Colors.white24,
+                fontSize: 8,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: match.moveIndices.map((idx) {
+              final isActive = highlightedIndex == idx;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: _MoveBadge(move: moves[idx], isActive: isActive),
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
   }

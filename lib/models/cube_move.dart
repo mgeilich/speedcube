@@ -146,10 +146,10 @@ class CubeMove {
 
     int turns = 1;
     String suffix = cleanNotation.substring(startIdx);
-    if (suffix.contains("'") || suffix.contains("’")) {
-      turns = -1;
-    } else if (suffix.contains("2")) {
+    if (suffix.contains("2")) {
       turns = 2;
+    } else if (suffix.contains("'") || suffix.contains("’")) {
+      turns = -1;
     }
 
     return CubeMove(face, turns, wide);

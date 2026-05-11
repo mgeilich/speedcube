@@ -52,8 +52,8 @@ class CubeState {
       d: List.filled(9, CubeColor.white),
       f: List.filled(9, CubeColor.green),
       b: List.filled(9, CubeColor.blue),
-      r: List.filled(9, CubeColor.orange),
-      l: List.filled(9, CubeColor.red),
+      r: List.filled(9, CubeColor.red),
+      l: List.filled(9, CubeColor.orange),
     );
   }
 
@@ -131,27 +131,40 @@ class CubeState {
     }
 
     if (move.isWide) {
-      // Decompose wide move into face move + inverse slice move
-      // Rw = R + M', Lw = L + M, etc.
       List<CubeMove> componentMoves = [];
-      componentMoves.add(CubeMove(move.face, move.turns, false));
       switch (move.face) {
-        case CubeFace.r: componentMoves.add(CubeMove(CubeFace.m, -move.turns)); break;
-        case CubeFace.l: componentMoves.add(CubeMove(CubeFace.m, move.turns)); break;
-        case CubeFace.u: componentMoves.add(CubeMove(CubeFace.e, -move.turns)); break;
-        case CubeFace.d: componentMoves.add(CubeMove(CubeFace.e, move.turns)); break;
-        case CubeFace.f: componentMoves.add(CubeMove(CubeFace.s, move.turns)); break;
-        case CubeFace.b: componentMoves.add(CubeMove(CubeFace.s, -move.turns)); break;
+        case CubeFace.r:
+          componentMoves.add(CubeMove(CubeFace.r, move.turns, false));
+          componentMoves.add(CubeMove(CubeFace.m, -move.turns));
+          break;
+        case CubeFace.l:
+          componentMoves.add(CubeMove(CubeFace.l, move.turns, false));
+          componentMoves.add(CubeMove(CubeFace.m, move.turns));
+          break;
+        case CubeFace.u:
+          componentMoves.add(CubeMove(CubeFace.u, move.turns, false));
+          componentMoves.add(CubeMove(CubeFace.e, -move.turns));
+          break;
+        case CubeFace.d:
+          componentMoves.add(CubeMove(CubeFace.d, move.turns, false));
+          componentMoves.add(CubeMove(CubeFace.e, move.turns));
+          break;
+        case CubeFace.f:
+          componentMoves.add(CubeMove(CubeFace.f, move.turns, false));
+          componentMoves.add(CubeMove(CubeFace.s, move.turns));
+          break;
+        case CubeFace.b:
+          componentMoves.add(CubeMove(CubeFace.b, move.turns, false));
+          componentMoves.add(CubeMove(CubeFace.s, -move.turns));
+          break;
         default: break;
       }
       return applyMoves(componentMoves);
     }
 
     final state = clone();
-    int turns = move.turns;
-    if (turns == -1) turns = 3;
-    if (turns == 2) turns = 2;
-
+    int turns = (move.turns % 4 + 4) % 4;
+    
     for (int i = 0; i < turns; i++) {
       state._applyQuarterTurn(move.face);
     }
@@ -181,81 +194,64 @@ class CubeState {
   }
 
   void _applyQuarterTurn(CubeFace face) {
+    final s = _getAllStickers();
+    
     switch (face) {
       case CubeFace.u:
-        _rotateFaceClockwise(u);
-        _cycleEdges(f, [0, 1, 2], l, [0, 1, 2], b, [0, 1, 2], r, [0, 1, 2]);
-        break;
-      case CubeFace.d:
-        _rotateFaceClockwise(d);
-        _cycleEdges(f, [6, 7, 8], r, [6, 7, 8], b, [6, 7, 8], l, [6, 7, 8]);
-        break;
-      case CubeFace.f:
-        _rotateFaceClockwise(f);
-        _cycleEdgesComplex(u, [6, 7, 8], r, [0, 3, 6], d, [2, 1, 0], l, [8, 5, 2]);
-        break;
-      case CubeFace.b:
-        _rotateFaceClockwise(b);
-        _cycleEdgesComplex(u, [2, 1, 0], l, [0, 3, 6], d, [6, 7, 8], r, [8, 5, 2]);
+        _cycle(s, [0, 2, 8, 6]); _cycle(s, [1, 5, 7, 3]);
+        _cycle(s, [18, 36, 45, 9]); _cycle(s, [19, 37, 46, 10]); _cycle(s, [20, 38, 47, 11]);
         break;
       case CubeFace.r:
-        _rotateFaceClockwise(r);
-        _cycleEdgesComplex(u, [2, 5, 8], b, [6, 3, 0], d, [2, 5, 8], f, [2, 5, 8]);
+        _cycle(s, [9, 11, 17, 15]); _cycle(s, [10, 14, 16, 12]);
+        _cycle(s, [2, 51, 35, 20]); _cycle(s, [5, 48, 32, 23]); _cycle(s, [8, 45, 29, 26]);
+        break;
+      case CubeFace.f:
+        _cycle(s, [18, 20, 26, 24]); _cycle(s, [19, 23, 25, 21]);
+        _cycle(s, [6, 9, 29, 44]); _cycle(s, [7, 12, 28, 41]); _cycle(s, [8, 15, 27, 38]);
+        break;
+      case CubeFace.d:
+        _cycle(s, [27, 29, 35, 33]); _cycle(s, [28, 32, 34, 30]);
+        _cycle(s, [24, 15, 51, 42]); _cycle(s, [25, 16, 52, 43]); _cycle(s, [26, 17, 53, 44]);
         break;
       case CubeFace.l:
-        _rotateFaceClockwise(l);
-        _cycleEdgesComplex(u, [0, 3, 6], f, [0, 3, 6], d, [0, 3, 6], b, [8, 5, 2]);
+        _cycle(s, [36, 38, 44, 42]); _cycle(s, [37, 41, 43, 39]);
+        _cycle(s, [0, 18, 27, 53]); _cycle(s, [3, 21, 30, 50]); _cycle(s, [6, 24, 33, 47]);
+        break;
+      case CubeFace.b:
+        _cycle(s, [45, 47, 53, 51]); _cycle(s, [46, 50, 52, 48]);
+        _cycle(s, [2, 36, 33, 17]); _cycle(s, [1, 39, 34, 14]); _cycle(s, [0, 42, 35, 11]);
         break;
       case CubeFace.m:
-        // M is in direction of L: U -> F -> D -> B -> U
-        _cycleEdgesComplex(u, [1, 4, 7], f, [1, 4, 7], d, [1, 4, 7], b, [7, 4, 1]);
+        _cycle(s, [1, 19, 28, 52]); _cycle(s, [4, 22, 31, 49]); _cycle(s, [7, 25, 34, 46]);
         break;
       case CubeFace.e:
-        // E is in direction of D: F -> R -> B -> L -> F
-        _cycleEdgesComplex(f, [3, 4, 5], r, [3, 4, 5], b, [3, 4, 5], l, [3, 4, 5]);
+        _cycle(s, [21, 12, 48, 39]); _cycle(s, [22, 13, 49, 40]); _cycle(s, [23, 14, 50, 41]);
         break;
       case CubeFace.s:
-        // S is in direction of F: U -> R -> D -> L -> U
-        _cycleEdgesComplex(u, [3, 4, 5], r, [1, 4, 7], d, [5, 4, 3], l, [7, 4, 1]);
+        _cycle(s, [3, 10, 32, 43]); _cycle(s, [4, 13, 31, 40]); _cycle(s, [5, 16, 30, 37]);
         break;
-      default:
-        break;
+      default: break;
     }
+    _setAllStickers(s);
   }
 
-  void _rotateFaceClockwise(List<CubeColor> face) {
-    final temp = List<CubeColor>.from(face);
-    face[0] = temp[6]; face[1] = temp[3]; face[2] = temp[0];
-    face[3] = temp[7]; face[4] = temp[4]; face[5] = temp[1];
-    face[6] = temp[8]; face[7] = temp[5]; face[8] = temp[2];
-  }
-
-  void _rotateFaceCounterClockwise(List<CubeColor> face) {
-    final temp = List<CubeColor>.from(face);
-    face[0] = temp[2]; face[1] = temp[5]; face[2] = temp[8];
-    face[3] = temp[1]; face[4] = temp[4]; face[5] = temp[7];
-    face[6] = temp[0]; face[7] = temp[3]; face[8] = temp[6];
-  }
-
-  void _rotateFace180(List<CubeColor> face) {
-    final temp = List<CubeColor>.from(face);
-    face[0] = temp[8]; face[1] = temp[7]; face[2] = temp[6];
-    face[3] = temp[5]; face[4] = temp[4]; face[5] = temp[3];
-    face[6] = temp[2]; face[7] = temp[1]; face[8] = temp[0];
-  }
-
-  void _cycleEdges(List<CubeColor> p1, List<int> i1, List<CubeColor> p2, List<int> i2, List<CubeColor> p3, List<int> i3, List<CubeColor> p4, List<int> i4) {
-    for (int i = 0; i < 3; i++) {
-        final temp = p1[i1[i]];
-        p1[i1[i]] = p4[i4[i]];
-        p4[i4[i]] = p3[i3[i]];
-        p3[i3[i]] = p2[i2[i]];
-        p2[i2[i]] = temp;
+  void _cycle(List<CubeColor> s, List<int> indices) {
+    final temp = s[indices.last];
+    for (int i = indices.length - 1; i > 0; i--) {
+      s[indices[i]] = s[indices[i - 1]];
     }
+    s[indices[0]] = temp;
   }
 
-  void _cycleEdgesComplex(List<CubeColor> p1, List<int> i1, List<CubeColor> p2, List<int> i2, List<CubeColor> p3, List<int> i3, List<CubeColor> p4, List<int> i4) {
-    _cycleEdges(p1, i1, p2, i2, p3, i3, p4, i4);
+  List<CubeColor> _getAllStickers() => [...u, ...r, ...f, ...d, ...l, ...b];
+
+  void _setAllStickers(List<CubeColor> s) {
+    u.setAll(0, s.sublist(0, 9));
+    r.setAll(0, s.sublist(9, 18));
+    f.setAll(0, s.sublist(18, 27));
+    d.setAll(0, s.sublist(27, 36));
+    l.setAll(0, s.sublist(36, 45));
+    b.setAll(0, s.sublist(45, 54));
   }
 
   List<CubeColor> getFace(CubeFace face) {
@@ -394,50 +390,15 @@ class CubeState {
   }
 
   CubeState rotateX() {
-    final state = clone();
-    final tempU = List<CubeColor>.from(u);
-    state.u.setAll(0, f);
-    state.f.setAll(0, d);
-    state.d.setAll(0, _rotate180Fixed(b));
-    state.b.setAll(0, _rotate180Fixed(tempU));
-    state._rotateFaceClockwise(state.r);
-    state._rotateFaceCounterClockwise(state.l);
-    return state;
+    return applyMove(CubeMove(CubeFace.r, 1)).applyMove(CubeMove(CubeFace.l, -1)).applyMove(CubeMove(CubeFace.m, -1));
   }
 
   CubeState rotateY() {
-    final state = clone();
-    final tempF = List<CubeColor>.from(f);
-    state.f.setAll(0, r);
-    state.r.setAll(0, b);
-    state.b.setAll(0, l);
-    state.l.setAll(0, tempF);
-    state._rotateFaceClockwise(state.u);
-    state._rotateFaceCounterClockwise(state.d);
-    return state;
+    return applyMove(CubeMove(CubeFace.u, 1)).applyMove(CubeMove(CubeFace.d, -1)).applyMove(CubeMove(CubeFace.e, -1));
   }
 
   CubeState rotateZ() {
-    final state = clone();
-    final tempU = List<CubeColor>.from(u);
-    state.u.setAll(0, _rotateFaceClockwiseCloned(l));
-    state.l.setAll(0, _rotateFaceClockwiseCloned(d));
-    state.d.setAll(0, _rotateFaceClockwiseCloned(r));
-    state.r.setAll(0, _rotateFaceClockwiseCloned(tempU));
-    state._rotateFaceClockwise(state.f);
-    state._rotateFaceCounterClockwise(state.b);
-    return state;
+    return applyMove(CubeMove(CubeFace.f, 1)).applyMove(CubeMove(CubeFace.b, -1)).applyMove(CubeMove(CubeFace.s, 1));
   }
 
-  List<CubeColor> _rotateFaceClockwiseCloned(List<CubeColor> face) {
-    final res = List<CubeColor>.from(face);
-    _rotateFaceClockwise(res);
-    return res;
-  }
-
-  List<CubeColor> _rotate180Fixed(List<CubeColor> face) {
-    final res = List<CubeColor>.from(face);
-    _rotateFace180(res);
-    return res;
-  }
 }
