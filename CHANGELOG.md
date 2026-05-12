@@ -2,6 +2,13 @@
 
 All notable changes to the SpeedCube AR project will be documented in this file.
 
+## [2026.5.2] - 2026-05-12
+
+### Fixed
+- **F2L Algorithm Library Audit**: Performed a comprehensive audit and correction of all 16 F2L cases. Standardized naming, improved descriptions with explicit slot information, and verified all algorithm and setup sequences for 100% simulation accuracy.
+- **OLL/PLL Stability**: Fixed several incorrect algorithms and setup sequences in the OLL and PLL libraries to ensure reliable solves and accurate pedagogical demonstrations.
+- **Standardized Notation**: Unified the internal representation of cube moves to prevent visual artifacts during "Left" face algorithmic sequences.
+
 ## [2026.5.1] - 2026-05-07
 
 ### Added
