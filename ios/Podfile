@@ -30,6 +30,7 @@ flutter_ios_podfile_setup
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
+  inhibit_all_warnings!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do
@@ -48,6 +49,9 @@ post_install do |installer|
         ## dart: PermissionGroup.camera
         'PERMISSION_CAMERA=1',
       ]
+      
+      # Fix IPHONEOS_DEPLOYMENT_TARGET warnings
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
     end
   end
 end
