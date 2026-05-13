@@ -243,10 +243,12 @@ class AlgLibrary {
       name: 'OLL 21',
       category: AlgCategory.oll,
       subcategory: 'Cross',
-      algorithm: "R U2 R' U' R U R' U' R U R'",
-      setupMoves: "R U' R' U R U' R' U R U2 R'",
-      description: 'H-Pattern: All 4 corners face sideways.',
+      algorithm: "R U R' U R U' R' U R U2 R'",
+      setupMoves: "R U2 R' U' R U R' U' R U' R'",
+      description: 'H-Pattern: All 4 corners face sideways (Left and Right).',
     ),
+
+
     AlgCase(
       id: 'oll22',
       name: 'OLL 22',
@@ -254,35 +256,38 @@ class AlgLibrary {
       subcategory: 'Cross',
       algorithm: "R U2 R2 U' R2 U' R2 U2 R",
       setupMoves: "R' U2 R2 U R2 U R2 U2 R'",
-      description: 'Pi-Pattern: Two corners face front, two face side/back.',
+      description: 'Pi-Pattern: Headlights face front, back corners face out.',
     ),
     AlgCase(
       id: 'oll23',
       name: 'OLL 23',
       category: AlgCategory.oll,
       subcategory: 'Cross',
-      algorithm: "R2 D' R U2 R' D R U2 R",
-      setupMoves: "R' U2 R' D' R U2 R' D R2",
-      description: 'U-Pattern: Two "headlights" face you.',
+      algorithm: "R2 D R' U2 R D' R' U2 R'",
+      setupMoves: "R U2 R D R' U2 R D' R2",
+      description: 'U-Pattern: Headlights on front, back corners oriented.',
     ),
+
     AlgCase(
       id: 'oll24',
       name: 'OLL 24',
       category: AlgCategory.oll,
       subcategory: 'Cross',
       algorithm: "r U R' U' r' F R F'",
-      setupMoves: "F R' F' Rw U R U' Rw'",
-      description: 'T-Pattern: Two "headlights" on the side faces.',
+      setupMoves: "F R' F' r U R U' r'",
+      description: 'T-Pattern: One side oriented, other corners face Front and Back.',
     ),
+
     AlgCase(
       id: 'oll25',
       name: 'OLL 25',
       category: AlgCategory.oll,
       subcategory: 'Cross',
       algorithm: "F' r U R' U' r' F R",
-      setupMoves: "R' F' Rw U R U' Rw' F",
-      description: 'L-Pattern: Also called "Bowtie".',
+      setupMoves: "R' F' r U R U' r' F",
+      description: 'L-Pattern: Bowtie. Diagonal corners oriented.',
     ),
+
     AlgCase(
       id: 'oll26',
       name: 'OLL 26',
