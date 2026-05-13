@@ -679,24 +679,36 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
     }
   }
 
+  void _pause() {
+    _animGeneration++;
+    _animController.clearQueue();
+    setState(() => _isAnimating = false);
+  }
+
   void _animate() {
-    if (_isAnimating) return;
+    if (_isAnimating) {
+      _pause();
+      return;
+    }
+
     _animGeneration++;
     final myGen = _animGeneration;
-    _animController.clearQueue();
-    setState(() {
+    final moves = widget.algCase.algorithmMoves;
+
+    // If at the end, reset to start before playing
+    if (_highlightedMove >= moves.length - 1) {
       _cubeState = (widget.algCase.category == AlgCategory.f2l
               ? CubeState.solved()
               : CubeState.yellowTopSolved())
           .applyMoves(widget.algCase.setupMoveList);
-      _isAnimating = true;
       _highlightedMove = -1;
-    });
+    }
 
-    final moves = widget.algCase.algorithmMoves;
-    Future.delayed(const Duration(milliseconds: 300), () {
+    setState(() => _isAnimating = true);
+
+    Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted && _animGeneration == myGen) {
-        _playStep(moves, 0, myGen);
+        _playStep(moves, _highlightedMove + 1, myGen);
       }
     });
   }
@@ -706,7 +718,6 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
       if (mounted && _animGeneration == gen) {
         setState(() {
           _isAnimating = false;
-          _highlightedMove = -1;
         });
       }
       return;
@@ -714,10 +725,30 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
     setState(() => _highlightedMove = index);
     _animController.queueMoves([moves[index]]);
     final moveDuration = const Duration(milliseconds: 450) +
-        const Duration(milliseconds: 80);
+        const Duration(milliseconds: 120);
     Future.delayed(moveDuration, () {
       _playStep(moves, index + 1, gen);
     });
+  }
+
+  void _stepForward() {
+    final moves = widget.algCase.algorithmMoves;
+    if (_highlightedMove >= moves.length - 1) return;
+
+    _pause();
+    final nextIndex = _highlightedMove + 1;
+    setState(() => _highlightedMove = nextIndex);
+    _animController.queueMoves([moves[nextIndex]]);
+  }
+
+  void _stepBackward() {
+    if (_highlightedMove < 0) return;
+
+    _pause();
+    final moves = widget.algCase.algorithmMoves;
+    final move = moves[_highlightedMove];
+    _animController.queueMoves([move.inverse]);
+    setState(() => _highlightedMove--);
   }
 
   @override
@@ -778,7 +809,7 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
             ),
           ),
           Expanded(
-            flex: 3,
+            flex: 4,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: GestureDetector(
@@ -812,7 +843,7 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
               ),
             ),
           ),
-          Expanded(
+          Flexible(
             flex: 2,
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(vertical: 4),
@@ -856,39 +887,40 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
             child: Row(
               children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _resetToCase,
-                    icon: const Icon(Icons.replay_rounded, size: 18),
-                    label: const Text('Reset'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white70,
-                      side: const BorderSide(color: Colors.white24),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
+                _buildActionButton(
+                  icon: Icons.replay_rounded,
+                  onPressed: _resetToCase,
+                  tooltip: 'Reset',
+                ),
+                const SizedBox(width: 8),
+                _buildActionButton(
+                  icon: Icons.skip_previous_rounded,
+                  onPressed: _highlightedMove < 0 ? null : _stepBackward,
+                  tooltip: 'Step Back',
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  flex: 2,
+                  flex: 3,
                   child: ElevatedButton.icon(
-                    onPressed: _isAnimating ? null : _animate,
+                    onPressed: _animate,
                     icon: Icon(
                       _isAnimating
-                          ? Icons.hourglass_top_rounded
-                          : Icons.play_arrow_rounded,
+                          ? Icons.pause_rounded
+                          : (_highlightedMove >= moves.length - 1 
+                              ? Icons.replay_rounded 
+                              : Icons.play_arrow_rounded),
                       size: 20,
                     ),
-                    label: Text(_isAnimating ? 'Animating…' : 'Animate'),
+                    label: Text(
+                      _isAnimating 
+                          ? 'Pause' 
+                          : (_highlightedMove >= moves.length - 1 ? 'Replay' : 'Animate')
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF6366F1),
-                      disabledBackgroundColor:
-                          const Color(0xFF6366F1).withValues(alpha: 0.4),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
@@ -896,10 +928,40 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
                     ),
                   ),
                 ),
+                const SizedBox(width: 12),
+                _buildActionButton(
+                  icon: Icons.skip_next_rounded,
+                  onPressed: _highlightedMove >= moves.length - 1 ? null : _stepForward,
+                  tooltip: 'Step Forward',
+                ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required VoidCallback? onPressed,
+    required String tooltip,
+  }) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: onPressed != null ? Colors.white10 : Colors.white.withValues(alpha: 0.03),
+        ),
+      ),
+      child: IconButton(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 20),
+        color: onPressed != null ? Colors.white70 : Colors.white24,
+        tooltip: tooltip,
       ),
     );
   }

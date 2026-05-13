@@ -397,16 +397,24 @@ class HomeController extends ChangeNotifier {
   void handleAnalysisNext({Duration? overrideDuration}) {
     if (!_showingSolution || !_analysisController.hasNext) return;
 
-    final move = _analysisController.solution[_analysisController.currentIndex];
-    _analysisController.setAnimatingIndexInternal(_analysisController.currentIndex + 1);
+    final int baseIndex =
+        _analysisController.animatingIndex ?? _analysisController.currentIndex;
+    if (baseIndex >= _analysisController.solution.length) return;
+
+    final move = _analysisController.solution[baseIndex];
+    _analysisController.setAnimatingIndexInternal(baseIndex + 1);
     _queueAnalysisMove(move, false, overrideDuration: overrideDuration);
   }
 
   void handleAnalysisPrevious({Duration? overrideDuration}) {
     if (!_showingSolution || !_analysisController.hasPrevious) return;
 
-    final prevMoveIndex = _analysisController.currentIndex - 1;
-    _analysisController.setAnimatingIndexInternal(_analysisController.currentIndex);
+    final int baseIndex =
+        _analysisController.animatingIndex ?? _analysisController.currentIndex;
+    if (baseIndex <= 0) return;
+
+    final prevMoveIndex = baseIndex - 1;
+    _analysisController.setAnimatingIndexInternal(baseIndex - 1);
     final move = _analysisController.solution[prevMoveIndex];
     final inverseMove = move.inverse;
 

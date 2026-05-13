@@ -55,8 +55,8 @@ class AnalysisController extends ChangeNotifier {
       (_currentIndex > 0 && _currentIndex <= _solution.length)
           ? _solution[_currentIndex - 1]
           : null;
-  bool get hasNext => _currentIndex < _solution.length;
-  bool get hasPrevious => _currentIndex > 0;
+  bool get hasNext => (_animatingIndex ?? _currentIndex) < _solution.length;
+  bool get hasPrevious => (_animatingIndex ?? _currentIndex) > 0;
   bool get isComplete => _currentIndex >= _solution.length;
   int get phase1MoveCount => _phase1MoveCount;
   String? get stageName => _stageName;
@@ -238,12 +238,14 @@ class AnalysisController extends ChangeNotifier {
   /// Request next move
   void nextMove() {
     if (!hasNext) return;
+    pause();
     onNextRequest?.call();
   }
 
   /// Request previous move
   void previousMove() {
     if (!hasPrevious) return;
+    pause();
     onPreviousRequest?.call();
   }
 

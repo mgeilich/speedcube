@@ -225,6 +225,8 @@ class SolveControls extends StatelessWidget {
                       : analysisController.play,
                   onRewind: analysisController.rewind,
                   onFastForward: () => analysisController.play(fast: true),
+                  onStepForward: analysisController.nextMove,
+                  onStepBackward: analysisController.previousMove,
                   onJumpToStart: () => onSeek(0, immediate: true),
                   onJumpToEnd: () =>
                       onSeek(analysisController.solution.length, immediate: true),
