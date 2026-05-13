@@ -761,24 +761,40 @@ class _RouxGuideScreenState extends State<RouxGuideScreen>
 
   Widget _buildCubePreview(CubeState state, {double rotationX = 0, double rotationY = 0, List<MapEntry<CubeFace, int>>? highlightedStickers, bool dimNonHighlighted = false}) {
     return Container(
-      width: 100,
-      height: 100,
+      width: 120,
+      height: 120,
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.black26,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: CustomPaint(
-        painter: CubeRenderer(
-          cubeState: state,
-          rotationX: rotationX,
-          rotationY: rotationY,
-          highlightedStickers: highlightedStickers,
-          dimNonHighlighted: dimNonHighlighted,
+        color: Colors.black.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.1),
+          width: 1.5,
         ),
-        size: const Size(80, 80),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: CustomPaint(
+          painter: CubeRenderer(
+            cubeState: state,
+            rotationX: rotationX,
+            rotationY: rotationY,
+            highlightedStickers: highlightedStickers,
+            dimNonHighlighted: dimNonHighlighted,
+          ),
+          size: const Size(112, 112),
+        ),
       ),
     );
   }
+
 
   Widget _buildIllustration(String title, String subtitle, CubeState state, {double rotationX = 0, double rotationY = 0, List<MapEntry<CubeFace, int>>? highlightedStickers, bool dimNonHighlighted = false}) {
      return Column(

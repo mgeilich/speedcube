@@ -212,6 +212,8 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
                   ? _homeController.cancelDemo
                   : _homeController.resetToSaved,
             ),
+            const SizedBox(height: 8),
+
             SolveControls(
               showingSolution: _homeController.showingSolution,
               showExplanations: _homeController.showExplanations,

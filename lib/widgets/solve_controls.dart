@@ -75,40 +75,19 @@ class SolveControls extends StatelessWidget {
 
   final Map<int, String>? moveLabels;
 
-  void _showPhase2Info(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: const Text("Phase 2 Rules",
-            style: TextStyle(color: Colors.white, fontSize: 18)),
-        content: const Text(
-          MoveExplainer.phase2Note,
-          style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.4),
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text("Got it",
-                style: TextStyle(color: Color(0xFF38BDF8))),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     if (showingSolution) {
-      return Expanded(
-        child: Stack(
-          children: [
-            Column(
+      return AnimatedBuilder(
+        animation: analysisController,
+        builder: (context, child) {
+          return Expanded(
+            child: Column(
               children: [
+                // 1. Move Counter / Scrubber
                 if (MediaQuery.of(context).size.height >= 700) ...[
                   const SizedBox(height: 12),
-                  // Progress scrubber
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Row(
@@ -213,7 +192,7 @@ class SolveControls extends StatelessWidget {
                   const SizedBox(height: 12),
                 ],
 
-                // Tape Deck Controls
+                // 2. Play Controls (Tape Deck)
                 TapeDeckControls(
                   isPlaying: analysisController.isPlaying,
                   isRewinding: analysisController.isRewinding,
@@ -230,13 +209,12 @@ class SolveControls extends StatelessWidget {
                   onJumpToStart: () => onSeek(0, immediate: true),
                   onJumpToEnd: () =>
                       onSeek(analysisController.solution.length, immediate: true),
-// onARMode: onARMode, // Removed
                   activeColor:
                       SolveTheme.getStageColor(analysisController.stageName),
                 ),
                 const SizedBox(height: 12),
 
-                // Analysis buttons (timeline)
+                // 3. Move Buttons (Timeline)
                 if (showExplanations || isDemo) ...[
                   AnalysisTimeline(
                     controller: analysisController,
@@ -244,395 +222,18 @@ class SolveControls extends StatelessWidget {
                   const SizedBox(height: 12),
                 ],
 
-                const SizedBox(height: 12),
-
-                // Move Explanation Area
+                // 4. Explanation Box
                 if (showExplanations)
                   Expanded(
-                    child: AnimatedBuilder(
-                      animation: analysisController,
-                      builder: (context, child) {
-                        final move = analysisController.currentMove;
-                        final index = analysisController.currentIndex;
-
-                        final bool isPremium = PremiumManager().isPremium;
-
-                        if (!isPremium && move != null && !isDemo) {
-                          // PRO Teaser for non-premium users
-                          return Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 20),
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF6366F1)
-                                  .withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: const Color(0xFF6366F1)
-                                    .withValues(alpha: 0.3),
-                                width: 2,
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.workspace_premium,
-                                    color: Color(0xFFF59E0B), size: 40),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  "UNLOC PRO EXPLANATIONS",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  "Upgrade to see the rationale and objective behind every move.",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      backgroundColor: Colors.transparent,
-                                      isScrollControlled: true,
-                                      builder: (_) =>
-                                          const PremiumUpsellSheet(),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFF59E0B),
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  child: const Text("SEE ALL FEATURES"),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-
-                        if (move == null) {
-                          // Initial "Start" state
-                          final isCurrent = index == 0;
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 4),
-                            child: GestureDetector(
-                              onTap: () => onSeek(0, immediate: true),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: isCurrent
-                                      ? Colors.white.withValues(alpha: 0.1)
-                                      : Colors.white.withValues(alpha: 0.05),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: isCurrent
-                                        ? const Color(0xFF6366F1)
-                                        : Colors.white12,
-                                    width: isCurrent ? 1.5 : 1,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    if (index < analysisController.currentIndex)
-                                      const Padding(
-                                        padding: EdgeInsets.only(right: 12),
-                                        child: Icon(
-                                          Icons.check_circle,
-                                          color: Color(0xFF10B981),
-                                          size: 18,
-                                        ),
-                                      )
-                                    else
-                                      const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            "START",
-                                            style: TextStyle(
-                                              color: Color(0xFF818CF8),
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 0.5,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            "Scrambled state",
-                                            style: TextStyle(
-                                              color: isCurrent
-                                                  ? Colors.white
-                                                  : Colors.white70,
-                                              fontSize: 13,
-                                              fontWeight: isCurrent
-                                                  ? FontWeight.w600
-                                                  : FontWeight.normal,
-                                            ),
-                                          ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                        }
-
-                        // Compact tappable summary row - ONLY FOR PREMIUM
-                        final stageColor = SolveTheme.getStageColor(
-                            analysisController.moveStageNames[index - 1]);
-                        final phaseColor = stageColor;
-                        final objective = MoveExplainer.getObjective(
-                          move,
-                          analysisController.currentPhase,
-                          analysisController.states[index - 1],
-                          analysisController.states[index],
-                        );
-
-                        final isCompleted =
-                            index < analysisController.currentIndex;
-                        final isCurrent =
-                            index == analysisController.currentIndex;
-
-                        final stageName =
-                            analysisController.moveStageNames[index - 1];
-                        final stageDesc =
-                            analysisController.moveStageDescriptions[index - 1];
-                        final algorithmName =
-                            analysisController.moveAlgorithmNames[index - 1];
-                        final stageGoal = stageName != null
-                            ? MoveExplainer.getStageGoal(stageName)
-                            : null;
-                        final isKociemba = stageName == null;
-
-                        final fullObjective =
-                            (stageDesc != null && stageDesc.isNotEmpty)
-                                ? stageDesc
-                                : objective;
-
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 4),
-                          child: GestureDetector(
-                            onTap: () {
-                              if (analysisController.isPlaying) {
-                                onSeekStart();
-                                onSeek(index);
-                              } else {
-                                onSeek(index);
-                              }
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12),
-                              decoration: BoxDecoration(
-                                color: isCurrent
-                                    ? Colors.white.withValues(alpha: 0.1)
-                                    : Colors.white.withValues(alpha: 0.05),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color:
-                                      isCurrent ? phaseColor : Colors.white12,
-                                  width: isCurrent ? 1.5 : 1,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  if (isCompleted)
-                                    const Padding(
-                                      padding: EdgeInsets.only(right: 12),
-                                      child: Icon(
-                                        Icons.check_circle,
-                                        color: Color(0xFF10B981),
-                                        size: 18,
-                                      ),
-                                    )
-                                  else
-                                    const SizedBox(width: 4),
-                                  // Move info
-                                  Expanded(
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 2),
-                                            child: Row(
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    if (isKociemba &&
-                                                        index >
-                                                            analysisController
-                                                                .phase1MoveCount) {
-                                                      _showPhase2Info(context);
-                                                    }
-                                                  },
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Text(
-                                                        (isKociemba
-                                                            ? "PHASE ${index <= analysisController.phase1MoveCount ? 1 : 2}"
-                                                            : stageName
-                                                                .toUpperCase()),
-                                                        style: TextStyle(
-                                                          color: isCompleted
-                                                              ? Colors.white38
-                                                              : stageColor,
-                                                          fontSize: 10,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          letterSpacing: 0.5,
-                                                        ),
-                                                      ),
-                                                      if (isKociemba &&
-                                                          index >
-                                                              analysisController
-                                                                  .phase1MoveCount) ...[
-                                                        const SizedBox(width: 4),
-                                                        Icon(
-                                                          Icons.info_outline,
-                                                          size: 10,
-                                                          color: isCompleted
-                                                              ? Colors.white38
-                                                              : stageColor,
-                                                        ),
-                                                      ],
-                                                    ],
-                                                  ),
-                                                ),
-                                                if (algorithmName != null) ...[
-                                                  const SizedBox(width: 8),
-                                                  Container(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                            horizontal: 5,
-                                                            vertical: 1),
-                                                    decoration: BoxDecoration(
-                                                      color: (isCompleted
-                                                              ? Colors.white12
-                                                              : const Color(
-                                                                  0xFFFACC15))
-                                                          .withValues(
-                                                              alpha: 0.15),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              4),
-                                                      border: Border.all(
-                                                        color: (isCompleted
-                                                                ? Colors.white12
-                                                                : const Color(
-                                                                    0xFFFACC15))
-                                                            .withValues(
-                                                                alpha: 0.3),
-                                                        width: 0.5,
-                                                      ),
-                                                    ),
-                                                    child: Text(
-                                                      algorithmName.toUpperCase(),
-                                                      style: TextStyle(
-                                                        color: isCompleted
-                                                            ? Colors.white38
-                                                            : const Color(
-                                                                0xFFFACC15),
-                                                        fontSize: 8,
-                                                        fontWeight:
-                                                            FontWeight.w900,
-                                                        letterSpacing: 0.5,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ],
-                                            ),
-                                          ),
-                                          if (stageGoal != null)
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 6),
-                                              child: Text(
-                                                stageGoal,
-                                                style: TextStyle(
-                                                  color: isCompleted
-                                                      ? Colors.white24
-                                                      : Colors.white70,
-                                                  fontSize: 11,
-                                                  fontStyle: FontStyle.italic,
-                                                  height: 1.2,
-                                                ),
-                                              ),
-                                            ),
-                                          Text(
-                                            isKociemba
-                                                ? MoveExplainer.getRationale(
-                                                    move,
-                                                    index - 1,
-                                                    analysisController
-                                                        .solution.length,
-                                                    analysisController
-                                                        .states[index - 1],
-                                                    analysisController
-                                                        .states[index],
-                                                    phase: index <=
-                                                            analysisController
-                                                                .phase1MoveCount
-                                                        ? 1
-                                                        : 2,
-                                                  )
-                                                : fullObjective,
-                                            style: TextStyle(
-                                              color: isCompleted
-                                                  ? Colors.white38
-                                                  : Colors.white,
-                                              fontSize: 13,
-                                              fontWeight: isCurrent
-                                                  ? FontWeight.w600
-                                                  : FontWeight.normal,
-                                              fontStyle: isKociemba
-                                                  ? FontStyle.italic
-                                                  : FontStyle.normal,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    child: _buildExplanationBox(context),
                   )
                 else
                   const Spacer(),
                 const SizedBox(height: 12),
               ],
             ),
-          ],
-        ),
+          );
+        },
       );
     } else {
       return Expanded(
@@ -652,6 +253,217 @@ class SolveControls extends StatelessWidget {
         ),
       );
     }
+  }
+
+  Widget _buildExplanationBox(BuildContext context) {
+    final move = analysisController.currentMove;
+    final index = analysisController.currentIndex;
+    final bool isPremium = PremiumManager().isPremium;
+
+    if (!isPremium && move != null && !isDemo) {
+      return Container(
+        margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFF6366F1).withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: const Color(0xFF6366F1).withValues(alpha: 0.3),
+            width: 2,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.workspace_premium, color: Color(0xFFF59E0B), size: 32),
+            const SizedBox(height: 12),
+            const Text(
+              "UNLOCK PRO EXPLANATIONS",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "Upgrade to see the rationale and objective behind every move.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  isScrollControlled: true,
+                  builder: (_) => const PremiumUpsellSheet(),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFF59E0B),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text("SEE ALL FEATURES", style: TextStyle(fontSize: 12)),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (move == null) {
+      final isCurrent = index == 0;
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isCurrent ? const Color(0xFF6366F1) : Colors.white12,
+              width: isCurrent ? 1.5 : 1,
+            ),
+          ),
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "START",
+                style: TextStyle(
+                  color: Color(0xFF818CF8),
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "The cube is in its initial scrambled state. Use the controls above to navigate the solution.",
+                style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final stageColor = SolveTheme.getStageColor(
+        analysisController.moveStageNames[index - 1]);
+    final objective = MoveExplainer.getObjective(
+      move,
+      analysisController.currentPhase,
+      analysisController.states[index - 1],
+      analysisController.states[index],
+    );
+
+    final stageName = analysisController.moveStageNames[index - 1];
+    final stageDesc = analysisController.moveStageDescriptions[index - 1];
+    final algorithmName = analysisController.moveAlgorithmNames[index - 1];
+    final stageGoal = stageName != null ? MoveExplainer.getStageGoal(stageName) : null;
+    final isKociemba = stageName == null;
+
+    final fullObjective = (stageDesc != null && stageDesc.isNotEmpty) ? stageDesc : objective;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: stageColor.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: stageColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    (isKociemba
+                            ? "PHASE ${index <= analysisController.phase1MoveCount ? 1 : 2}"
+                            : stageName.toUpperCase()),
+                    style: TextStyle(
+                      color: stageColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                if (algorithmName != null) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFACC15).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      algorithmName.toUpperCase(),
+                      style: const TextStyle(
+                        color: Color(0xFFFACC15),
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (stageGoal != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  stageGoal,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    fontSize: 12,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            Text(
+              isKociemba
+                  ? MoveExplainer.getRationale(
+                      move,
+                      index - 1,
+                      analysisController.solution.length,
+                      analysisController.states[index - 1],
+                      analysisController.states[index],
+                      phase: index <= analysisController.phase1MoveCount ? 1 : 2,
+                    )
+                  : fullObjective,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildMainActionButton(BuildContext context) {

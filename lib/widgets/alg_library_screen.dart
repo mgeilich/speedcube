@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../models/alg_library.dart';
-import '../models/cube_move.dart';
 import '../models/cube_state.dart';
 import '../animation/cube_animation_controller.dart';
 import '../utils/premium_manager.dart';
-import '../utils/trigger_detector.dart';
-import 'cube_renderer.dart';
+import 'cube_interactive_view.dart';
+import 'analysis_timeline.dart';
+import 'tape_deck_controls.dart';
+import '../controllers/analysis_controller.dart';
+
+
 
 /// Full-screen algorithm library browser (OLL + PLL)
 class AlgLibraryScreen extends StatefulWidget {
@@ -636,9 +639,9 @@ class _AlgDetailSheet extends StatefulWidget {
 class _AlgDetailSheetState extends State<_AlgDetailSheet>
     with SingleTickerProviderStateMixin {
   late CubeAnimationController _animController;
+  late AnalysisController _analysisController;
   late CubeState _cubeState;
-  bool _isAnimating = false;
-  int _highlightedMove = -1;
+  final List<bool> _moveDirectionQueue = [];
   int _animGeneration = 0;
 
   // Rotation state for drag-to-rotate
@@ -646,29 +649,49 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
   double _rotationY = 0.5;
   Offset? _lastPanPosition;
 
+  void _onPanStart(DragStartDetails details) {
+    _lastPanPosition = details.localPosition;
+  }
+
+  void _onPanUpdate(DragUpdateDetails details) {
+    if (_lastPanPosition != null) {
+      final delta = details.localPosition - _lastPanPosition!;
+      setState(() {
+        _rotationY += delta.dx * 0.01;
+        _rotationX += delta.dy * 0.01;
+        _rotationX = _rotationX.clamp(-0.4, 1.4);
+      });
+      _lastPanPosition = details.localPosition;
+    }
+  }
+
+  void _onPanEnd(DragEndDetails details) {
+    _lastPanPosition = null;
+  }
+
+
   @override
   void initState() {
     super.initState();
     _animController = CubeAnimationController(
       vsync: this,
-      moveDuration: const Duration(milliseconds: 450),
+      moveDuration: const Duration(milliseconds: 400),
       onUpdate: () => setState(() {}),
       onMoveComplete: _onMoveComplete,
+    );
+    _analysisController = AnalysisController(
+      onPlayRequest: () => _animate(),
+      onRewindRequest: () => _animate(isReverse: true),
+      onPauseRequest: _pause,
+      onNextRequest: _stepForward,
+      onPreviousRequest: _stepBackward,
+      onSeekRequest: _onSeek,
     );
     _resetToCase();
   }
 
   void _resetToCase() {
-    _animGeneration++;
-    _animController.clearQueue();
-    setState(() {
-      _cubeState = (widget.algCase.category == AlgCategory.f2l
-              ? CubeState.solved()
-              : CubeState.yellowTopSolved())
-          .applyMoves(widget.algCase.setupMoveList);
-      _isAnimating = false;
-      _highlightedMove = -1;
-    });
+    _onSeek(0, immediate: true);
   }
 
   void _onMoveComplete() {
@@ -676,111 +699,159 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
       setState(() {
         _cubeState = _cubeState.applyMove(_animController.currentMove!);
       });
+      
+      final isReverse = _moveDirectionQueue.isNotEmpty ? _moveDirectionQueue.removeAt(0) : false;
+      final nextIndex = isReverse ? _analysisController.currentIndex - 1 : _analysisController.currentIndex + 1;
+      _analysisController.updateIndexInternal(nextIndex);
+      
+      if (_moveDirectionQueue.isEmpty) {
+        _analysisController.setAnimatingIndexInternal(null);
+      }
     }
   }
 
   void _pause() {
     _animGeneration++;
     _animController.clearQueue();
-    setState(() => _isAnimating = false);
+    _moveDirectionQueue.clear();
+    _analysisController.setPlayingInternal(false);
+    _analysisController.setRewindingInternal(false);
+    _analysisController.setAnimatingIndexInternal(null);
+    setState(() {});
   }
 
-  void _animate() {
-    if (_isAnimating) {
-      _pause();
-      return;
-    }
-
-    _animGeneration++;
-    final myGen = _animGeneration;
-    final moves = widget.algCase.algorithmMoves;
-
-    // If at the end, reset to start before playing
-    if (_highlightedMove >= moves.length - 1) {
-      _cubeState = (widget.algCase.category == AlgCategory.f2l
+  void _onSeek(int index, {bool immediate = false}) {
+    _pause();
+    final baseState = (widget.algCase.category == AlgCategory.f2l
               ? CubeState.solved()
               : CubeState.yellowTopSolved())
           .applyMoves(widget.algCase.setupMoveList);
-      _highlightedMove = -1;
+    
+    if (_analysisController.solution.isEmpty) {
+      _analysisController.loadSolution(widget.algCase.algorithmMoves, baseState, 0);
+    }
+    
+    _analysisController.updateIndexInternal(index);
+    setState(() {
+      _cubeState = _analysisController.states[index];
+    });
+  }
+
+  void _animate({bool isReverse = false}) {
+    // Increment generation to cancel any existing auto-play loops
+    _animGeneration++;
+    final myGen = _animGeneration;
+    
+    if (isReverse) {
+      if (!_analysisController.hasPrevious) {
+        _pause();
+        return;
+      }
+      _analysisController.setRewindingInternal(true);
+    } else {
+      if (!_analysisController.hasNext) {
+        _onSeek(0, immediate: true); // Loop back to start
+      }
+      _analysisController.setPlayingInternal(true);
     }
 
-    setState(() => _isAnimating = true);
 
-    Future.delayed(const Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted && _animGeneration == myGen) {
-        _playStep(moves, _highlightedMove + 1, myGen);
+        _playStep(myGen, isReverse: isReverse);
       }
     });
   }
 
-  void _playStep(List<CubeMove> moves, int index, int gen) {
-    if (!mounted || _animGeneration != gen || index >= moves.length) {
-      if (mounted && _animGeneration == gen) {
-        setState(() {
-          _isAnimating = false;
-        });
+  void _playStep(int gen, {bool isReverse = false}) {
+    if (!mounted || _animGeneration != gen) return;
+    
+    if (isReverse) {
+      if (!_analysisController.hasPrevious) {
+        _pause();
+        return;
       }
-      return;
+      _stepBackward(fromAutoPlay: true);
+    } else {
+      if (!_analysisController.hasNext) {
+        _pause();
+        return;
+      }
+      _stepForward(fromAutoPlay: true);
     }
-    setState(() => _highlightedMove = index);
-    _animController.queueMoves([moves[index]]);
-    final moveDuration = const Duration(milliseconds: 450) +
-        const Duration(milliseconds: 120);
-    Future.delayed(moveDuration, () {
-      _playStep(moves, index + 1, gen);
+
+    final int baseDuration = _analysisController.isFastForwarding ? 200 : 400;
+    final duration = Duration(milliseconds: baseDuration + 50); // Small buffer
+    Future.delayed(duration, () {
+      if (mounted && _animGeneration == gen) {
+        _playStep(gen, isReverse: isReverse);
+      }
     });
   }
 
-  void _stepForward() {
-    final moves = widget.algCase.algorithmMoves;
-    if (_highlightedMove >= moves.length - 1) return;
+  void _stepForward({bool fromAutoPlay = false}) {
+    if (!_analysisController.hasNext) return;
+    if (!fromAutoPlay) _pause();
 
-    _pause();
-    final nextIndex = _highlightedMove + 1;
-    setState(() => _highlightedMove = nextIndex);
-    _animController.queueMoves([moves[nextIndex]]);
+    final int baseIndex = _analysisController.animatingIndex ?? _analysisController.currentIndex;
+    if (baseIndex >= _analysisController.solution.length) return;
+
+    _analysisController.setAnimatingIndexInternal(baseIndex + 1);
+    _moveDirectionQueue.add(false);
+    final move = _analysisController.solution[baseIndex];
+    
+    final int baseDuration = _analysisController.isFastForwarding ? 200 : 400;
+    _animController.setSpeed(Duration(milliseconds: baseDuration));
+    _animController.queueMoves([move]);
   }
 
-  void _stepBackward() {
-    if (_highlightedMove < 0) return;
+  void _stepBackward({bool fromAutoPlay = false}) {
+    if (!_analysisController.hasPrevious) return;
+    if (!fromAutoPlay) _pause();
 
-    _pause();
-    final moves = widget.algCase.algorithmMoves;
-    final move = moves[_highlightedMove];
+    final int baseIndex = _analysisController.animatingIndex ?? _analysisController.currentIndex;
+    if (baseIndex <= 0) return;
+
+    final prevMoveIndex = baseIndex - 1;
+    _analysisController.setAnimatingIndexInternal(baseIndex - 1);
+    _moveDirectionQueue.add(true);
+    final move = _analysisController.solution[prevMoveIndex];
+    
+    final int baseDuration = _analysisController.isFastForwarding ? 200 : 400;
+    _animController.setSpeed(Duration(milliseconds: baseDuration));
     _animController.queueMoves([move.inverse]);
-    setState(() => _highlightedMove--);
   }
+
 
   @override
   void dispose() {
     _animController.dispose();
+    _analysisController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final moves = widget.algCase.algorithmMoves;
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Container(
-      height: screenHeight * 0.82,
+      height: MediaQuery.of(context).size.height * 0.88,
       decoration: const BoxDecoration(
-        color: Color(0xFF1A1A2E),
+        color: Color(0xFF0F0F1A),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         children: [
+          // Header
           Container(
             width: 40,
             height: 4,
-            margin: const EdgeInsets.only(top: 8, bottom: 4),
+            margin: const EdgeInsets.only(top: 12, bottom: 8),
             decoration: BoxDecoration(
               color: Colors.white24,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             child: Row(
               children: [
                 _badge(
@@ -790,178 +861,181 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
                     AlgCategory.pll => 'PLL',
                     AlgCategory.coll => 'COLL',
                     AlgCategory.winterVariation => 'WV',
-                    _ => 'Commutator',
+                    _ => 'Alg',
                   },
                   const Color(0xFF6366F1),
                 ),
-                const SizedBox(width: 8),
-                _badge(widget.algCase.subcategory, Colors.white24),
-                const Spacer(),
-                Text(
-                  widget.algCase.name,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    widget.algCase.name,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close_rounded, color: Colors.white38),
                 ),
               ],
             ),
           ),
-          Expanded(
-            flex: 4,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: GestureDetector(
-                onPanStart: (d) => _lastPanPosition = d.localPosition,
-                onPanUpdate: (d) {
-                  if (_lastPanPosition != null) {
-                    final delta = d.localPosition - _lastPanPosition!;
-                    setState(() {
-                      _rotationY += delta.dx * 0.01;
-                      _rotationX += delta.dy * 0.01;
-                      _rotationX = _rotationX.clamp(-0.4, 1.4);
-                    });
-                    _lastPanPosition = d.localPosition;
-                  }
-                },
-                onPanEnd: (_) => _lastPanPosition = null,
-                child: CustomPaint(
-                  painter: CubeRenderer(
-                    cubeState: _cubeState,
-                    rotationX: _rotationX,
-                    rotationY: _rotationY,
-                    animatingMove: _animController.isAnimating
-                        ? _animController.currentMove
-                        : null,
-                    animationProgress: _animController.isAnimating
-                        ? _animController.progress
-                        : 0.0,
-                  ),
-                  child: const SizedBox.expand(),
-                ),
-              ),
+
+          // Standardized Cube View
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            child: CubeInteractiveView(
+              cubeState: _cubeState,
+              rotationX: _rotationX,
+              rotationY: _rotationY,
+              animatingMove: _animController.isAnimating
+                  ? _animController.currentMove
+                  : null,
+              animationProgress: _animController.isAnimating
+                  ? _animController.progress
+                  : 0.0,
+              onPanStart: (details) => _onPanStart(details),
+              onPanUpdate: (details) => _onPanUpdate(details),
+              onPanEnd: (details) => _onPanEnd(details),
             ),
           ),
-          Flexible(
-            flex: 2,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Column(
+
+
+          const SizedBox(height: 12),
+
+          // Progress Scrubber
+          ListenableBuilder(
+            listenable: _analysisController,
+            builder: (context, _) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      alignment: WrapAlignment.center,
-                      children: TriggerDetector.detect(moves).map((match) {
-                        if (match.isTrigger) {
-                          return _TriggerGroupBadge(
-                            match: match,
-                            moves: moves,
-                            highlightedIndex: _highlightedMove,
-                          );
-                        } else {
-                          final index = match.moveIndices.first;
-                          return _MoveBadge(
-                            move: moves[index],
-                            isActive: _highlightedMove == index,
-                          );
-                        }
-                      }).toList(),
+                  const Icon(Icons.history_rounded,
+                      color: Colors.white24, size: 18),
+                  Expanded(
+                    child: SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        trackHeight: 2,
+                        thumbShape:
+                            const RoundSliderThumbShape(enabledThumbRadius: 6),
+                        overlayShape:
+                            const RoundSliderOverlayShape(overlayRadius: 14),
+                        activeTrackColor: const Color(0xFF6366F1),
+                        inactiveTrackColor: Colors.white10,
+                        thumbColor: const Color(0xFF6366F1),
+                      ),
+                      child: Slider(
+                        value: _analysisController.currentIndex.toDouble(),
+                        min: 0,
+                        max: _analysisController.solution.length.toDouble(),
+                        divisions: _analysisController.solution.isNotEmpty
+                            ? _analysisController.solution.length
+                            : 1,
+                        onChanged: (value) => _onSeek(value.round()),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Text(
-                      widget.algCase.description,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          color: Colors.white38, fontSize: 12, height: 1.4),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${_analysisController.currentIndex}/${_analysisController.solution.length}',
+                    style: const TextStyle(
+                      color: Colors.white38,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'monospace',
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-            child: Row(
-              children: [
-                _buildActionButton(
-                  icon: Icons.replay_rounded,
-                  onPressed: _resetToCase,
-                  tooltip: 'Reset',
-                ),
-                const SizedBox(width: 8),
-                _buildActionButton(
-                  icon: Icons.skip_previous_rounded,
-                  onPressed: _highlightedMove < 0 ? null : _stepBackward,
-                  tooltip: 'Step Back',
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  flex: 3,
-                  child: ElevatedButton.icon(
-                    onPressed: _animate,
-                    icon: Icon(
-                      _isAnimating
-                          ? Icons.pause_rounded
-                          : (_highlightedMove >= moves.length - 1 
-                              ? Icons.replay_rounded 
-                              : Icons.play_arrow_rounded),
-                      size: 20,
+
+          const SizedBox(height: 12),
+
+          // Play Controls
+          ListenableBuilder(
+            listenable: _analysisController,
+            builder: (context, _) => TapeDeckControls(
+              isPlaying: _analysisController.isPlaying,
+              isRewinding: _analysisController.isRewinding,
+              isFastForwarding: _analysisController.isFastForwarding,
+              hasPrevious: _analysisController.hasPrevious,
+              hasNext: _analysisController.hasNext,
+              onPlayPause: () => _analysisController.isPlaying
+                  ? _analysisController.pause()
+                  : _analysisController.play(),
+              onRewind: _analysisController.rewind,
+              onFastForward: () => _analysisController.play(fast: true),
+              onStepForward: _analysisController.nextMove,
+              onStepBackward: _analysisController.previousMove,
+              onJumpToStart: () => _onSeek(0, immediate: true),
+              onJumpToEnd: () =>
+                  _onSeek(_analysisController.solution.length, immediate: true),
+              activeColor: const Color(0xFF6366F1),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Move Buttons (Timeline)
+          AnalysisTimeline(controller: _analysisController),
+
+          // Boxed Description (Explanation)
+          if (widget.algCase.description.isNotEmpty)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+                child: SingleChildScrollView(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color(0xFF6366F1).withValues(alpha: 0.3),
+                        width: 1.5,
+                      ),
                     ),
-                    label: Text(
-                      _isAnimating 
-                          ? 'Pause' 
-                          : (_highlightedMove >= moves.length - 1 ? 'Replay' : 'Animate')
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6366F1),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Row(
+                          children: [
+                            Icon(Icons.info_outline, color: Color(0xFF818CF8), size: 16),
+                            SizedBox(width: 8),
+                            Text(
+                              "ALGORITHM NOTES",
+                              style: TextStyle(
+                                color: Color(0xFF818CF8),
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          widget.algCase.description,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                _buildActionButton(
-                  icon: Icons.skip_next_rounded,
-                  onPressed: _highlightedMove >= moves.length - 1 ? null : _stepForward,
-                  tooltip: 'Step Forward',
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+              ),
+            )
+          else
+            const Spacer(),
 
-  Widget _buildActionButton({
-    required IconData icon,
-    required VoidCallback? onPressed,
-    required String tooltip,
-  }) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: onPressed != null ? Colors.white10 : Colors.white.withValues(alpha: 0.03),
-        ),
-      ),
-      child: IconButton(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 20),
-        color: onPressed != null ? Colors.white70 : Colors.white24,
-        tooltip: tooltip,
+        ],
       ),
     );
   }
@@ -970,16 +1044,14 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withValues(alpha: 0.5)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         text,
         style: TextStyle(
-          color: color == const Color(0xFF6366F1)
-              ? const Color(0xFF818CF8)
-              : Colors.white54,
+          color: color.withValues(alpha: 0.8),
           fontSize: 11,
           fontWeight: FontWeight.bold,
           letterSpacing: 0.5,
@@ -989,100 +1061,6 @@ class _AlgDetailSheetState extends State<_AlgDetailSheet>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Trigger / Move Badges
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _MoveBadge extends StatelessWidget {
-  final CubeMove move;
-  final bool isActive;
-
-  const _MoveBadge({required this.move, required this.isActive});
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: isActive
-            ? const Color(0xFF6366F1).withValues(alpha: 0.85)
-            : const Color(0xFF6366F1).withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: isActive
-              ? const Color(0xFF6366F1)
-              : const Color(0xFF6366F1).withValues(alpha: 0.3),
-          width: isActive ? 2 : 1,
-        ),
-      ),
-      child: Text(
-        move.toString(),
-        style: TextStyle(
-          color: isActive ? Colors.white : const Color(0xFF818CF8),
-          fontWeight: FontWeight.bold,
-          fontFamily: 'monospace',
-          fontSize: 13,
-        ),
-      ),
-    );
-  }
-}
-
-class _TriggerGroupBadge extends StatelessWidget {
-  final TriggerMatch match;
-  final List<CubeMove> moves;
-  final int highlightedIndex;
-
-  const _TriggerGroupBadge({
-    required this.match,
-    required this.moves,
-    required this.highlightedIndex,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final hasActive = match.moveIndices.contains(highlightedIndex);
-
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.03),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: hasActive ? const Color(0xFF6366F1).withValues(alpha: 0.3) : Colors.white10,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 4),
-            child: Text(
-              match.name.toUpperCase(),
-              style: TextStyle(
-                color: hasActive ? const Color(0xFFFACC15) : Colors.white24,
-                fontSize: 8,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: match.moveIndices.map((idx) {
-              final isActive = highlightedIndex == idx;
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: _MoveBadge(move: moves[idx], isActive: isActive),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Guide / How-to-use bottom sheet

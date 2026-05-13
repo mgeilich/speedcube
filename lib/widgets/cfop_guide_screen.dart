@@ -1180,23 +1180,38 @@ class _CfopGuideScreenState extends State<CfopGuideScreen>
 
   Widget _buildCubePreview(CubeState state, {double rotationX = -0.6}) {
     return Container(
-      width: 100,
-      height: 100,
+      width: 120,
+      height: 120,
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.black26,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: CustomPaint(
-        painter: CubeRenderer(
-          cubeState: state,
-          rotationX: rotationX,
-          rotationY: 0.6,
+        color: Colors.black.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.1),
+          width: 1.5,
         ),
-        size: const Size(100, 100),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: CustomPaint(
+          painter: CubeRenderer(
+            cubeState: state,
+            rotationX: rotationX,
+            rotationY: 0.6,
+          ),
+          size: const Size(112, 112),
+        ),
       ),
     );
   }
+
 
   void _requestDemo(
     int stepIndex,
@@ -1252,28 +1267,43 @@ class _CfopGuideScreenState extends State<CfopGuideScreen>
             ),
             const SizedBox(width: 16),
             Container(
-              width: 100,
-              height: 100,
+              width: 110,
+              height: 110,
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Colors.black26,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white10),
-              ),
-              child: CustomPaint(
-                painter: CubeRenderer(
-                  cubeState: cubeState,
-                  rotationX: rotationX,
-                  rotationY: rotationY,
-                  highlightedStickers: highlightedStickers,
-                  dimNonHighlighted: highlightedStickers != null,
+                color: Colors.black.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  width: 1.5,
                 ),
-                size: const Size(100, 100),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: CustomPaint(
+                  painter: CubeRenderer(
+                    cubeState: cubeState,
+                    rotationX: rotationX,
+                    rotationY: rotationY,
+                    highlightedStickers: highlightedStickers,
+                    dimNonHighlighted: highlightedStickers != null,
+                  ),
+                  size: const Size(102, 102),
+                ),
               ),
             ),
           ],
         ),
       ],
     );
+
   }
 
   Widget _buildDemoButtons(List<DemoOption> demoOptions) {
