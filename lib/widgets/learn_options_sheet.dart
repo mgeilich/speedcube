@@ -77,10 +77,11 @@ class LearnOptionsSheet extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             // Options list
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
                   _buildOptionCard(
                     icon: Icons.info_outline,
                     title: 'Introduction to the Cube',
@@ -161,9 +162,11 @@ class LearnOptionsSheet extends StatelessWidget {
                       onSelectHeiseMethod();
                     },
                   ),
+
                   const SizedBox(height: 40),
                 ],
               ),
+            ),
             ),
           ],
         ),
@@ -178,7 +181,11 @@ class LearnOptionsSheet extends StatelessWidget {
     required VoidCallback onTap,
     bool isAdvanced = false,
     bool isPremium = false,
+    Color? color,
   }) {
+    final cardColor = color ?? (isAdvanced
+        ? const Color(0xFFF59E0B)
+        : const Color(0xFF10B981));
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -194,19 +201,16 @@ class LearnOptionsSheet extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isAdvanced
-                    ? const Color(0xFFF59E0B).withValues(alpha: 0.1)
-                    : const Color(0xFF10B981).withValues(alpha: 0.1),
+                color: cardColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                color: isAdvanced
-                    ? const Color(0xFFF59E0B)
-                    : const Color(0xFF10B981),
+                color: cardColor,
                 size: 24,
               ),
             ),
+
             const SizedBox(width: 16),
             Expanded(
               child: Column(

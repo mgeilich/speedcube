@@ -239,6 +239,13 @@ class _PremiumUpsellSheetState extends State<PremiumUpsellSheet> {
                   ),
                   _buildDivider(),
                   _buildFeatureRow(
+                    Icons.gesture_rounded,
+                    'Interactive Finger Tricks',
+                    'Master triggers with 3D guided animations.',
+                    false,
+                  ),
+                  _buildDivider(),
+                  _buildFeatureRow(
                     Icons.menu_book_rounded,
                     'Full Algorithm Library',
                     'F2L, OLL, PLL, COLL, Winter Variation, and Commutators.',

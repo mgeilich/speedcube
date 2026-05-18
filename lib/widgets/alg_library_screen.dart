@@ -7,6 +7,7 @@ import 'cube_interactive_view.dart';
 import 'analysis_timeline.dart';
 import 'tape_deck_controls.dart';
 import '../controllers/analysis_controller.dart';
+import 'finger_trick_tab.dart';
 
 
 
@@ -25,7 +26,7 @@ class _AlgLibraryScreenState extends State<AlgLibraryScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -163,6 +164,7 @@ class _AlgLibraryScreenState extends State<AlgLibraryScreen>
           tabs: const [
             Tab(text: 'CFOP'),
             Tab(text: 'Advanced'),
+            Tab(text: 'Finger Tricks'),
           ],
         ),
       ),
@@ -195,6 +197,7 @@ class _AlgLibraryScreenState extends State<AlgLibraryScreen>
             ],
             onTap: _openCase,
           ),
+          const FingerTrickTab(),
         ],
       ),
     );
