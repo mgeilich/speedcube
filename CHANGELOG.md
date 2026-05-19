@@ -2,6 +2,14 @@
 
 All notable changes to the SpeedCube AR project will be documented in this file.
 
+## [2026.5.3] - 2026-05-19
+
+### Added
+- **Finger Trick Interactive Library**: Implemented a comprehensive finger trick guide with instructional sequences and single-step demo navigation for algorithms.
+- **Finger Trick Video Integration**: Added hardware-compatible, slow-motion video demonstrations of finger tricks into the learning modules.
+- **Visual Overlays**: Developed a visual 3D arrow and "ghost hand" overlay system that projects precise finger placement logic over the interactive cube model.
+- **Handedness Support**: Added dynamic mirroring logic (Righty/Lefty) for finger trick instructions and visual overlays to improve accessibility.
+
 ## [2026.5.2] - 2026-05-12
 
 ### Fixed
