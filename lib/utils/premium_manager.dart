@@ -40,14 +40,6 @@ class PremiumManager extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _isPremium = prefs.getBool(_kPremiumKey) ?? false;
 
-    // // Auto-unlock premium in debug mode for testing
-    // if (kDebugMode && !_isPremium) {
-    //   _unlockPremium();
-    // }
-    
-    // TEMPORARY OVERRIDE FOR SCREENSHOTS
-    _isPremium = false;
-
     notifyListeners();
   }
 
