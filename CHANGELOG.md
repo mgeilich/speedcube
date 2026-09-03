@@ -2,6 +2,11 @@
 
 All notable changes to the SpeedCube AR project will be documented in this file.
 
+## [2026.9.1] - 2026-09-03
+
+### Fixed
+- **In-App Purchase Persistence**: Fixed an issue where the Pro unlock status was reset upon app relaunch, ensuring purchased or restored Pro features persist across sessions without manual re-restoration.
+
 ## [2026.5.3] - 2026-05-19
 
 ### Added
