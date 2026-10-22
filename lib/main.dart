@@ -17,8 +17,10 @@ import 'widgets/solve_controls.dart';
 import 'widgets/introduction_sheet.dart';
 import 'widgets/settings_sheet.dart';
 import 'widgets/alg_library_screen.dart';
+import 'widgets/learn_split_view.dart';
 
 import 'widgets/ar_scan_screen.dart';
+import 'utils/app_layout.dart';
 import 'utils/premium_manager.dart';
 import 'controllers/home_controller.dart';
 import 'dart:async';
@@ -47,6 +49,12 @@ class SpeedCubeApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
+      ),
+      // Keep every screen clear of side insets: the iPhone Duo puts its
+      // status strip on the right edge in both postures.
+      builder: (context, child) => ColoredBox(
+        color: const Color(0xFF0F0F1A),
+        child: SafeArea(top: false, bottom: false, child: child!),
       ),
       home: const SpeedCubeHome(),
     );
@@ -180,73 +188,162 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
 
   @override
   Widget build(BuildContext context) {
+    final wide = AppLayout.isWide(context);
+    final header = HomeHeader(
+      onScanPressed: _startScan,
+      onLearnPressed: _showLearnMenu,
+      onLibraryPressed: _showAlgLibrary,
+      onSettingsPressed: _showSettings,
+    );
+    final cubeView = CubeInteractiveView(
+      expand: wide,
+      cubeState: _homeController.cubeState,
+      rotationX: _homeController.rotationX,
+      rotationY: _homeController.rotationY,
+      animatingMove: _homeController.animationController.isAnimating
+          ? _homeController.animationController.currentMove
+          : null,
+      animationProgress: _homeController.animationController.isAnimating
+          ? _homeController.animationController.progress
+          : 0,
+      stickerLabels: _homeController.stickerLabels,
+      onPanStart: _onPanStart,
+      onPanUpdate: _onPanUpdate,
+      onPanEnd: _onPanEnd,
+      showingSolution: _homeController.showingSolution,
+      highlightedStickers: _homeController.highlightedStickers,
+      dimNonHighlighted: _homeController.dimNonHighlighted,
+      onExit: _homeController.isDemo
+          ? _homeController.cancelDemo
+          : _homeController.resetToSaved,
+    );
+    SolveControls controls(
+            [SolveControlsSection section = SolveControlsSection.all]) =>
+        SolveControls(
+          section: section,
+          showingSolution: _homeController.showingSolution,
+          showExplanations: _homeController.showExplanations,
+          moveIndex: _homeController.moveIndex,
+          solutionStartIndex: _homeController.solutionStartIndex,
+          moveHistory: _homeController.moveHistory,
+          analysisController: _homeController.analysisController,
+          isScrambling: _homeController.isScrambling,
+          isSolving: _homeController.isSolving,
+          solveStatus: _homeController.solveStatus,
+          isAnimating: _homeController.animationController.isAnimating,
+          cubeState: _homeController.cubeState,
+          scrambleLength: _homeController.scrambleLength,
+          onScrambleLengthChanged: (val) =>
+              _homeController.scrambleLength = val,
+          onScramble: _homeController.scramble,
+          onRandomize: _homeController.randomize,
+          onSolve: _homeController.solve,
+          onSeek: _homeController.handleAnalysisSeek,
+          onSeekStart: _homeController.handleAnalysisSeekStart,
+          onShowWebDemo: _showWebDemoPopup,
+          isDemo: _homeController.isDemo,
+          onCancelDemo: _homeController.cancelDemo,
+          onReset: _homeController.resetToSaved,
+          canReset: _homeController.canReset,
+          isScanned: _homeController.isScanned,
+          selectedMethod: _homeController.selectedSolveMethod,
+          onMethodChanged: _homeController.setSelectedSolveMethod,
+          moveLabels: _homeController.moveLabels,
+        );
+
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F1A),
       body: SafeArea(
-        child: Column(
-          children: [
-            HomeHeader(
-              onScanPressed: _startScan,
-              onLearnPressed: _showLearnMenu,
-              onLibraryPressed: _showAlgLibrary,
-              onSettingsPressed: _showSettings,
-            ),
-            CubeInteractiveView(
-              cubeState: _homeController.cubeState,
-              rotationX: _homeController.rotationX,
-              rotationY: _homeController.rotationY,
-              animatingMove: _homeController.animationController.isAnimating
-                  ? _homeController.animationController.currentMove
-                  : null,
-              animationProgress: _homeController.animationController.isAnimating
-                  ? _homeController.animationController.progress
-                  : 0,
-              stickerLabels: _homeController.stickerLabels,
-              onPanStart: _onPanStart,
-              onPanUpdate: _onPanUpdate,
-              onPanEnd: _onPanEnd,
-              showingSolution: _homeController.showingSolution,
-              highlightedStickers: _homeController.highlightedStickers,
-              dimNonHighlighted: _homeController.dimNonHighlighted,
-              onExit: _homeController.isDemo
-                  ? _homeController.cancelDemo
-                  : _homeController.resetToSaved,
-            ),
-            const SizedBox(height: 8),
-
-            SolveControls(
-              showingSolution: _homeController.showingSolution,
-              showExplanations: _homeController.showExplanations,
-              moveIndex: _homeController.moveIndex,
-              solutionStartIndex: _homeController.solutionStartIndex,
-              moveHistory: _homeController.moveHistory,
-              analysisController: _homeController.analysisController,
-              isScrambling: _homeController.isScrambling,
-              isSolving: _homeController.isSolving,
-              solveStatus: _homeController.solveStatus,
-              isAnimating: _homeController.animationController.isAnimating,
-              cubeState: _homeController.cubeState,
-              scrambleLength: _homeController.scrambleLength,
-              onScrambleLengthChanged: (val) =>
-                  _homeController.scrambleLength = val,
-              onScramble: _homeController.scramble,
-              onRandomize: _homeController.randomize,
-              onSolve: _homeController.solve,
-              onSeek: _homeController.handleAnalysisSeek,
-              onSeekStart: _homeController.handleAnalysisSeekStart,
-              onShowWebDemo: _showWebDemoPopup,
-              isDemo: _homeController.isDemo,
-              onCancelDemo: _homeController.cancelDemo,
-              onReset: _homeController.resetToSaved,
-              canReset: _homeController.canReset,
-              isScanned: _homeController.isScanned,
-              selectedMethod: _homeController.selectedSolveMethod,
-              onMethodChanged: _homeController.setSelectedSolveMethod,
-              moveLabels: _homeController.moveLabels,
-            ),
-          ],
-        ),
+        child: wide
+            // Split screen (iPhone Duo unfolded, iPad/phone landscape):
+            // scramble on the left, solver on the right
+            ? Column(
+                children: [
+                  header,
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: _buildPane(
+                            'SCRAMBLE',
+                            _buildScrambleCube(),
+                            controls(SolveControlsSection.scramble),
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildPane(
+                            'SOLVER',
+                            AnimatedOpacity(
+                              opacity: _homeController.showingSolution ||
+                                      _homeController.isSolving
+                                  ? 1
+                                  : 0.35,
+                              duration: const Duration(milliseconds: 300),
+                              child: cubeView,
+                            ),
+                            controls(SolveControlsSection.solve),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              )
+            : Column(
+                children: [
+                  header,
+                  cubeView,
+                  const SizedBox(height: 8),
+                  controls(),
+                ],
+              ),
       ),
+    );
+  }
+
+  Widget _buildPane(String title, Widget cube, Widget controls) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 4, 24, 0),
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white38,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
+          ),
+        ),
+        Expanded(child: cube),
+        controls,
+      ],
+    );
+  }
+
+  /// The left pane's cube: animates while scrambling, then holds the
+  /// scrambled starting position while the solver plays on the right.
+  Widget _buildScrambleCube() {
+    final showStart = _homeController.showingSolution;
+    final animating =
+        !showStart && _homeController.animationController.isAnimating;
+    return CubeInteractiveView(
+      expand: true,
+      cubeState: showStart
+          ? (_homeController.savedState ?? _homeController.cubeState)
+          : _homeController.cubeState,
+      rotationX: _homeController.rotationX,
+      rotationY: _homeController.rotationY,
+      animatingMove:
+          animating ? _homeController.animationController.currentMove : null,
+      animationProgress:
+          animating ? _homeController.animationController.progress : 0,
+      onPanStart: _onPanStart,
+      onPanUpdate: _onPanUpdate,
+      onPanEnd: _onPanEnd,
     );
   }
 
@@ -351,63 +448,65 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CfopGuideScreen(
-          initialExpandedStepIndex: initialStepIndex != -1
-              ? initialStepIndex
-              : (_homeController.lastCfopStepIndex ?? -1),
-          initialScrollOffset: _homeController.lastCfopScrollOffset ?? 0.0,
-          initialOllSubIndex: _homeController.lastOllSubTabIndex ?? 0,
-          initialPllSubIndex: _homeController.lastPllSubTabIndex ?? 0,
-          initialF2lSubIndex: _homeController.lastF2lSubTabIndex ?? 0,
-          onTabChanged: (index, {ollSubIndex, pllSubIndex, f2lSubIndex}) {
-            _homeController.updateCfopProgress(
-              index,
-              0.0,
-              ollSubIndex: ollSubIndex,
-              pllSubIndex: pllSubIndex,
-              f2lSubIndex: f2lSubIndex,
-            );
-          },
-          onDemoRequested: (stepIndex, initialState,
-              {moves,
-              initialRotationX,
-              targetRotationX,
-              initialRotationY,
-              targetRotationY,
-              demoType,
-              stickerLabels,
-              targetPieces,
-              highlightedStickers,
-              dimNonHighlighted,
-              moveDescriptions,
-              moveLabels,
-              scrollOffset,
-              ollSubIndex,
-              pllSubIndex,
-              f2lSubIndex}) {
-            if (scrollOffset != null) {
+        builder: (context) => LearnSplitView(
+          guide: CfopGuideScreen(
+            initialExpandedStepIndex: initialStepIndex != -1
+                ? initialStepIndex
+                : (_homeController.lastCfopStepIndex ?? -1),
+            initialScrollOffset: _homeController.lastCfopScrollOffset ?? 0.0,
+            initialOllSubIndex: _homeController.lastOllSubTabIndex ?? 0,
+            initialPllSubIndex: _homeController.lastPllSubTabIndex ?? 0,
+            initialF2lSubIndex: _homeController.lastF2lSubTabIndex ?? 0,
+            onTabChanged: (index, {ollSubIndex, pllSubIndex, f2lSubIndex}) {
               _homeController.updateCfopProgress(
-                stepIndex,
-                scrollOffset,
+                index,
+                0.0,
                 ollSubIndex: ollSubIndex,
                 pllSubIndex: pllSubIndex,
                 f2lSubIndex: f2lSubIndex,
               );
-            }
-            _onDemoRequested(stepIndex, initialState,
-                moves: moves,
-                initialRotationX: initialRotationX,
-                targetRotationX: targetRotationX,
-                initialRotationY: initialRotationY,
-                targetRotationY: targetRotationY,
-                demoType: 'advanced',
-                stickerLabels: stickerLabels,
-                targetPieces: targetPieces,
-                highlightedStickers: highlightedStickers,
-                dimNonHighlighted: dimNonHighlighted ?? false,
-                moveDescriptions: moveDescriptions,
-                moveLabels: moveLabels);
-          },
+            },
+            onDemoRequested: (stepIndex, initialState,
+                {moves,
+                initialRotationX,
+                targetRotationX,
+                initialRotationY,
+                targetRotationY,
+                demoType,
+                stickerLabels,
+                targetPieces,
+                highlightedStickers,
+                dimNonHighlighted,
+                moveDescriptions,
+                moveLabels,
+                scrollOffset,
+                ollSubIndex,
+                pllSubIndex,
+                f2lSubIndex}) {
+              if (scrollOffset != null) {
+                _homeController.updateCfopProgress(
+                  stepIndex,
+                  scrollOffset,
+                  ollSubIndex: ollSubIndex,
+                  pllSubIndex: pllSubIndex,
+                  f2lSubIndex: f2lSubIndex,
+                );
+              }
+              _onDemoRequested(stepIndex, initialState,
+                  moves: moves,
+                  initialRotationX: initialRotationX,
+                  targetRotationX: targetRotationX,
+                  initialRotationY: initialRotationY,
+                  targetRotationY: targetRotationY,
+                  demoType: 'advanced',
+                  stickerLabels: stickerLabels,
+                  targetPieces: targetPieces,
+                  highlightedStickers: highlightedStickers,
+                  dimNonHighlighted: dimNonHighlighted ?? false,
+                  moveDescriptions: moveDescriptions,
+                  moveLabels: moveLabels);
+            },
+          ),
         ),
       ),
     );
@@ -506,7 +605,11 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
     );
   }
 
-  void _showRouxGuide({int? initialStepIndex, double? scrollOffset, int? cmllSubIndex, int? lseSubIndex}) {
+  void _showRouxGuide(
+      {int? initialStepIndex,
+      double? scrollOffset,
+      int? cmllSubIndex,
+      int? lseSubIndex}) {
     if (!PremiumManager().canAccessFeature('roux_tutorial')) {
       _showPremiumUpsell();
       return;
@@ -516,49 +619,55 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RouxGuideScreen(
-          initialExpandedStepIndex: initialStepIndex ?? _homeController.lastRouxStepIndex ?? 0,
-          initialScrollOffset: scrollOffset ?? _homeController.lastRouxScrollOffset ?? 0,
-          initialCmllSubIndex: cmllSubIndex ?? _homeController.lastCmllSubTabIndex ?? 0,
-          initialLseSubIndex: lseSubIndex ?? _homeController.lastLseSubTabIndex ?? 0,
-          onTabChanged: (stepIndex, {cmllSubIndex, lseSubIndex}) {
-            _homeController.updateRouxProgress(
-              stepIndex,
-              0,
-              cmllSubIndex: cmllSubIndex,
-              lseSubIndex: lseSubIndex,
-            );
-          },
-          onDemoRequested: (stepIndex, initialState,
-              {moves,
-              initialRotationX,
-              targetRotationX,
-              initialRotationY,
-              targetRotationY,
-              demoType,
-              stickerLabels,
-              targetPieces,
-              scrollOffset,
-              cmllSubIndex,
-              lseSubIndex}) {
-            if (scrollOffset != null) {
+        builder: (context) => LearnSplitView(
+          guide: RouxGuideScreen(
+            initialExpandedStepIndex:
+                initialStepIndex ?? _homeController.lastRouxStepIndex ?? 0,
+            initialScrollOffset:
+                scrollOffset ?? _homeController.lastRouxScrollOffset ?? 0,
+            initialCmllSubIndex:
+                cmllSubIndex ?? _homeController.lastCmllSubTabIndex ?? 0,
+            initialLseSubIndex:
+                lseSubIndex ?? _homeController.lastLseSubTabIndex ?? 0,
+            onTabChanged: (stepIndex, {cmllSubIndex, lseSubIndex}) {
               _homeController.updateRouxProgress(
                 stepIndex,
-                scrollOffset,
+                0,
                 cmllSubIndex: cmllSubIndex,
                 lseSubIndex: lseSubIndex,
               );
-            }
-            _onDemoRequested(stepIndex, initialState,
-                moves: moves,
-                initialRotationX: initialRotationX,
-                targetRotationX: targetRotationX,
-                initialRotationY: initialRotationY,
-                targetRotationY: targetRotationY,
-                demoType: 'roux',
-                stickerLabels: stickerLabels,
-                targetPieces: targetPieces);
-          },
+            },
+            onDemoRequested: (stepIndex, initialState,
+                {moves,
+                initialRotationX,
+                targetRotationX,
+                initialRotationY,
+                targetRotationY,
+                demoType,
+                stickerLabels,
+                targetPieces,
+                scrollOffset,
+                cmllSubIndex,
+                lseSubIndex}) {
+              if (scrollOffset != null) {
+                _homeController.updateRouxProgress(
+                  stepIndex,
+                  scrollOffset,
+                  cmllSubIndex: cmllSubIndex,
+                  lseSubIndex: lseSubIndex,
+                );
+              }
+              _onDemoRequested(stepIndex, initialState,
+                  moves: moves,
+                  initialRotationX: initialRotationX,
+                  targetRotationX: targetRotationX,
+                  initialRotationY: initialRotationY,
+                  targetRotationY: targetRotationY,
+                  demoType: 'roux',
+                  stickerLabels: stickerLabels,
+                  targetPieces: targetPieces);
+            },
+          ),
         ),
       ),
     );
@@ -574,40 +683,44 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ZzGuideScreen(
-          initialExpandedStepIndex:
-              initialStepIndex ?? _homeController.lastZzStepIndex ?? 0,
-          initialScrollOffset: scrollOffset ?? _homeController.lastZzScrollOffset ?? 0,
-          onTabChanged: (stepIndex) {
-            _homeController.updateZzProgress(stepIndex, 0);
-          },
-          onDemoRequested: (stepIndex, initialState,
-              {moves,
-              initialRotationX,
-              targetRotationX,
-              initialRotationY,
-              targetRotationY,
-              demoType,
-              stickerLabels,
-              targetPieces,
-              scrollOffset}) {
-            if (scrollOffset != null) {
-              _homeController.updateZzProgress(stepIndex, scrollOffset);
-            }
-            _onDemoRequested(stepIndex, initialState,
-                moves: moves,
-                initialRotationX: initialRotationX,
-                targetRotationX: targetRotationX,
-                initialRotationY: initialRotationY,
-                targetRotationY: targetRotationY,
-                demoType: 'zz',
-                stickerLabels: stickerLabels,
-                targetPieces: targetPieces);
-          },
+        builder: (context) => LearnSplitView(
+          guide: ZzGuideScreen(
+            initialExpandedStepIndex:
+                initialStepIndex ?? _homeController.lastZzStepIndex ?? 0,
+            initialScrollOffset:
+                scrollOffset ?? _homeController.lastZzScrollOffset ?? 0,
+            onTabChanged: (stepIndex) {
+              _homeController.updateZzProgress(stepIndex, 0);
+            },
+            onDemoRequested: (stepIndex, initialState,
+                {moves,
+                initialRotationX,
+                targetRotationX,
+                initialRotationY,
+                targetRotationY,
+                demoType,
+                stickerLabels,
+                targetPieces,
+                scrollOffset}) {
+              if (scrollOffset != null) {
+                _homeController.updateZzProgress(stepIndex, scrollOffset);
+              }
+              _onDemoRequested(stepIndex, initialState,
+                  moves: moves,
+                  initialRotationX: initialRotationX,
+                  targetRotationX: targetRotationX,
+                  initialRotationY: initialRotationY,
+                  targetRotationY: targetRotationY,
+                  demoType: 'zz',
+                  stickerLabels: stickerLabels,
+                  targetPieces: targetPieces);
+            },
+          ),
         ),
       ),
     );
   }
+
   void _showPetrusGuide({int? initialStepIndex, double? scrollOffset}) {
     if (!PremiumManager().canAccessFeature('petrus_tutorial')) {
       _showPremiumUpsell();
@@ -618,32 +731,34 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => PetrusGuideScreen(
-          initialExpandedStepIndex: initialStepIndex ?? 0,
-          initialScrollOffset: scrollOffset ?? 0,
-          onTabChanged: (stepIndex) {
-            // Optional: Store progress in HomeController
-          },
-          onDemoRequested: (stepIndex, initialState,
-              {moves,
-              initialRotationX,
-              targetRotationX,
-              initialRotationY,
-              targetRotationY,
-              demoType,
-              stickerLabels,
-              targetPieces,
-              scrollOffset}) {
-            _onDemoRequested(stepIndex, initialState,
-                moves: moves,
-                initialRotationX: initialRotationX,
-                targetRotationX: targetRotationX,
-                initialRotationY: initialRotationY,
-                targetRotationY: targetRotationY,
-                demoType: 'petrus',
-                stickerLabels: stickerLabels,
-                targetPieces: targetPieces);
-          },
+        builder: (context) => LearnSplitView(
+          guide: PetrusGuideScreen(
+            initialExpandedStepIndex: initialStepIndex ?? 0,
+            initialScrollOffset: scrollOffset ?? 0,
+            onTabChanged: (stepIndex) {
+              // Optional: Store progress in HomeController
+            },
+            onDemoRequested: (stepIndex, initialState,
+                {moves,
+                initialRotationX,
+                targetRotationX,
+                initialRotationY,
+                targetRotationY,
+                demoType,
+                stickerLabels,
+                targetPieces,
+                scrollOffset}) {
+              _onDemoRequested(stepIndex, initialState,
+                  moves: moves,
+                  initialRotationX: initialRotationX,
+                  targetRotationX: targetRotationX,
+                  initialRotationY: initialRotationY,
+                  targetRotationY: targetRotationY,
+                  demoType: 'petrus',
+                  stickerLabels: stickerLabels,
+                  targetPieces: targetPieces);
+            },
+          ),
         ),
       ),
     );
@@ -659,34 +774,36 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => HeiseGuideScreen(
-          initialExpandedStepIndex: initialStepIndex ?? 0,
-          initialScrollOffset: scrollOffset ?? 0,
-          onTabChanged: (stepIndex) {
-            // Optional: Store progress
-          },
-          onDemoRequested: (stepIndex, initialState,
-              {moves,
-              initialRotationX,
-              targetRotationX,
-              initialRotationY,
-              targetRotationY,
-              demoType,
-              stickerLabels,
-              targetPieces,
-              scrollOffset,
-              moveLabels}) {
-            _onDemoRequested(stepIndex, initialState,
-                moves: moves,
-                initialRotationX: initialRotationX,
-                targetRotationX: targetRotationX,
-                initialRotationY: initialRotationY,
-                targetRotationY: targetRotationY,
-                demoType: 'heise',
-                stickerLabels: stickerLabels,
-                targetPieces: targetPieces,
-                moveLabels: moveLabels);
-          },
+        builder: (context) => LearnSplitView(
+          guide: HeiseGuideScreen(
+            initialExpandedStepIndex: initialStepIndex ?? 0,
+            initialScrollOffset: scrollOffset ?? 0,
+            onTabChanged: (stepIndex) {
+              // Optional: Store progress
+            },
+            onDemoRequested: (stepIndex, initialState,
+                {moves,
+                initialRotationX,
+                targetRotationX,
+                initialRotationY,
+                targetRotationY,
+                demoType,
+                stickerLabels,
+                targetPieces,
+                scrollOffset,
+                moveLabels}) {
+              _onDemoRequested(stepIndex, initialState,
+                  moves: moves,
+                  initialRotationX: initialRotationX,
+                  targetRotationX: targetRotationX,
+                  initialRotationY: initialRotationY,
+                  targetRotationY: targetRotationY,
+                  demoType: 'heise',
+                  stickerLabels: stickerLabels,
+                  targetPieces: targetPieces,
+                  moveLabels: moveLabels);
+            },
+          ),
         ),
       ),
     );

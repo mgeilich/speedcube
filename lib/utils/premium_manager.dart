@@ -19,7 +19,12 @@ class PremiumManager extends ChangeNotifier {
   static const String _kSubscriptionId = 'SpeedCube_AR_Pro_Unlock';
 
   /// Whether the user has unlocked premium features.
-  bool get isPremium => _isPremium;
+  bool get isPremium => _isPremium || _debugForcePremium;
+
+  /// Debug-only override for testing Pro screens in the simulator:
+  /// `flutter run --dart-define=FORCE_PREMIUM=true`. Always false in release.
+  static const bool _debugForcePremium =
+      kDebugMode && bool.fromEnvironment('FORCE_PREMIUM');
 
   /// The list of available products from the store.
   List<ProductDetails> get products => _products;

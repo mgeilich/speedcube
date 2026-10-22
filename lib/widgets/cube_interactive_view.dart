@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/cube_state.dart';
 import '../models/cube_move.dart';
+import '../utils/app_layout.dart';
 import 'cube_renderer.dart';
-
 
 class CubeInteractiveView extends StatelessWidget {
   final CubeState cubeState;
@@ -19,6 +19,8 @@ class CubeInteractiveView extends StatelessWidget {
   final List<MapEntry<CubeFace, int>>? highlightedStickers;
   final bool dimNonHighlighted;
 
+  /// Fill the parent instead of capping the height (side-by-side layout).
+  final bool expand;
 
   const CubeInteractiveView({
     super.key,
@@ -35,110 +37,106 @@ class CubeInteractiveView extends StatelessWidget {
     this.showingSolution = false,
     this.highlightedStickers,
     this.dimNonHighlighted = false,
+    this.expand = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final cube = _buildCube();
+    if (expand) return cube;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-
         ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height < 750 ? 280 : 320,
+            maxHeight: AppLayout.isShort(context) ? 280 : 320,
           ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return GestureDetector(
-                onPanStart: onPanStart,
-                onPanUpdate: onPanUpdate,
-                onPanEnd: onPanEnd,
-                child: Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  decoration: BoxDecoration(
-                    gradient: const RadialGradient(
-                      colors: [
-                        Color(0xFF1E1E2E),
-                        Color(0xFF0F0F1A),
-                      ],
-                      radius: 1.5,
-                    ),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: Stack(
-                      children: [
-                        // 3D Cube
-                        CustomPaint(
-                          painter: CubeRenderer(
-                            cubeState: cubeState,
-                            rotationX: rotationX,
-                            rotationY: rotationY,
-                            animatingMove: animatingMove,
-                            animationProgress: animationProgress,
-                            highlightedFace: null,
-                            highlightedStickers: highlightedStickers,
-                            availableStickers: null,
-                            stickerLabels: stickerLabels,
-                            dimNonHighlighted: dimNonHighlighted,
-                          ),
-                          size: Size.infinite,
-                        ),
-
-
-                        // Exit Button (Prominent X in top right)
-                        if (showingSolution && onExit != null)
-                          Positioned(
-                            top: 16,
-                            right: 16,
-                            child: MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: GestureDetector(
-                                onTap: onExit,
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.4),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color:
-                                          Colors.white.withValues(alpha: 0.2),
-                                      width: 1,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color:
-                                            Colors.black.withValues(alpha: 0.2),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Icon(
-                                    Icons.close,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+          child: cube,
         ),
       ],
     );
   }
 
+  Widget _buildCube() {
+    return GestureDetector(
+      onPanStart: onPanStart,
+      onPanUpdate: onPanUpdate,
+      onPanEnd: onPanEnd,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+        decoration: BoxDecoration(
+          gradient: const RadialGradient(
+            colors: [
+              Color(0xFF1E1E2E),
+              Color(0xFF0F0F1A),
+            ],
+            radius: 1.5,
+          ),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Stack(
+            children: [
+              // 3D Cube
+              CustomPaint(
+                painter: CubeRenderer(
+                  cubeState: cubeState,
+                  rotationX: rotationX,
+                  rotationY: rotationY,
+                  animatingMove: animatingMove,
+                  animationProgress: animationProgress,
+                  highlightedFace: null,
+                  highlightedStickers: highlightedStickers,
+                  availableStickers: null,
+                  stickerLabels: stickerLabels,
+                  dimNonHighlighted: dimNonHighlighted,
+                ),
+                size: Size.infinite,
+              ),
 
+              // Exit Button (Prominent X in top right)
+              if (showingSolution && onExit != null)
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: GestureDetector(
+                      onTap: onExit,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.4),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

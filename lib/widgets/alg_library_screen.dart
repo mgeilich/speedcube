@@ -13,7 +13,10 @@ import 'finger_trick_tab.dart';
 
 /// Full-screen algorithm library browser (OLL + PLL)
 class AlgLibraryScreen extends StatefulWidget {
-  const AlgLibraryScreen({super.key});
+  /// False when embedded beside a tutorial (see LearnSplitView).
+  final bool showBackButton;
+
+  const AlgLibraryScreen({super.key, this.showBackButton = true});
 
   @override
   State<AlgLibraryScreen> createState() => _AlgLibraryScreenState();
@@ -133,11 +136,14 @@ class _AlgLibraryScreenState extends State<AlgLibraryScreen>
       appBar: AppBar(
         backgroundColor: const Color(0xFF0D0D1A),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: Colors.white70),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
+        leading: widget.showBackButton
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white70),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
         title: const Text(
           'Algorithm Library',
           style: TextStyle(

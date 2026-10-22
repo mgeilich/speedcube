@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/app_layout.dart';
 import '../models/cube_state.dart';
 import '../models/cube_move.dart';
 import '../controllers/analysis_controller.dart';
@@ -13,7 +14,12 @@ import 'solve_stats_sheet.dart';
 import 'tape_deck_controls.dart';
 import 'scramble_settings_panel.dart';
 
+/// Which part of the controls to show. The split (iPhone Duo unfolded)
+/// layout puts [scramble] and [solve] in separate panes.
+enum SolveControlsSection { all, scramble, solve }
+
 class SolveControls extends StatelessWidget {
+  final SolveControlsSection section;
   final bool showingSolution;
   final bool showExplanations;
   final int moveIndex;
@@ -44,6 +50,7 @@ class SolveControls extends StatelessWidget {
 
   const SolveControls({
     super.key,
+    this.section = SolveControlsSection.all,
     required this.showingSolution,
     required this.showExplanations,
     required this.moveIndex,
@@ -78,6 +85,12 @@ class SolveControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (section == SolveControlsSection.scramble) {
+      return _buildActionArea(_buildScramblePane());
+    }
+    if (section == SolveControlsSection.solve && !showingSolution) {
+      return _buildActionArea(_buildSolvePane());
+    }
     if (showingSolution) {
       return AnimatedBuilder(
         animation: analysisController,
@@ -86,7 +99,7 @@ class SolveControls extends StatelessWidget {
             child: Column(
               children: [
                 // 1. Move Counter / Scrubber
-                if (MediaQuery.of(context).size.height >= 700) ...[
+                if (!AppLayout.isShort(context, 700)) ...[
                   const SizedBox(height: 12),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -236,23 +249,99 @@ class SolveControls extends StatelessWidget {
         },
       );
     } else {
-      return Expanded(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Center(
-                  child: _buildMainActionButton(context),
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
+      return _buildActionArea(_buildMainActionButton(context));
+    }
+  }
+
+  Widget _buildActionArea(Widget child) {
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Center(child: child),
+            ),
+            const SizedBox(height: 24),
+          ],
         ),
+      ),
+    );
+  }
+
+  /// Left pane of the split layout: scramble settings only.
+  Widget _buildScramblePane() {
+    if (isScrambling) {
+      return _buildButton(
+        icon: Icons.shuffle,
+        label: 'Scrambling...',
+        onPressed: null,
+        color: const Color(0xFFF59E0B),
+        width: 280,
       );
     }
+    return _buildScramblePanel();
+  }
+
+  /// Right pane of the split layout before a solution is showing.
+  Widget _buildSolvePane() {
+    if (isDemo) {
+      return _buildButton(
+        icon: Icons.close,
+        label: 'CANCEL',
+        onPressed: onCancelDemo,
+        color: const Color(0xFFEF4444),
+        width: 280,
+      );
+    } else if (isSolving) {
+      return _buildButton(
+        icon: Icons.auto_fix_high,
+        label: solveStatus ?? 'Solving...',
+        onPressed: null,
+        color: const Color(0xFF22C55E),
+        width: 280,
+      );
+    } else if (cubeState.isSolved || isScrambling) {
+      return const Text(
+        'Scramble or scan a cube, then choose a method to solve it step by step.',
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.white54, fontSize: 14, height: 1.4),
+      );
+    }
+    return _buildSolverButton();
+  }
+
+  Widget _buildScramblePanel() {
+    return ScrambleSettingsPanel(
+      scrambleLength: scrambleLength,
+      onLengthChanged: onScrambleLengthChanged,
+      onScramble: onScramble,
+      onRandomize: onRandomize,
+      isScrambling: isScrambling,
+      isAnimating: isAnimating,
+    );
+  }
+
+  Widget _buildSolverButton() {
+    if (PremiumManager().isPremium) {
+      return PremiumSolverSelector(
+        isAnimating: isAnimating,
+        isSolving: isSolving,
+        solveStatus: solveStatus,
+        onSolve: onSolve,
+        selectedMethod: selectedMethod,
+        onMethodChanged: onMethodChanged,
+      );
+    }
+    return _buildButton(
+      icon: Icons.auto_fix_high,
+      label: 'Solve',
+      onPressed:
+          isAnimating ? null : () => onSolve(method: SolveMethod.kociemba),
+      color: const Color(0xFF6366F1),
+      width: 280,
+    );
   }
 
   Widget _buildExplanationBox(BuildContext context) {
@@ -494,47 +583,14 @@ class SolveControls extends StatelessWidget {
     } else if (showingSolution) {
       return const SizedBox.shrink();
     } else if (cubeState.isSolved && !isScrambling && !isSolving) {
-      return ScrambleSettingsPanel(
-        scrambleLength: scrambleLength,
-        onLengthChanged: onScrambleLengthChanged,
-        onScramble: onScramble,
-        onRandomize: onRandomize,
-        isScrambling: isScrambling,
-        isAnimating: isAnimating,
-      );
+      return _buildScramblePanel();
     } else {
-      final bool isPremium = PremiumManager().isPremium;
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ScrambleSettingsPanel(
-            scrambleLength: scrambleLength,
-            onLengthChanged: onScrambleLengthChanged,
-            onScramble: onScramble,
-            onRandomize: onRandomize,
-            isScrambling: isScrambling,
-            isAnimating: isAnimating,
-          ),
+          _buildScramblePanel(),
           const SizedBox(height: 16),
-          if (isPremium)
-            PremiumSolverSelector(
-              isAnimating: isAnimating,
-              isSolving: isSolving,
-              solveStatus: solveStatus,
-              onSolve: onSolve,
-              selectedMethod: selectedMethod,
-              onMethodChanged: onMethodChanged,
-            )
-          else
-            _buildButton(
-              icon: Icons.auto_fix_high,
-              label: 'Solve',
-              onPressed: isAnimating
-                  ? null
-                  : () => onSolve(method: SolveMethod.kociemba),
-              color: const Color(0xFF6366F1),
-              width: 280,
-            ),
+          _buildSolverButton(),
         ],
       );
     }

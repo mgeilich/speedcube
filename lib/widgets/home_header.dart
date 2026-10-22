@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import '../utils/app_layout.dart';
 import '../utils/premium_manager.dart';
 import 'premium_upsell_sheet.dart';
 
@@ -19,7 +20,7 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isShort = MediaQuery.of(context).size.height < 750;
+    final isShort = AppLayout.isShort(context);
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: isShort ? 8 : 12),
       child: Row(
@@ -36,15 +37,22 @@ class HomeHeader extends StatelessWidget {
             child: const Icon(Icons.view_in_ar, color: Colors.white, size: 20),
           ),
           const SizedBox(width: 8),
-          const Text(
-            "SpeedCube AR",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+          // Shrinks to fit on narrow screens (e.g. iPhone Duo outer display)
+          const Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "SpeedCube AR",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
-          const Spacer(),
+          const SizedBox(width: 8),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -108,7 +116,8 @@ class HomeHeader extends StatelessWidget {
                     visualDensity: VisualDensity.compact,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
-                    icon: const Icon(Icons.menu_book, color: Colors.white70, size: 24),
+                    icon: const Icon(Icons.menu_book,
+                        color: Colors.white70, size: 24),
                     onPressed: () {
                       if (!kIsWeb && !PremiumManager().isPremium) {
                         showModalBottomSheet(
@@ -148,7 +157,8 @@ class HomeHeader extends StatelessWidget {
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: const Icon(Icons.settings, color: Colors.white70, size: 24),
+                icon:
+                    const Icon(Icons.settings, color: Colors.white70, size: 24),
                 onPressed: onSettingsPressed,
                 tooltip: 'Settings',
               ),

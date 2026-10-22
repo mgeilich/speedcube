@@ -238,7 +238,7 @@ class HeiseSolver {
   static Future<List<CubeMove>?> solveEdgesAndTwoCornersIsolate(Map<String, dynamic> args) async {
     try {
       KociembaTables.data = args['tables'];
-      return _solveEdgesAndTwoCorners(args['state']);
+      return await _solveEdgesAndTwoCorners(args['state']);
     } catch (e, stack) {
       debugPrint("Heise Isolate Error (Stage 5): $e\n$stack");
       rethrow;

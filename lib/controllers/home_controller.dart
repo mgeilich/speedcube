@@ -107,6 +107,9 @@ class HomeController extends ChangeNotifier {
 
   // Getters
   CubeState get cubeState => _cubeState;
+
+  /// The scrambled/scanned starting position, before any solution moves.
+  CubeState? get savedState => _savedState;
   CubeAnimationController get animationController => _animationController;
   AnalysisController get analysisController => _analysisController;
   double get rotationX => _rotationX;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/app_layout.dart';
 import '../utils/haptic_service.dart';
 
 class TapeDeckControls extends StatelessWidget {
@@ -37,7 +38,7 @@ class TapeDeckControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isShort = MediaQuery.of(context).size.height < 750;
+    final isShort = AppLayout.isShort(context);
     final smallButtonSize = isShort ? 38.0 : 42.0;
     final spacing = isShort ? 4.0 : 8.0;
 
