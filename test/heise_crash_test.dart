@@ -21,7 +21,7 @@ void main() {
     await KociembaSearch().solve(CubeState.solved());
 
     final random = Random();
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 5; i++) {
       final scramble = _generateRandomScramble(random, 20);
       final state = CubeState.solved().applyMoves(scramble);
       

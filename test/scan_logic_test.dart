@@ -5,6 +5,7 @@ import 'package:speedcube_ar/solver/kociemba_search.dart';
 
 void main() {
   setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
     // Ensure tables are loaded before running solver tests
     await KociembaSolver.init();
   });

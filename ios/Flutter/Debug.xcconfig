@@ -1,2 +1,6 @@
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
 #include "Generated.xcconfig"
+
+WARNING_CFLAGS = $(inherited) -Wno-deprecated-declarations -Wno-deprecated
+OTHER_CFLAGS = $(inherited) -Wno-deprecated-declarations -Wno-deprecated
+OTHER_SWIFT_FLAGS = $(inherited) -Xcc -Wno-deprecated-declarations -Xcc -Wno-deprecated
