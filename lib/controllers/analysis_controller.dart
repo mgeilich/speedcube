@@ -103,15 +103,19 @@ class AnalysisController extends ChangeNotifier {
   /// Strips common method prefixes for cleaner display.
   static String normalizeStage(String raw) {
     // Remove method prefixes like "CFOP ", "Roux ", etc.
+    var name = raw;
     final prefixes = ['CFOP ', 'Roux ', 'ZZ ', 'Petrus ', 'Heise '];
     for (final p in prefixes) {
-      if (raw.startsWith(p)) return raw.substring(p.length);
+      if (name.startsWith(p)) {
+        name = name.substring(p.length);
+        break;
+      }
     }
     // Roux records each block piece separately ("FB DL", "SB DFR")
-    if (raw.startsWith('FB ')) return 'First Block';
-    if (raw.startsWith('SB ')) return 'Second Block';
+    if (name.startsWith('FB ')) return 'First Block';
+    if (name.startsWith('SB ')) return 'Second Block';
     // Also strip " (Fallback)" suffixes and "Stage 1a: " numbering (ZZ)
-    return raw
+    return name
         .replaceAll(RegExp(r'\s*\(Fallback\)'), '')
         .replaceFirst(RegExp(r'^Stage \d+[a-z]?:\s*'), '');
   }
