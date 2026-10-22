@@ -107,8 +107,13 @@ class AnalysisController extends ChangeNotifier {
     for (final p in prefixes) {
       if (raw.startsWith(p)) return raw.substring(p.length);
     }
-    // Also strip " (Fallback)" suffixes
-    return raw.replaceAll(RegExp(r'\s*\(Fallback\)'), '');
+    // Roux records each block piece separately ("FB DL", "SB DFR")
+    if (raw.startsWith('FB ')) return 'First Block';
+    if (raw.startsWith('SB ')) return 'Second Block';
+    // Also strip " (Fallback)" suffixes and "Stage 1a: " numbering (ZZ)
+    return raw
+        .replaceAll(RegExp(r'\s*\(Fallback\)'), '')
+        .replaceFirst(RegExp(r'^Stage \d+[a-z]?:\s*'), '');
   }
 
   /// Load a new solution and calculate states
