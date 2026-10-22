@@ -350,14 +350,33 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
 
   void _showIntroduction() {
     _homeController.showingSolution = false;
+    _showGuideSheet(const IntroductionSheet());
+  }
+
+  /// Beginner guides are bottom sheets on phones. On wide screens they open as
+  /// a page beside the algorithm library, like the method tutorials.
+  void _showGuideSheet(Widget sheet) {
+    if (AppLayout.isWide(context) &&
+        PremiumManager().canAccessFeature('alg_library')) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => LearnSplitView(
+            guide: Scaffold(
+              backgroundColor: const Color(0xFF0F0F1A),
+              body: sheet,
+            ),
+          ),
+        ),
+      );
+      return;
+    }
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const IntroductionSheet(),
-    ).then((_) {
-      // Logic for when intro is closed
-    });
+      builder: (_) => sheet,
+    );
   }
 
   void _showSettings() {
@@ -401,11 +420,8 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
 
   void _showLayerByLayerGuide({int initialStepIndex = -1}) {
     _homeController.showingSolution = false;
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => LayerByLayerGuideSheet(
+    _showGuideSheet(
+      LayerByLayerGuideSheet(
         initialExpandedStepIndex: initialStepIndex != -1
             ? initialStepIndex
             : (_homeController.lastLblStepIndex ?? -1),
