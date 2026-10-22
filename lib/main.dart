@@ -5,6 +5,7 @@ import 'widgets/premium_upsell_sheet.dart';
 import 'utils/logging_config.dart';
 import 'models/cube_state.dart';
 import 'models/cube_move.dart';
+import 'models/solve_method.dart';
 import 'widgets/layer_by_layer_guide_sheet.dart';
 import 'widgets/cfop_guide_screen.dart';
 import 'widgets/roux_guide_screen.dart';
@@ -812,6 +813,26 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
   void _showAlgLibrary() {
     if (!PremiumManager().canAccessFeature('alg_library')) {
       _showPremiumUpsell();
+      return;
+    }
+    if (AppLayout.isWide(context)) {
+      // Side by side with the tutorial for the solver's current method
+      // (LearnSplitView puts the library in the right pane).
+      switch (_homeController.selectedSolveMethod) {
+        case SolveMethod.roux:
+          _showRouxGuide();
+        case SolveMethod.zz:
+          _showZzGuide();
+        case SolveMethod.petrus:
+          _showPetrusGuide();
+        case SolveMethod.heise:
+          HeiseGuideScreen.clearCache();
+          _showHeiseGuide();
+        case SolveMethod.cfop:
+        case SolveMethod.kociemba:
+        case SolveMethod.lbl:
+          _showCfopGuide();
+      }
       return;
     }
     Navigator.push(
