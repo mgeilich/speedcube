@@ -89,11 +89,11 @@ class AnalysisController extends ChangeNotifier {
     for (int i = 0; i < _moveStageNames.length; i++) {
       final name = _moveStageNames[i] ?? 'Kociemba';
       // Normalize: strip method prefix for display (e.g. "CFOP F2L" -> "F2L")
-      final displayName = _normalizeStage(name);
+      final displayName = normalizeStage(name);
 
       if (!seen.contains(displayName)) {
         seen.add(displayName);
-        final count = _moveStageNames.where((s) => _normalizeStage(s ?? 'Kociemba') == displayName).length;
+        final count = _moveStageNames.where((s) => normalizeStage(s ?? 'Kociemba') == displayName).length;
         result.add((name: displayName, count: count));
       }
     }
@@ -101,7 +101,7 @@ class AnalysisController extends ChangeNotifier {
   }
 
   /// Strips common method prefixes for cleaner display.
-  static String _normalizeStage(String raw) {
+  static String normalizeStage(String raw) {
     // Remove method prefixes like "CFOP ", "Roux ", etc.
     final prefixes = ['CFOP ', 'Roux ', 'ZZ ', 'Petrus ', 'Heise '];
     for (final p in prefixes) {

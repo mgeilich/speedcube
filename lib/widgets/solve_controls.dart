@@ -78,9 +78,13 @@ class SolveControls extends StatelessWidget {
     required this.onMethodChanged,
     required this.selectedMethod,
     this.moveLabels,
+    this.onCompare,
   });
 
   final Map<int, String>? moveLabels;
+
+  /// Opens the method comparison for the current scramble.
+  final VoidCallback? onCompare;
 
 
   @override
@@ -324,6 +328,25 @@ class SolveControls extends StatelessWidget {
   }
 
   Widget _buildSolverButton() {
+    if (onCompare == null) return _buildSolveSelector();
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildSolveSelector(),
+        const SizedBox(height: 8),
+        TextButton.icon(
+          onPressed: isAnimating ? null : onCompare,
+          icon: const Icon(Icons.compare_arrows, size: 18),
+          label: const Text('Compare all methods'),
+          style: TextButton.styleFrom(
+            foregroundColor: const Color(0xFF818CF8),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSolveSelector() {
     if (PremiumManager().isPremium) {
       return PremiumSolverSelector(
         isAnimating: isAnimating,

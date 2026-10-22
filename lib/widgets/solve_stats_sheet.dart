@@ -8,10 +8,9 @@ class SolveStatsSheet extends StatelessWidget {
 
   const SolveStatsSheet({super.key, required this.controller});
 
-  static Color _stageColor(String displayName, int index) {
-    if (displayName == 'Phase 1' || displayName == 'Phase 2') {
-      return SolveTheme.primaryIndigo;
-    }
+  static Color stageColor(String displayName, int index) {
+    if (displayName == 'Phase 1') return SolveTheme.primaryIndigo;
+    if (displayName == 'Phase 2') return SolveTheme.secondaryBlue;
 
     final color = SolveTheme.getStageColor(displayName);
     if (color != SolveTheme.primaryIndigo) return color;
@@ -146,7 +145,7 @@ class SolveStatsSheet extends StatelessWidget {
                     Expanded(
                       flex: breakdown[i].count,
                       child: Container(
-                        color: _stageColor(breakdown[i].name, i),
+                        color: stageColor(breakdown[i].name, i),
                         child: i > 0
                             ? Container(
                                 decoration: const BoxDecoration(
@@ -185,7 +184,7 @@ class SolveStatsSheet extends StatelessWidget {
                   Divider(color: Colors.white.withValues(alpha: 0.05), height: 1),
               itemBuilder: (context, i) {
                 final stage = breakdown[i];
-                final color = _stageColor(stage.name, i);
+                final color = stageColor(stage.name, i);
                 final percentage = (stage.count / totalMoves * 100).round();
 
                 return Padding(

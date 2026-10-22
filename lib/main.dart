@@ -19,6 +19,7 @@ import 'widgets/introduction_sheet.dart';
 import 'widgets/settings_sheet.dart';
 import 'widgets/alg_library_screen.dart';
 import 'widgets/learn_split_view.dart';
+import 'widgets/method_comparison_screen.dart';
 
 import 'widgets/ar_scan_screen.dart';
 import 'utils/app_layout.dart';
@@ -250,6 +251,7 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
           selectedMethod: _homeController.selectedSolveMethod,
           onMethodChanged: _homeController.setSelectedSolveMethod,
           moveLabels: _homeController.moveLabels,
+          onCompare: _showMethodComparison,
         );
 
     return Scaffold(
@@ -824,6 +826,23 @@ class _SpeedCubeHomeState extends State<SpeedCubeHome>
         ),
       ),
     );
+  }
+
+  Future<void> _showMethodComparison() async {
+    if (!PremiumManager().canAccessFeature('lbl_solver')) {
+      _showPremiumUpsell();
+      return;
+    }
+    final pick = await Navigator.push<ComparisonPick>(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            MethodComparisonScreen(state: _homeController.cubeState.clone()),
+      ),
+    );
+    if (pick == null || !mounted) return;
+    _homeController.setSelectedSolveMethod(pick.method);
+    _homeController.solve(method: pick.method, precomputed: pick.result);
   }
 
   void _showAlgLibrary() {

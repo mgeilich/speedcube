@@ -567,6 +567,7 @@ class HomeController extends ChangeNotifier {
   Future<void> solve({
     SolveMethod? method,
     bool? showExplanations,
+    SolveResult? precomputed,
   }) async {
     final solveMethod = method ?? _selectedSolveMethod;
     if (_animationController.isAnimating) return;
@@ -602,14 +603,17 @@ class HomeController extends ChangeNotifier {
 
     SolveResult solveResult;
     try {
-      solveResult = await SolverService.solve(
-        state: solveState,
-        method: solveMethod,
-        onProgress: (status) {
-          _solveStatus = status;
-          notifyListeners();
-        },
-      );
+      // A result from the method comparison was solved from this same state.
+      solveResult = precomputed != null && !_showingSolution
+          ? precomputed
+          : await SolverService.solve(
+              state: solveState,
+              method: solveMethod,
+              onProgress: (status) {
+                _solveStatus = status;
+                notifyListeners();
+              },
+            );
     } catch (e) {
       debugPrint("Solver failed: $e");
       _isSolving = false;

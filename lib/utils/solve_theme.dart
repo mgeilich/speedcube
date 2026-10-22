@@ -14,6 +14,11 @@ class SolveTheme {
     }
 
     final s = stageName.toLowerCase();
+    // More specific names first: "yellow cross" and "edge orientation" would
+    // otherwise match the generic "cross" / "orientation" checks below.
+    if (s.contains('yellow cross') || s.contains('edge orientation')) {
+      return yellowGold;
+    }
     if (s.contains('cross') ||
         s.contains('white layer') ||
         s.contains('white cross') ||
