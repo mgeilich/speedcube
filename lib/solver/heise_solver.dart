@@ -189,9 +189,16 @@ class HeiseSolver {
   static List<CubeMove>? solve2x2x2Isolate(List<int> data) {
     try {
       final c = KociembaCube.fromData(data);
-      _log.info("  [Isolate] Starting Stage 1 BFS...");
-      final result = _bfsFromK(c, (c) => _is2x2x2Solved(c), 8);
-      _log.info("  [Isolate] Stage 1 BFS complete. Result: ${result != null ? result.length : 'null'}");
+      final result = _solve2x2x2Optimal(c);
+      final check = KociembaCube.clone(c);
+      for (final m in result) {
+        check.applyMove(m.face, m.turns);
+      }
+      if (!_is2x2x2Solved(check)) {
+        _log.warning("  [Isolate] Stage 1 table result invalid; falling back to BFS");
+        return _bfsFromK(c, (c) => _is2x2x2Solved(c), 8);
+      }
+      _log.info("  [Isolate] Stage 1 complete. Result: ${result.length} moves");
       return result;
     } catch (e, stack) {
       debugPrint("Heise Isolate Error (Stage 1): $e\n$stack");
@@ -483,6 +490,106 @@ class HeiseSolver {
 
   // --- Utilities ---
 
+  // --- Stage 1: exact 2x2x2 block search ---
+  //
+  // The DBL block is corner 6 plus edges 6, 7 and 10. Each piece's placement
+  // is encoded as position * orientations + orientation (24 values each), so
+  // the block has 24^4 = 331,776 encodings. A distance table over all of them
+  // is small and gives an optimal block from any position instantly; the old
+  // node-capped BFS only reached ~5 moves and often gave up.
+
+  static const _blockEdges = [6, 7, 10];
+  static List<Uint8List>? _cornerMoveTable;
+  static List<Uint8List>? _edgeMoveTable;
+  static Uint8List? _blockDistance;
+
+  /// For each piece placement (24) and physical move (18), the new placement.
+  static List<Uint8List> _buildPieceMoveTable({required bool corner}) {
+    final oris = corner ? 3 : 2;
+    final table = List.generate(24, (_) => Uint8List(18));
+    for (int placement = 0; placement < 24; placement++) {
+      final pos = placement ~/ oris, ori = placement % oris;
+      for (int m = 0; m < 18; m++) {
+        final move = CubeMove.physicalMoves[m];
+        final k = KociembaCube();
+        final perm = corner ? k.cp : k.ep;
+        final orient = corner ? k.co : k.eo;
+        // Put the tracked piece (0) at `pos` by swapping it with the piece there.
+        perm[0] = perm[pos];
+        perm[pos] = 0;
+        orient[pos] = ori;
+        k.applyMove(move.face, move.turns);
+        final newPos = perm.indexOf(0);
+        table[placement][m] = newPos * oris + orient[newPos];
+      }
+    }
+    return table;
+  }
+
+  static int _blockIndex(int c, int e0, int e1, int e2) =>
+      ((c * 24 + e0) * 24 + e1) * 24 + e2;
+
+  static int _blockIndexOf(KociembaCube k) {
+    int placementOf(Uint8List perm, Uint8List orient, int piece, int oris) {
+      final pos = perm.indexOf(piece);
+      return pos * oris + orient[pos];
+    }
+
+    return _blockIndex(
+      placementOf(k.cp, k.co, 6, 3),
+      placementOf(k.ep, k.eo, _blockEdges[0], 2),
+      placementOf(k.ep, k.eo, _blockEdges[1], 2),
+      placementOf(k.ep, k.eo, _blockEdges[2], 2),
+    );
+  }
+
+  static void _ensureBlockTables() {
+    if (_blockDistance != null) return;
+    final cm = _cornerMoveTable = _buildPieceMoveTable(corner: true);
+    final em = _edgeMoveTable = _buildPieceMoveTable(corner: false);
+    final dist = Uint8List(331776)..fillRange(0, 331776, 255);
+    final solved = _blockIndex(6 * 3, 6 * 2, 7 * 2, 10 * 2);
+    dist[solved] = 0;
+    var frontier = <int>[solved];
+    for (int depth = 0; frontier.isNotEmpty; depth++) {
+      final next = <int>[];
+      for (final idx in frontier) {
+        final c = idx ~/ 13824, e0 = (idx ~/ 576) % 24;
+        final e1 = (idx ~/ 24) % 24, e2 = idx % 24;
+        for (int m = 0; m < 18; m++) {
+          final n = _blockIndex(cm[c][m], em[e0][m], em[e1][m], em[e2][m]);
+          if (dist[n] == 255) {
+            dist[n] = depth + 1;
+            next.add(n);
+          }
+        }
+      }
+      frontier = next;
+    }
+    _blockDistance = dist;
+  }
+
+  /// Optimal move sequence that builds the DBL 2x2x2 block.
+  static List<CubeMove> _solve2x2x2Optimal(KociembaCube start) {
+    _ensureBlockTables();
+    final dist = _blockDistance!, cm = _cornerMoveTable!, em = _edgeMoveTable!;
+    var idx = _blockIndexOf(start);
+    final path = <CubeMove>[];
+    while (dist[idx] > 0) {
+      final c = idx ~/ 13824, e0 = (idx ~/ 576) % 24;
+      final e1 = (idx ~/ 24) % 24, e2 = idx % 24;
+      for (int m = 0; m < 18; m++) {
+        final n = _blockIndex(cm[c][m], em[e0][m], em[e1][m], em[e2][m]);
+        if (dist[n] == dist[idx] - 1) {
+          path.add(CubeMove.physicalMoves[m]);
+          idx = n;
+          break;
+        }
+      }
+    }
+    return path;
+  }
+
   static List<CubeMove>? _bfsFromK(KociembaCube start, bool Function(KociembaCube) goal, int maxDepth, {List<CubeMove>? allowedMoves}) {
     if (goal(start)) return [];
     
@@ -596,11 +703,12 @@ class HeiseSolver {
   static List<CubeMove> _reorientMoves(List<CubeMove> moves, List<CubeMove> orientation) {
     if (orientation.isEmpty) return moves;
     
-    // Reverse the orientation to find the mapping from standard to current
-    final invOrientation = orientation.reversed.map((m) => m.inverse).toList();
-    
+    // A standard-frame face X is the physical face that `orientation` carries
+    // to X. _mapFace answers that when given `orientation` itself; passing the
+    // inverse only coincides for 180° rotations (x2, y2), so other frames
+    // produced moves that didn't solve the cube.
     return moves.map((m) {
-      final face = _mapFace(m.face, invOrientation);
+      final face = _mapFace(m.face, orientation);
       return CubeMove(face, m.turns, m.isWide);
     }).toList();
   }

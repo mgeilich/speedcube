@@ -28,13 +28,13 @@ void main() {
     const iterations = 20; 
 
     log.info("--- Testing ZZ Solver ---");
-    try { await testSolver("ZZ", (s) => ZzSolver.solve(s), iterations, random, log); } catch(e) { log.severe("ZZ failed: $e"); }
+    await testSolver("ZZ", (s) => ZzSolver.solve(s), iterations, random, log);
 
     log.info("--- Testing Petrus Solver ---");
-    try { await testSolver("Petrus", (s) => PetrusSolver.solve(s), iterations, random, log); } catch(e) { log.severe("Petrus failed: $e"); }
+    await testSolver("Petrus", (s) => PetrusSolver.solve(s), iterations, random, log);
 
     log.info("--- Testing Heise Solver ---");
-    try { await testSolver("Heise", (s) => HeiseSolver.solve(s), iterations, random, log); } catch(e) { log.severe("Heise failed: $e"); }
+    await testSolver("Heise", (s) => HeiseSolver.solve(s), iterations, random, log);
   }, timeout: const Timeout(Duration(minutes: 10)));
 }
 
