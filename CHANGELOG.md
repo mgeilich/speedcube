@@ -2,6 +2,21 @@
 
 All notable changes to the SpeedCube AR project will be documented in this file.
 
+## [2026.10.0] - 2026-10-22
+
+### Added
+- **iPhone Duo Split Screens**: When unfolded (and on iPad or landscape iPhone), the home screen shows the scramble and the solver side by side, and tutorials open beside the Algorithm Library, including from the library button and the beginner guides.
+- **Method Comparison**: "Compare all methods" solves the current scramble with every method and shows move counts, stage breakdowns and solve times side by side; tapping a method plays that exact solution.
+
+### Fixed
+- **Roux Solver**: Checks now use fixed reference colours instead of M-slice centres, and CMLL/LSE handle U-layer alignment and edge orientation correctly. 100/100 test scrambles solve (previously about 3 in 4), averaging under 5 seconds instead of 34.
+- **Heise Solver**: Fixed move translation for rotated orientations and replaced the 2x2x2 block search with an exact distance table. 100/100 test scrambles solve, averaging about 1 second.
+- **Cover Screen Layout**: The header no longer overflows on the Duo's narrow outer display, and all screens stay clear of its side status strip.
+- **Stage Colours**: Yellow Cross and Edge Orientation now use their intended colours; Kociemba's two phases are distinguishable.
+
+### Changed
+- Built with Flutter 3.47.7 for Xcode 27 and the iOS 27 SDK.
+
 ## [2026.9.1] - 2026-09-03
 
 ### Fixed
