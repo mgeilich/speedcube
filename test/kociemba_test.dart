@@ -1,9 +1,11 @@
 // ignore_for_file: avoid_print
 
+import 'package:flutter_test/flutter_test.dart';
 import 'package:speedcube_ar/models/cube_state.dart';
 import 'package:speedcube_ar/solver/kociemba_search.dart';
 
 void main() async {
+  TestWidgetsFlutterBinding.ensureInitialized();
   print('Starting exhaustive Kociemba solver test (100 runs)...');
   int successCount = 0;
 

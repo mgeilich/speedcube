@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/app_layout.dart';
 import '../models/cube_move.dart';
 import '../controllers/analysis_controller.dart';
 
@@ -31,9 +32,10 @@ class _AnalysisTimelineState extends State<AnalysisTimeline> {
   }
 
   void _onControllerChanged() {
-    // Auto-scroll to keep current move visible
+    // Auto-scroll to keep current or animating move visible
     if (_scrollController.hasClients) {
-      final index = widget.controller.currentIndex;
+      final index =
+          widget.controller.animatingIndex ?? widget.controller.currentIndex;
       final itemWidth = 72.0; // Width of each move chip + spacing
       final targetOffset = index * itemWidth - 100; // Center it
 
@@ -48,7 +50,7 @@ class _AnalysisTimelineState extends State<AnalysisTimeline> {
 
   @override
   Widget build(BuildContext context) {
-    final isShort = MediaQuery.of(context).size.height < 750;
+    final isShort = AppLayout.isShort(context);
     return Container(
       height: isShort ? 70 : 80,
       padding: EdgeInsets.symmetric(vertical: isShort ? 8 : 12),
@@ -72,6 +74,7 @@ class _AnalysisTimelineState extends State<AnalysisTimeline> {
                   1, // Start + Moves (Solved is reachable via last move)
               itemBuilder: (context, index) {
                 final isCurrent = index == widget.controller.currentIndex;
+                final isAnimating = index == widget.controller.animatingIndex;
                 final isPast = index < widget.controller.currentIndex;
 
                 if (index == 0) {
@@ -79,7 +82,7 @@ class _AnalysisTimelineState extends State<AnalysisTimeline> {
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: _StartChip(
-                      isCurrent: isCurrent,
+                      isCurrent: isCurrent || isAnimating,
                       onTap: () => widget.controller.goToMove(0),
                     ),
                   );
@@ -92,7 +95,7 @@ class _AnalysisTimelineState extends State<AnalysisTimeline> {
                   padding: const EdgeInsets.only(right: 8),
                   child: _MoveChip(
                     move: move,
-                    isCurrent: isCurrent,
+                    isCurrent: isCurrent || isAnimating,
                     isPast: isPast,
                     onTap: () => widget.controller.goToMove(index),
                   ),
@@ -188,6 +191,8 @@ class _MoveChip extends StatelessWidget {
         return const Color(0xFFB71234); // Red
       case CubeFace.l:
         return const Color(0xFFFF5800); // Orange
+      default:
+        return Colors.grey;
     }
   }
 }

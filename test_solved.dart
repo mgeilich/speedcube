@@ -4,7 +4,7 @@ import 'lib/models/cube_state.dart';
 import 'lib/models/cube_move.dart';
 import 'lib/solver/lbl_solver.dart';
 
-void main() {
+void main() async {
   initLogging();
   final log = Logger('TestSolved');
 
@@ -17,7 +17,7 @@ void main() {
   _checkIntegrity(state, log);
 
   // 2. Solve White Cross
-  final result = LblSolver.solve(initial);
+  final result = await LblSolver.solve(initial);
   if (result == null) {
     return;
   }

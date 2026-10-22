@@ -13,14 +13,15 @@ class KociembaSearch {
 
   List<CubeMove>? _bestSolution;
   int _bestSolutionLength = 999;
+  final bool solveCorners;
 
-  KociembaSearch({this.timeLimitMs = 400, this.maxTotalDepth = 24});
+  KociembaSearch({this.timeLimitMs = 400, this.maxTotalDepth = 24, this.solveCorners = true});
 
   Future<KociembaSolveResult?> solve(CubeState state) async {
     await KociembaTables.init();
     final cube = KociembaCube.fromCubeState(state);
 
-    if (cube.isSolved) {
+    if (cube.isSolved && solveCorners) {
       return KociembaSolveResult(moves: [], phase1MoveCount: 0);
     }
 
@@ -148,10 +149,26 @@ class KociembaSearch {
       int cp, int ep, int usp, int depth, List<int> moves, int lastFace) {
     int h1 = KociembaTables.cpUspPrun[cp * KociembaTables.nSlicePerm + usp];
     int h2 = KociembaTables.epUspPrun[ep * KociembaTables.nSlicePerm + usp];
-    int h = h1 > h2 ? h1 : h2;
 
-    if (h == 0) return true;
-    if (h > depth) return false;
+    if (solveCorners) {
+      final int h = h1 > h2 ? h1 : h2;
+      if (h == 0) return true;
+      if (h > depth) return false;
+    } else {
+      // Heise Stage 5: only care about edges — use h2 for pruning only.
+      // h1 (corners) is intentionally ignored so the search isn't killed.
+      if (h2 == 0) {
+        // All edges solved. Check that exactly 3 corners remain unsolved.
+        final cube = KociembaCube();
+        cube.cpRank = cp;
+        final unsolved = cube.unsolvedCornerCount;
+        // Accept 0 (fully solved) or 3 (commutator finish)
+        if (unsolved == 0 || unsolved == 3) return true;
+        // Wrong corner count; reject but keep searching.
+        return false;
+      }
+      if (h2 > depth) return false;
+    }
 
     for (int mIdx = 0; mIdx < 10; mIdx++) {
       int moveIdx = KociembaTables.phase2AvailableMoves[mIdx];
@@ -208,8 +225,40 @@ class KociembaSolver {
   }
 
   static Future<KociembaSolveResult> solve(CubeState state) async {
+    final orientationMoves = <CubeMove>[];
+    
+    // 1. Orient White to Top
+    final whiteFace = _findCenterFace(state, CubeColor.white);
+    if (whiteFace == CubeFace.d) { orientationMoves.add(CubeMove.x2); }
+    else if (whiteFace == CubeFace.f) { orientationMoves.add(CubeMove.x); }
+    else if (whiteFace == CubeFace.b) { orientationMoves.add(CubeMove.xPrime); }
+    else if (whiteFace == CubeFace.l) { orientationMoves.add(CubeMove.z); }
+    else if (whiteFace == CubeFace.r) { orientationMoves.add(CubeMove.zPrime); }
+    
+    var orientedState = state.applyMoves(orientationMoves);
+    
+    // 2. Orient Green to Front (White is now on Top)
+    final greenFace = _findCenterFace(orientedState, CubeColor.green);
+    if (greenFace == CubeFace.b) { orientationMoves.add(CubeMove.y2); }
+    else if (greenFace == CubeFace.r) { orientationMoves.add(CubeMove.y); }
+    else if (greenFace == CubeFace.l) { orientationMoves.add(CubeMove.yPrime); }
+    
+    orientedState = state.applyMoves(orientationMoves);
+
     final search = KociembaSearch(timeLimitMs: 400);
-    final result = await search.solve(state);
-    return result ?? KociembaSolveResult(moves: [], phase1MoveCount: 0);
+    final result = await search.solve(orientedState);
+    if (result == null) return KociembaSolveResult(moves: [], phase1MoveCount: 0);
+    
+    return KociembaSolveResult(
+      moves: [...orientationMoves, ...result.moves],
+      phase1MoveCount: orientationMoves.length + result.phase1MoveCount,
+    );
+  }
+
+  static CubeFace _findCenterFace(CubeState s, CubeColor c) {
+    for (final f in CubeFace.physicalFaces) {
+      if (s.getFace(f)[4] == c) return f;
+    }
+    return CubeFace.u;
   }
 }

@@ -3,7 +3,7 @@ import 'package:speedcube_ar/models/cube_state.dart';
 import 'package:speedcube_ar/models/cube_move.dart';
 import 'package:speedcube_ar/solver/lbl_solver.dart';
 
-void main() {
+void main() async {
   final scrambleStr = "U' B D' R' L D R B' L' B R F' B' L' D' U' D' F U' R'";
   final moves = scrambleStr
       .split(' ')
@@ -16,7 +16,7 @@ void main() {
   final whiteFace = CubeFace.u; // Simplified for debug of known scramble
   final p = LblSolver.perspectiveFor(whiteFace);
 
-  final res = LblSolver.solve(s)!;
+  final res = (await LblSolver.solve(s))!;
 
   print("Tracing stages...");
   String lastStage = "";

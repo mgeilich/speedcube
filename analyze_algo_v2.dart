@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print
-import 'package:speedcube_ar/models/cube_state.dart';
-import 'package:speedcube_ar/models/cube_move.dart';
-import 'package:speedcube_ar/solver/kociemba_coordinates.dart';
+import 'lib/models/cube_state.dart';
+import 'lib/models/cube_move.dart';
+import 'lib/solver/kociemba_coordinates.dart';
 
 void main() {
   final centers = {

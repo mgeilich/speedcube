@@ -29,7 +29,7 @@ class PiecePathSolver {
       // Heuristic: don't go too deep for simple paths
       if (current.path.length > 8) continue;
 
-      for (final move in CubeMove.allMoves) {
+      for (final move in CubeMove.physicalMoves) {
         final nextPos = _applyMove(current.pos, move);
         final nextId = _posToId(nextPos.face, nextPos.index);
 
@@ -82,7 +82,7 @@ class PiecePathSolver {
 
       if (current.path.length > 7) continue;
 
-      for (final move in CubeMove.allMoves) {
+      for (final move in CubeMove.physicalMoves) {
         final nextPositions =
             current.positions.map((p) => _applyMove(p, move)).toList();
         final nextId = _positionsToId(nextPositions);
@@ -170,14 +170,14 @@ class _TrackerState {
 
   factory _TrackerState.one(CubeFace face, int index) {
     final faces = {
-      for (final f in CubeFace.values) f: List<bool>.filled(9, false),
+      for (final f in CubeFace.physicalFaces) f: List<bool>.filled(9, false),
     };
     faces[face]![index] = true;
     return _TrackerState(faces);
   }
 
   _StickerPos getPos() {
-    for (final face in CubeFace.values) {
+    for (final face in CubeFace.physicalFaces) {
       for (int i = 0; i < 9; i++) {
         if (faces[face]![i]) {
           return _StickerPos(face, i);
@@ -189,7 +189,7 @@ class _TrackerState {
 
   _TrackerState applyMove(CubeMove move) {
     final nextFaces = {
-      for (final f in CubeFace.values) f: List<bool>.from(faces[f]!),
+      for (final f in CubeFace.physicalFaces) f: List<bool>.from(faces[f]!),
     };
 
     int turns = move.turns;
@@ -231,6 +231,8 @@ class _TrackerState {
       case CubeFace.l:
         _cycle(fMap[CubeFace.u]!, [0, 3, 6], fMap[CubeFace.f]!, [0, 3, 6],
             fMap[CubeFace.d]!, [0, 3, 6], fMap[CubeFace.b]!, [8, 5, 2]);
+        break;
+      default:
         break;
     }
   }

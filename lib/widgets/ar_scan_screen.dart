@@ -60,6 +60,8 @@ class _ARScanScreenState extends State<ARScanScreen> {
         return CubeColor.white;
       case CubeFace.d:
         return CubeColor.yellow;
+      default:
+        return null;
     }
   }
 
@@ -807,15 +809,6 @@ class _ARScanScreenState extends State<ARScanScreen> {
                 ],
               ),
             ),
-          // Close Button
-          Positioned(
-            top: 40,
-            left: 20,
-            child: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white, size: 30),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ),
         ],
       ),
     );

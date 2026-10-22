@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../utils/haptic_service.dart';
 import '../utils/premium_manager.dart';
-import 'premium_upsell_sheet.dart';
 
 class ScrambleSettingsPanel extends StatelessWidget {
   final int scrambleLength;
   final Function(int) onLengthChanged;
   final VoidCallback onScramble;
+  final VoidCallback onRandomize;
   final bool isScrambling;
   final bool isAnimating;
 
@@ -15,6 +15,7 @@ class ScrambleSettingsPanel extends StatelessWidget {
     required this.scrambleLength,
     required this.onLengthChanged,
     required this.onScramble,
+    required this.onRandomize,
     required this.isScrambling,
     required this.isAnimating,
   });
@@ -68,22 +69,6 @@ class ScrambleSettingsPanel extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           // Premium indicator if needed
-          if (!PremiumManager().isPremium)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.lock, color: Colors.amber, size: 12),
-                const SizedBox(width: 4),
-                Text(
-                  "PRO: 21-50 moves",
-                  style: TextStyle(
-                    color: Colors.amber.withValues(alpha: 0.8),
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
           const SizedBox(height: 10),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
@@ -101,63 +86,84 @@ class ScrambleSettingsPanel extends StatelessWidget {
             child: Slider(
               value: scrambleLength.toDouble(),
               min: 5,
-              max: 50,
-              divisions: 45,
+              max: 20,
+              divisions: 15,
               onChanged: (val) {
                 final int newLength = val.round();
-                final bool isPremium = PremiumManager().isPremium;
-
-                if (!isPremium && newLength > 20) {
-                  // Trigger upsell and cap at 20 if we just crossed the line
-                  if (scrambleLength <= 20) {
-                    HapticService.impactMedium();
-                    showModalBottomSheet(
-                      context: context,
-                      backgroundColor: Colors.transparent,
-                      isScrollControlled: true,
-                      builder: (_) => const PremiumUpsellSheet(),
-                    );
-                    onLengthChanged(20);
-                  }
-                  return;
-                }
-
                 HapticService.selection();
                 onLengthChanged(newLength);
               },
             ),
           ),
           const SizedBox(height: 15),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: (isScrambling || isAnimating) ? null : onScramble,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF818CF8),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: isScrambling
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : const Text(
-                      "SCRAMBLE CUBE",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
-                      ),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: (isScrambling || isAnimating) ? null : onScramble,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white.withValues(alpha: 0.1),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-            ),
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                    elevation: 0,
+                  ),
+                  child: isScrambling
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text(
+                          "SCRAMBLE",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                            fontSize: 13,
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: (isScrambling || isAnimating) ? null : onRandomize,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6366F1),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 8,
+                    shadowColor: const Color(0xFF6366F1).withValues(alpha: 0.3),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (!PremiumManager().isPremium) ...[
+                        const Icon(Icons.lock, size: 14, color: Colors.white70),
+                        const SizedBox(width: 6),
+                      ],
+                      const Text(
+                        "RANDOMIZE",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

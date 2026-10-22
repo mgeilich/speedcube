@@ -8,7 +8,8 @@ class MoveExplainer {
   static String getDescription(CubeMove move) {
     final faceName = _getFaceFullName(move.face);
     final direction = _getDirectionDescription(move.turns);
-    return "Rotate $faceName $direction";
+    final type = move.isWide ? " (2 layers)" : "";
+    return "Rotate $faceName $direction$type";
   }
 
   /// Returns a short, high-level objective for this specific move.
@@ -68,6 +69,9 @@ class MoveExplainer {
   }
 
   /// Returns a detailed rationale for the move, identifying specific pieces and positions.
+  static const String phase2Note =
+      "Note that only double turns (180°) are used on the side faces (F, B, R, L) during this phase to avoid breaking the edge orientation achieved earlier.";
+
   static String getRationale(
     CubeMove move,
     int moveIndex,
@@ -76,6 +80,7 @@ class MoveExplainer {
     CubeState after, {
     int? phase,
   }) {
+
     final currentPhase = phase ?? (moveIndex < totalMoves / 2 ? 1 : 2);
     final keyInfo = _identifyKeyMovement(before, after);
 
@@ -91,19 +96,23 @@ class MoveExplainer {
     }
 
     if (currentPhase == 1) {
+      // Default Kociemba behavior (legacy)
       final kBefore = KociembaCube.fromCubeState(before);
       final kAfter = KociembaCube.fromCubeState(after);
+      // ... (keep existing Kociemba logic if stageName is null)
 
-      final beBefore = kBefore.badEdgeCount;
-      final beAfter = kAfter.badEdgeCount;
-      final slBefore = kBefore.sliceCorrectCount;
-      final slAfter = kAfter.sliceCorrectCount;
 
-      if (beAfter < beBefore) {
-        return "Phase 1 requires all 12 edges to be 'oriented' correctly. This turn flips ${beBefore - beAfter} badly oriented edges into their correct orientation.$specifics";
-      } else if (slAfter > slBefore) {
-        return "This move places an edge into the middle layer (UD-slice). Phase 2 can only start once all 4 middle edges are in this slice.$specifics";
-      } else if (beAfter == beBefore && slAfter == slBefore) {
+      final flippedEdges = _findFlippedEdges(kBefore, kAfter);
+      final movedToSlice = _findMovedToSlice(kBefore, kAfter);
+
+      if (flippedEdges.isNotEmpty) {
+        final pieceNames = _getPieceNames(flippedEdges, kBefore);
+        return "Phase 1 requires all 12 edges to be 'oriented' correctly. This turn flips $pieceNames into their correct orientation.$specifics";
+      } else if (movedToSlice.isNotEmpty) {
+        final pieceNames = _getPieceNames(movedToSlice, kBefore);
+        return "This move places $pieceNames into the middle layer (UD-slice). Phase 2 can only start once all 4 middle edges are in this slice.$specifics";
+      } else if (kAfter.badEdgeCount == kBefore.badEdgeCount &&
+          kAfter.sliceCorrectCount == kBefore.sliceCorrectCount) {
         // Rationale for U2 or setup moves
         String moveReason = "This is a setup move.";
         if (move.turns == 2 || move.turns == -2) {
@@ -113,46 +122,123 @@ class MoveExplainer {
         return "$moveReason It doesn't solve pieces directly but rearranges them so that a subsequent move can orient them or place them in the middle slice.";
       }
 
-      if (beAfter == 0 && slAfter == 4) {
+      if (kAfter.badEdgeCount == 0 && kAfter.sliceCorrectCount == 4) {
         return "The cube has reached the H-subgroup! Any remaining turns in this phase are used to optimize the transition to Phase 2.";
       }
 
       return "This move reduces the overall complexity of the cube, moving it closer to a state where orientation is locked.$specifics";
     } else {
       // Phase 2 Rationale
-      String restrictionNote = "";
-      if (move.face == CubeFace.f ||
-          move.face == CubeFace.b ||
-          move.face == CubeFace.r ||
-          move.face == CubeFace.l) {
-        if (move.turns.abs() == 2) {
-          restrictionNote =
-              " Note that only double turns (180°) are used on the side faces during this phase to avoid breaking the edge orientation achieved earlier.";
+      final movedPieces = _identifyMovedPieces(before, after);
+      if (movedPieces.isNotEmpty) {
+        final pieceNames = _formatPieceList(movedPieces);
+        return "Now that orientation is locked, we are permuting pieces. This move rearranges $pieceNames.";
+      }
+
+      return "The cube is in the simplified H-subgroup. We are rearranging the remaining pieces using only the following moves: U, D, L2, R2, F2, B2 — to reach the final solved state.";
+    }
+  }
+
+  static List<String> _identifyMovedPieces(CubeState before, CubeState after) {
+    final moved = <String>[];
+
+    // Check edges
+    for (final slot in _edgeSlots) {
+      if (!_isEdgeEqual(before, after, slot)) {
+        final currentPiece = _getEdgeColors(after, slot);
+        moved.add(_getEdgeNameFromColors(currentPiece));
+      }
+    }
+
+    // Check corners
+    for (final slot in _cornerSlots) {
+      if (!_isCornerEqual(before, after, slot)) {
+        final currentPiece = _getCornerColors(after, slot);
+        moved.add(_getCornerNameFromColors(currentPiece));
+      }
+    }
+
+    // De-duplicate: the same piece might be detected in multiple slots if it's large,
+    // but here slots are unique to pieces. However, piece names might repeat if orientation is different?
+    // Actually piece names are like "White-Blue edge", which is unique.
+    return moved.toSet().toList();
+  }
+
+  static String _formatPieceList(List<String> pieces) {
+    if (pieces.isEmpty) return "";
+    if (pieces.length == 1) return "the ${pieces[0]}";
+    if (pieces.length <= 4) {
+      final last = pieces.removeLast();
+      return "the ${pieces.join(', ')} and $last";
+    }
+    // If too many, just summarize
+    return "several pieces, including the ${pieces[0]} and ${pieces[1]}";
+  }
+
+
+  static List<int> _findFlippedEdges(KociembaCube before, KociembaCube after) {
+
+    final flipped = <int>[];
+    for (int i = 0; i < 12; i++) {
+      if (before.eo[i] == 1 && after.eo[i] == 0) {
+        flipped.add(before.ep[i]); // Get the piece index
+      }
+    }
+    return flipped;
+  }
+
+  static List<int> _findMovedToSlice(KociembaCube before, KociembaCube after) {
+    final moved = <int>[];
+    // Middle edges are 8, 9, 10, 11
+    for (int i = 0; i < 12; i++) {
+      // Check if a middle-layer edge (8-11) was NOT in a middle-layer slot (8-11) but now IS.
+      final pieceIdx = before.ep[i];
+      if (pieceIdx >= 8) {
+        final wasInSlice = i >= 8;
+        // Find where this piece is in 'after'
+        int nowIdx = -1;
+        for (int j = 0; j < 12; j++) {
+          if (after.ep[j] == pieceIdx) {
+            nowIdx = j;
+            break;
+          }
+        }
+        if (!wasInSlice && nowIdx >= 8) {
+          moved.add(pieceIdx);
         }
       }
-
-      if (keyInfo != null) {
-        return "Now that orientation is locked, we are permuting pieces. This move solves the ${keyInfo.pieceName} into its final position.$restrictionNote";
-      }
-
-      return "The cube is in the simplified H-subgroup. We are rearranging the remaining pieces using only the following moves: U, D, L2, R2, F2, B2 — to reach the final solved state.$restrictionNote";
     }
+    return moved;
+  }
+
+  static String _getPieceNames(List<int> pieceIndices, KociembaCube cube) {
+    if (pieceIndices.isEmpty) return "";
+    final names = pieceIndices.map((idx) {
+      final colors = cube.edgeColors[Edge.values[idx]]!;
+      return "${_getColorName(colors[0])}-${_getColorName(colors[1])} edge";
+    }).toList();
+
+    if (names.length == 1) return "the ${names[0]}";
+    if (names.length == 2) return "the ${names[0]} and ${names[1]}";
+
+    final last = names.removeLast();
+    return "the ${names.join(', ')} and $last";
   }
 
   static String _getFaceFullName(CubeFace face) {
     switch (face) {
-      case CubeFace.u:
-        return "Top";
-      case CubeFace.d:
-        return "Bottom";
-      case CubeFace.f:
-        return "Front";
-      case CubeFace.b:
-        return "Back";
-      case CubeFace.r:
-        return "Right";
-      case CubeFace.l:
-        return "Left";
+      case CubeFace.u: return "Top";
+      case CubeFace.d: return "Bottom";
+      case CubeFace.f: return "Front";
+      case CubeFace.b: return "Back";
+      case CubeFace.r: return "Right";
+      case CubeFace.l: return "Left";
+      case CubeFace.x: return "Whole Cube (X)";
+      case CubeFace.y: return "Whole Cube (Y)";
+      case CubeFace.z: return "Whole Cube (Z)";
+      case CubeFace.m: return "Middle Slice (M)";
+      case CubeFace.e: return "Equatorial Slice (E)";
+      case CubeFace.s: return "Standing Slice (S)";
     }
   }
 
@@ -254,11 +340,14 @@ class MoveExplainer {
 
   static String _getEdgeNameFromColors(Set<CubeColor> colors) {
     final list = colors.toList();
+    // Sort colors to have a stable name (e.g., White/Yellow first)
+    list.sort((a, b) => a.index.compareTo(b.index));
     return "${_getColorName(list[0])}-${_getColorName(list[1])} edge";
   }
 
   static String _getCornerNameFromColors(Set<CubeColor> colors) {
     final list = colors.toList();
+    list.sort((a, b) => a.index.compareTo(b.index));
     return "${_getColorName(list[0])}-${_getColorName(list[1])}-${_getColorName(list[2])} corner";
   }
 
@@ -274,18 +363,13 @@ class MoveExplainer {
 
   static String _getFaceAbbr(CubeFace face) {
     switch (face) {
-      case CubeFace.u:
-        return "Top";
-      case CubeFace.d:
-        return "Bottom";
-      case CubeFace.f:
-        return "Front";
-      case CubeFace.b:
-        return "Back";
-      case CubeFace.r:
-        return "Right";
-      case CubeFace.l:
-        return "Left";
+      case CubeFace.u: return "Top";
+      case CubeFace.d: return "Bottom";
+      case CubeFace.f: return "Front";
+      case CubeFace.b: return "Back";
+      case CubeFace.r: return "Right";
+      case CubeFace.l: return "Left";
+      default: return "Rotate";
     }
   }
 

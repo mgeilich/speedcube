@@ -74,20 +74,32 @@ class Polygon {
     return len > 0 ? Vec3(nx / len, ny / len, nz / len) : Vec3(0, 0, 1);
   }
 
-  bool isOnSlice(CubeFace face) {
-    switch (face) {
+  bool isOnMove(CubeMove move) {
+    if (move.face == CubeFace.x || move.face == CubeFace.y || move.face == CubeFace.z) return true;
+    
+    switch (move.face) {
       case CubeFace.u:
-        return cubieY == 1;
+        return cubieY == 1 || (move.isWide && cubieY == 0);
       case CubeFace.d:
-        return cubieY == -1;
+        return cubieY == -1 || (move.isWide && cubieY == 0);
       case CubeFace.r:
-        return cubieX == 1;
+        return cubieX == 1 || (move.isWide && cubieX == 0);
       case CubeFace.l:
-        return cubieX == -1;
+        return cubieX == -1 || (move.isWide && cubieX == 0);
       case CubeFace.f:
-        return cubieZ == 1;
+        return cubieZ == 1 || (move.isWide && cubieZ == 0);
       case CubeFace.b:
-        return cubieZ == -1;
+        return cubieZ == -1 || (move.isWide && cubieZ == 0);
+      case CubeFace.m:
+        return cubieX == 0;
+      case CubeFace.e:
+        return cubieY == 0;
+      case CubeFace.s:
+        return cubieZ == 0;
+      case CubeFace.x:
+      case CubeFace.y:
+      case CubeFace.z:
+        return true;
     }
   }
 }
@@ -150,11 +162,11 @@ class CubeRenderer extends CustomPainter {
     }
 
     for (final poly in polys) {
-      final onSlice =
-          animatingMove != null && poly.isOnSlice(animatingMove!.face);
+      final onMove =
+          animatingMove != null && poly.isOnMove(animatingMove!);
       poly.verts = poly.verts.map((v) {
         var p = v.clone();
-        if (onSlice) p = _applyMove(p, animatingMove!, animationProgress);
+        if (onMove) p = _applyMove(p, animatingMove!, animationProgress);
         p = p.rotateY(rotationY).rotateX(rotationX);
         return p;
       }).toList();
@@ -357,6 +369,8 @@ class CubeRenderer extends CustomPainter {
             return Vec3(cx + off, cy + p.dy, cz - p.dx);
           case CubeFace.l:
             return Vec3(cx - off, cy + p.dy, cz + p.dx);
+          default:
+            return Vec3(cx, cy, cz);
         }
       }).toList();
     } else {
@@ -408,6 +422,9 @@ class CubeRenderer extends CustomPainter {
             Vec3(cx - s, cy + s, cz + s),
             Vec3(cx - s, cy + s, cz - s)
           ];
+          break;
+        default:
+          verts = [];
           break;
       }
     }
@@ -493,6 +510,10 @@ class CubeRenderer extends CustomPainter {
         col = cz + 1;
         row = 1 - cy;
         break;
+      default:
+        col = 0;
+        row = 0;
+        break;
     }
     return Offset(col.toDouble(), row.toDouble());
   }
@@ -512,6 +533,18 @@ class CubeRenderer extends CustomPainter {
         return p.rotateZ(-angle);
       case CubeFace.b:
         return p.rotateZ(angle);
+      case CubeFace.x:
+        return p.rotateX(-angle);
+      case CubeFace.y:
+        return p.rotateY(-angle);
+      case CubeFace.z:
+        return p.rotateZ(-angle);
+      case CubeFace.m:
+        return p.rotateX(angle); // M is in direction of L
+      case CubeFace.e:
+        return p.rotateY(angle); // E is in direction of D
+      case CubeFace.s:
+        return p.rotateZ(-angle); // S is in direction of F
     }
   }
 

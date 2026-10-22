@@ -1,7 +1,7 @@
 import 'cube_move.dart';
 
 /// Categories for algorithm cases
-enum AlgCategory { f2l, oll, pll }
+enum AlgCategory { f2l, oll, pll, cmll, winterVariation, coll, commutators }
 
 /// A single algorithm case (OLL or PLL)
 class AlgCase {
@@ -42,29 +42,28 @@ class AlgCase {
 /// Static library of all OLL and PLL algorithm cases.
 /// All algorithms use only standard face notation: U D R L F B (with ' and 2).
 class AlgLibrary {
-  static const List<AlgCase> all = [...f2lCases, ...ollCases, ...pllCases];
+  static const List<AlgCase> all = [...f2lCases, ...ollCases, ...pllCases, ...cmllCases, ...winterVariationCases, ...collCases, ...commutatorCases];
 
   static List<AlgCase> get f2l => f2lCases;
   static List<AlgCase> get oll => ollCases;
   static List<AlgCase> get pll => pllCases;
+  static List<AlgCase> get cmll => cmllCases;
+  static List<AlgCase> get winterVariation => winterVariationCases;
+  static List<AlgCase> get coll => collCases;
+  static List<AlgCase> get commutators => commutatorCases;
 
   // ─────────────────────────────────────────────────────────────────────────
   // OLL CASES
   // OLL = Orient Last Layer. The goal is to make the top face all yellow.
-  // Each case describes the pattern of yellow stickers visible on top.
-  // ─────────────────────────────────────────────────────────────────────────
   static const List<AlgCase> ollCases = [
-    // ── Dot ──────────────────────────────────────────────────────────────
-    // No edges are oriented — only the center is yellow on top.
     AlgCase(
       id: 'oll1',
       name: 'OLL 1',
       category: AlgCategory.oll,
       subcategory: 'Dot',
       algorithm: "R U2 R2 F R F' U2 R' F R F'",
-      setupMoves: "F R' F' R U2 R U2 R2 F' R F",
-      description:
-          'Dot: no edges oriented. Combines a Sune with an F-move setup. One of the hardest OLL cases — 11 moves.',
+      setupMoves: "F R' F' R U2 F R' F' R2 U2 R'",
+      description: 'Dot: no edges oriented. Combines a Sune with an F-move setup.',
       isFree: true,
     ),
     AlgCase(
@@ -72,10 +71,9 @@ class AlgLibrary {
       name: 'OLL 2',
       category: AlgCategory.oll,
       subcategory: 'Dot',
-      algorithm: "F R U R' U' F' B U R U' R' B'",
-      setupMoves: "B R U R' U' B' F R U R' U' F'",
-      description:
-          'Dot: no edges oriented. Uses two "sexy move" triggers — one on F, one on B. Symmetric and satisfying to execute.',
+      algorithm: "r U r' U2 r U2 R' U2 R U' r'",
+      setupMoves: "Rw U R' U2 R U2 Rw' U2 Rw U' Rw'",
+      description: 'Dot: no edges oriented. Standard wide-move algorithm.',
       isFree: true,
     ),
     AlgCase(
@@ -83,36 +81,174 @@ class AlgLibrary {
       name: 'OLL 3',
       category: AlgCategory.oll,
       subcategory: 'Dot',
-      algorithm: "B U R U' R' B' U' F R U R' U' F'",
-      setupMoves: "F R U R' U' F' U B U R U' R' B'",
-      description:
-          'Dot: no edges oriented. A B-face trigger followed by a U\' and an F-face trigger. The U\' between them is key.',
-      isFree: true,
+      algorithm: "r' R2 U R' U r U2 r' U M'",
+      setupMoves: "M U' Rw U2 Rw' U' R U' R2 Rw",
+      description: 'Dot: center and 2 adjacent corners oriented.',
     ),
     AlgCase(
       id: 'oll4',
       name: 'OLL 4',
       category: AlgCategory.oll,
       subcategory: 'Dot',
-      algorithm: "B U R U' R' B' U F R U R' U' F'",
-      setupMoves: "F R U R' U' F' U' B U R U' R' B'",
-      description:
-          'Dot: no edges oriented. Like OLL 3 but with U instead of U\' between the two triggers. Mirror of OLL 3.',
+      algorithm: "M U' r U2 r' U' R U' R' M'",
+      setupMoves: "M R U R' U Rw U2 Rw' U M'",
+      description: 'Dot: center and 2 diagonal corners oriented.',
     ),
-
-    // ── Cross ─────────────────────────────────────────────────────────────
-    // All 4 edges are oriented — a yellow cross is visible on top.
-    // These are the most common OLL cases for beginners.
+    AlgCase(
+      id: 'oll5',
+      name: 'OLL 5',
+      category: AlgCategory.oll,
+      subcategory: 'Square',
+      algorithm: "l' U2 L U L' U l",
+      setupMoves: "Lw' U' L U' L' U2 Lw",
+      description: 'Square: a 1×2 block of yellow in the back-left corner.',
+    ),
+    AlgCase(
+      id: 'oll6',
+      name: 'OLL 6',
+      category: AlgCategory.oll,
+      subcategory: 'Square',
+      algorithm: "r U2 R' U' R U' r'",
+      setupMoves: "Rw U R' U R U2 Rw'",
+      description: 'Square: mirror of OLL 5. Block in the back-right.',
+    ),
+    AlgCase(
+      id: 'oll7',
+      name: 'OLL 7',
+      category: AlgCategory.oll,
+      subcategory: 'Lightning',
+      algorithm: "r U R' U R U2 r'",
+      setupMoves: "Rw U2 R' U' R U' Rw'",
+      description: 'Lightning: only 7 moves — a right-hand wide Sune.',
+    ),
+    AlgCase(
+      id: 'oll8',
+      name: 'OLL 8',
+      category: AlgCategory.oll,
+      subcategory: 'Lightning',
+      algorithm: "l' U' L U' L' U2 l",
+      setupMoves: "Lw' U2 L U L' U Lw",
+      description: 'Lightning: mirror of OLL 7. Left-hand wide Sune.',
+    ),
+    AlgCase(
+      id: 'oll9',
+      name: 'OLL 9',
+      category: AlgCategory.oll,
+      subcategory: 'Fish',
+      algorithm: "R U R' U' R' F R2 U R' U' F'",
+      setupMoves: "F U R U' R2 F' R U R U' R'",
+      description: 'Fish: one corner and one edge oriented.',
+    ),
+    AlgCase(
+      id: 'oll10',
+      name: 'OLL 10',
+      category: AlgCategory.oll,
+      subcategory: 'Fish',
+      algorithm: "R U R' U R' F R F' R U2 R'",
+      setupMoves: "R U2 R' F R' F' R U' R U' R'",
+      description: 'Fish: mirror of OLL 9.',
+    ),
+    AlgCase(
+      id: 'oll11',
+      name: 'OLL 11',
+      category: AlgCategory.oll,
+      subcategory: 'Lightning',
+      algorithm: "r U R' U R' F R F' R U2 r'",
+      setupMoves: "Rw U2 R' F R' F' R U' R U' Rw'",
+      description: 'Lightning: 11-move algorithm using wide moves and an F-trigger.',
+    ),
+    AlgCase(
+      id: 'oll12',
+      name: 'OLL 12',
+      category: AlgCategory.oll,
+      subcategory: 'Lightning',
+      algorithm: "M' R' U' R U' R' U2 R U' R r'",
+      setupMoves: "Rw R' U R' U2 R U R' U R M",
+      description: 'Lightning: mirror of OLL 11.',
+    ),
+    AlgCase(
+      id: 'oll13',
+      name: 'OLL 13',
+      category: AlgCategory.oll,
+      subcategory: 'Knight Move',
+      algorithm: "F U R U' R2 F' R U R U' R'",
+      setupMoves: "R U R' U' R' F R2 U R' U' F'",
+      description: 'Knight Move: asymmetric pattern with one edge and one corner.',
+    ),
+    AlgCase(
+      id: 'oll14',
+      name: 'OLL 14',
+      category: AlgCategory.oll,
+      subcategory: 'Knight Move',
+      algorithm: "R' F R U R' F' R F U' F' ",
+      setupMoves: "F U F' R' F R U' R' F' R",
+      description: 'Knight Move: mirror of OLL 13.',
+    ),
+    AlgCase(
+      id: 'oll15',
+      name: 'OLL 15',
+      category: AlgCategory.oll,
+      subcategory: 'Knight Move',
+      algorithm: "l' U' l L' U' L U l' U l",
+      setupMoves: "Lw' U' Lw U' L' U L Lw' U Lw",
+      description: 'Knight Move: rhythmic left-hand algorithm.',
+    ),
+    AlgCase(
+      id: 'oll16',
+      name: 'OLL 16',
+      category: AlgCategory.oll,
+      subcategory: 'Knight Move',
+      algorithm: "r U r' R U R' U' r U' r'",
+      setupMoves: "Rw U Rw' U R U' R' Rw U' Rw'",
+      description: 'Knight Move: mirror of OLL 15.',
+    ),
+    AlgCase(
+      id: 'oll17',
+      name: 'OLL 17',
+      category: AlgCategory.oll,
+      subcategory: 'Dot',
+      algorithm: "F R' F' R2 r' U R U' R' U' M'",
+      setupMoves: "M U R U R' U' Rw R2 F R F'",
+      description: 'Dot: diagonal corners, one edge.',
+    ),
+    AlgCase(
+      id: 'oll18',
+      name: 'OLL 18',
+      category: AlgCategory.oll,
+      subcategory: 'Dot',
+      algorithm: "r U R' U R U2 r2 U' R U' R' U2 r",
+      setupMoves: "Rw' U2 R U R' U Rw2 U2 R' U' R U' Rw'",
+      description: 'Dot: adjacent corners, one edge.',
+    ),
+    AlgCase(
+      id: 'oll19',
+      name: 'OLL 19',
+      category: AlgCategory.oll,
+      subcategory: 'Dot',
+      algorithm: "r' R U R U R' U' M' R' F R F'",
+      setupMoves: "F R' F' R M U R U' R' U' R' Rw",
+      description: 'Dot: diagonal corners, one edge (mirror of 17).',
+    ),
+    AlgCase(
+      id: 'oll20',
+      name: 'OLL 20',
+      category: AlgCategory.oll,
+      subcategory: 'Dot',
+      algorithm: "r U R' U' M2 U R U' R' U' M'",
+      setupMoves: "M U R U R' U' M2 U R U' Rw'",
+      description: 'Dot: adjacent corners, one edge (mirror of 18).',
+    ),
     AlgCase(
       id: 'oll21',
       name: 'OLL 21',
       category: AlgCategory.oll,
       subcategory: 'Cross',
-      algorithm: "R U2 R' U' R U R' U' R U' R'",
-      setupMoves: "R U R' U R U' R' U R U2 R'",
-      description:
-          'Cross: all edges oriented. Called "Anti-Sune" — the reverse of the Sune. All 4 corners are twisted. Very common case.',
+      algorithm: "R U R' U R U' R' U R U2 R'",
+      setupMoves: "R U2 R' U' R U R' U' R U' R'",
+      description: 'H-Pattern: All 4 corners face sideways (Left and Right).',
     ),
+
+
     AlgCase(
       id: 'oll22',
       name: 'OLL 22',
@@ -120,39 +256,38 @@ class AlgLibrary {
       subcategory: 'Cross',
       algorithm: "R U2 R2 U' R2 U' R2 U2 R",
       setupMoves: "R' U2 R2 U R2 U R2 U2 R'",
-      description:
-          'Cross: all edges oriented. Called "Pi" — two corners point up on opposite sides. Short and efficient at 9 moves.',
+      description: 'Pi-Pattern: Headlights face front, back corners face out.',
     ),
     AlgCase(
       id: 'oll23',
       name: 'OLL 23',
       category: AlgCategory.oll,
       subcategory: 'Cross',
-      algorithm: "R2 D' R U2 R' D R U2 R",
-      setupMoves: "R' U2 R' D' R U2 R D R2",
-      description:
-          'Cross: all edges oriented. Called "Headlights" — two adjacent corners face the same direction. Uses a D-move which is unusual for OLL.',
+      algorithm: "R2 D R' U2 R D' R' U2 R'",
+      setupMoves: "R U2 R D R' U2 R D' R2",
+      description: 'U-Pattern: Headlights on front, back corners oriented.',
     ),
+
     AlgCase(
       id: 'oll24',
       name: 'OLL 24',
       category: AlgCategory.oll,
       subcategory: 'Cross',
-      algorithm: "L' U' L U L F' L' F",
-      setupMoves: "F' L F L' U' L U L'",
-      description:
-          'Cross: all edges oriented. A left-hand version of a common trigger. Only 8 moves — one of the shorter cross cases.',
+      algorithm: "r U R' U' r' F R F'",
+      setupMoves: "F R' F' r U R U' r'",
+      description: 'T-Pattern: One side oriented, other corners face Front and Back.',
     ),
+
     AlgCase(
       id: 'oll25',
       name: 'OLL 25',
       category: AlgCategory.oll,
       subcategory: 'Cross',
-      algorithm: "F' L' U' L U F",
-      setupMoves: "F' U' L U L' F",
-      description:
-          'Cross: all edges oriented. Just 6 moves — the shortest OLL algorithm. A simple F-trigger on the left side.',
+      algorithm: "F' r U R' U' r' F R",
+      setupMoves: "R' F' r U R U' r' F",
+      description: 'L-Pattern: Bowtie. Diagonal corners oriented.',
     ),
+
     AlgCase(
       id: 'oll26',
       name: 'OLL 26',
@@ -160,8 +295,7 @@ class AlgLibrary {
       subcategory: 'Cross',
       algorithm: "R U2 R' U' R U' R'",
       setupMoves: "R U R' U R U2 R'",
-      description:
-          'Cross: all edges oriented. The classic "Sune" — one of the first OLL algorithms beginners learn. Only 7 moves.',
+      description: 'Anti-Sune: One corner oriented.',
       isFree: true,
     ),
     AlgCase(
@@ -171,13 +305,54 @@ class AlgLibrary {
       subcategory: 'Cross',
       algorithm: "R U R' U R U2 R'",
       setupMoves: "R U2 R' U' R U' R'",
-      description:
-          'Cross: all edges oriented. The "Anti-Sune" (right-hand version). Mirror of OLL 26. Also only 7 moves.',
+      description: 'Sune: One corner oriented.',
       isFree: true,
     ),
-
-    // ── T-shape ───────────────────────────────────────────────────────────
-    // Two adjacent edges oriented, forming a T with the center.
+    AlgCase(
+      id: 'oll28',
+      name: 'OLL 28',
+      category: AlgCategory.oll,
+      subcategory: 'S-shape',
+      algorithm: "r U R' U' r' R U R U' R'",
+      setupMoves: "R U R' U' R' Rw U R U' Rw'",
+      description: 'S-shape: also called Z-shape. Efficient 11-move alg.',
+    ),
+    AlgCase(
+      id: 'oll29',
+      name: 'OLL 29',
+      category: AlgCategory.oll,
+      subcategory: 'Awkward Shape',
+      algorithm: "R U R' U' R U' R' F' U' F R U R' ",
+      setupMoves: "R U' R' F' U F R U R' U R U' R'",
+      description: 'Awkward Shape: "Spotted Chameleon". Mirror of OLL 30.',
+    ),
+    AlgCase(
+      id: 'oll30',
+      name: 'OLL 30',
+      category: AlgCategory.oll,
+      subcategory: 'Awkward Shape',
+      algorithm: "F R' F R2 U' R' U' R U R' F2",
+      setupMoves: "F2 R U' R' U R U R2 F' R F'",
+      description: 'Awkward Shape: "Anti-Spotted Chameleon". Mirror of OLL 29.',
+    ),
+    AlgCase(
+      id: 'oll31',
+      name: 'OLL 31',
+      category: AlgCategory.oll,
+      subcategory: 'P-shape',
+      algorithm: "S R U R' U' R' F R f'",
+      setupMoves: "Fw R' F' R U R U' R' S'",
+      description: 'P-shape: rhythmic trigger-based algorithm.',
+    ),
+    AlgCase(
+      id: 'oll32',
+      name: 'OLL 32',
+      category: AlgCategory.oll,
+      subcategory: 'P-shape',
+      algorithm: "L U F' U' L' U L F L'",
+      setupMoves: "L F' L' U' L U F U' L'",
+      description: 'P-shape: mirror of OLL 31.',
+    ),
     AlgCase(
       id: 'oll33',
       name: 'OLL 33',
@@ -185,307 +360,17 @@ class AlgLibrary {
       subcategory: 'T-shape',
       algorithm: "R U R' U' R' F R F'",
       setupMoves: "F R' F' R U R U' R'",
-      description:
-          'T-shape: two adjacent edges oriented. One of the most common OLL cases. The algorithm is a "sexy move" followed by a sledgehammer.',
+      description: 'T-shape: "sexy move" followed by a sledgehammer.',
       isFree: true,
     ),
-    AlgCase(
-      id: 'oll45',
-      name: 'OLL 45',
-      category: AlgCategory.oll,
-      subcategory: 'T-shape',
-      algorithm: "F R U R' U' F'",
-      setupMoves: "F U R U' R' F'",
-      description:
-          'T-shape: two adjacent edges oriented. Just 6 moves — "F sexy F\'". The most beginner-friendly OLL. Often learned first.',
-      isFree: true,
-    ),
-
-    // ── Square ────────────────────────────────────────────────────────────
-    // Two adjacent stickers form a square block in one corner of the top.
-    AlgCase(
-      id: 'oll5',
-      name: 'OLL 5',
-      category: AlgCategory.oll,
-      subcategory: 'Square',
-      algorithm: "L' U2 L U L' U L",
-      setupMoves: "L' U' L U' L U2 L'",
-      description:
-          'Square: a 1×2 block of yellow in the back-left corner. A left-hand Sune variant — only 7 moves.',
-    ),
-    AlgCase(
-      id: 'oll6',
-      name: 'OLL 6',
-      category: AlgCategory.oll,
-      subcategory: 'Square',
-      algorithm: "R U2 R' U' R U' R'",
-      setupMoves: "R U R' U R U2 R'",
-      description:
-          'Square: a 1×2 block of yellow in the back-right corner. The right-hand Sune — same as OLL 26. Mirror of OLL 5.',
-    ),
-
-    // ── C-shape ───────────────────────────────────────────────────────────
-    // Two opposite edges oriented, with corners on one side — looks like a C.
     AlgCase(
       id: 'oll34',
       name: 'OLL 34',
       category: AlgCategory.oll,
       subcategory: 'C-shape',
       algorithm: "R U R2 U' R' F R U R U' F'",
-      setupMoves: "F U R' U R F' R U R2 U' R'",
-      description:
-          'C-shape: two opposite edges oriented. An 11-move algorithm that combines an R-move setup with an F-trigger.',
-    ),
-    AlgCase(
-      id: 'oll46',
-      name: 'OLL 46',
-      category: AlgCategory.oll,
-      subcategory: 'C-shape',
-      algorithm: "R' U' R' F R F' U R",
-      setupMoves: "R' U' F' R F R U R",
-      description:
-          'C-shape: two opposite edges oriented. Only 8 moves. Uses an F-trigger in the middle — efficient and elegant.',
-    ),
-
-    // ── W-shape ───────────────────────────────────────────────────────────
-    // The yellow pattern resembles a W across the top.
-    AlgCase(
-      id: 'oll36',
-      name: 'OLL 36',
-      category: AlgCategory.oll,
-      subcategory: 'W-shape',
-      algorithm: "R U R' F' R U R' U' R' F R2 U' R'",
-      setupMoves: "R U R2 F' R U' R U R' F R U' R'",
-      description:
-          'W-shape: a wide asymmetric yellow pattern. A 13-move algorithm — one of the longer OLL cases. Requires careful finger-tricking.',
-    ),
-    AlgCase(
-      id: 'oll38',
-      name: 'OLL 38',
-      category: AlgCategory.oll,
-      subcategory: 'W-shape',
-      algorithm: "R U R' U R U' R' U' R' F R F'",
-      setupMoves: "F R' F' R U R U' R' U R U' R'",
-      description:
-          'W-shape: mirror of OLL 36. An 11-move algorithm ending in a sledgehammer. The U\' U\' in the middle is the key rhythm.',
-    ),
-
-    // ── L-shape ───────────────────────────────────────────────────────────
-    // Two adjacent edges oriented, with the pattern forming an L.
-    AlgCase(
-      id: 'oll47',
-      name: 'OLL 47',
-      category: AlgCategory.oll,
-      subcategory: 'L-shape',
-      algorithm: "F' L' U' L U L' U' L U F",
-      setupMoves: "F' U' L U L' U' L U L' F",
-      description:
-          'L-shape: two adjacent edges, corners on one side. A left-hand trigger wrapped in F\' … F. 10 moves.',
-    ),
-    AlgCase(
-      id: 'oll48',
-      name: 'OLL 48',
-      category: AlgCategory.oll,
-      subcategory: 'L-shape',
-      algorithm: "F R U R' U' R U R' U' F'",
-      setupMoves: "F U R U' R' U R U' R' F'",
-      description:
-          'L-shape: mirror of OLL 47. A double sexy move wrapped in F … F\'. 10 moves.',
-    ),
-    AlgCase(
-      id: 'oll49',
-      name: 'OLL 49',
-      category: AlgCategory.oll,
-      subcategory: 'L-shape',
-      algorithm: "R B' R2 F R2 B R2 F' R",
-      setupMoves: "R' F R2 B' R2 F' R2 B R'",
-      description:
-          'L-shape: uses B-face moves which are unusual for OLL. The R2 moves make this recognizable by sound.',
-    ),
-    AlgCase(
-      id: 'oll50',
-      name: 'OLL 50',
-      category: AlgCategory.oll,
-      subcategory: 'L-shape',
-      algorithm: "R' F R2 B' R2 F' R2 B R'",
-      setupMoves: "R B' R2 F R2 B R2 F' R",
-      description:
-          'L-shape: mirror of OLL 49. Same B-face structure, reversed. Setup and algorithm are each other\'s inverse.',
-    ),
-    AlgCase(
-      id: 'oll53',
-      name: 'OLL 53',
-      category: AlgCategory.oll,
-      subcategory: 'L-shape',
-      algorithm: "L' U' L U' L' U L U' L' U2 L",
-      setupMoves: "L' U2 L U' L' U L U' L' U L",
-      description:
-          'L-shape: a left-hand 11-move algorithm. The repeated L\' U L pattern makes it easy to learn with muscle memory.',
-    ),
-    AlgCase(
-      id: 'oll54',
-      name: 'OLL 54',
-      category: AlgCategory.oll,
-      subcategory: 'L-shape',
-      algorithm: "R U R' U R U' R' U R U2 R'",
-      setupMoves: "R U2 R' U R U' R' U R U' R'",
-      description:
-          'L-shape: mirror of OLL 53. A right-hand 11-move algorithm. The U2 at the end is the key distinguishing move.',
-    ),
-
-    // ── P-shape ───────────────────────────────────────────────────────────
-    // The yellow pattern resembles the letter P.
-    AlgCase(
-      id: 'oll31',
-      name: 'OLL 31',
-      category: AlgCategory.oll,
-      subcategory: 'P-shape',
-      algorithm: "R' U' F U R U' R' F' R",
-      setupMoves: "R' F R U R' F' U' R",
-      description:
-          'P-shape: one edge and two corners oriented. A 9-move algorithm with an F-move in the middle — elegant and efficient.',
-    ),
-    AlgCase(
-      id: 'oll32',
-      name: 'OLL 32',
-      category: AlgCategory.oll,
-      subcategory: 'P-shape',
-      algorithm: "R U B' U' R' U R B R'",
-      setupMoves: "R' B' R U' R B U R'",
-      description:
-          'P-shape: mirror of OLL 31. Uses a B-face move instead of F. 9 moves — same length as its mirror.',
-    ),
-    AlgCase(
-      id: 'oll43',
-      name: 'OLL 43',
-      category: AlgCategory.oll,
-      subcategory: 'P-shape',
-      algorithm: "R' U' F' U F R",
-      setupMoves: "R' F' U' F U R",
-      description:
-          'P-shape: only 6 moves — one of the shortest OLL algorithms. A simple right-hand trigger with F-moves.',
-    ),
-    AlgCase(
-      id: 'oll44',
-      name: 'OLL 44',
-      category: AlgCategory.oll,
-      subcategory: 'P-shape',
-      algorithm: "R U F U' F' R'",
-      setupMoves: "R F U F' U' R'",
-      description:
-          'P-shape: mirror of OLL 43. Also just 6 moves. The F U\' F\' in the middle is a reverse trigger.',
-    ),
-
-    // ── S-shape ───────────────────────────────────────────────────────────
-    // The yellow pattern resembles an S or Z across the top.
-    AlgCase(
-      id: 'oll28',
-      name: 'OLL 28',
-      category: AlgCategory.oll,
-      subcategory: 'S-shape',
-      algorithm: "L F' L' F U F U' F'",
-      setupMoves: "F U F' U' F' L F L'",
-      description:
-          'S-shape: two opposite edges oriented diagonally. An 8-move algorithm mixing L and F triggers.',
-    ),
-    AlgCase(
-      id: 'oll57',
-      name: 'OLL 57',
-      category: AlgCategory.oll,
-      subcategory: 'S-shape',
-      algorithm: "R U R' U' L' U R U' R' L",
-      setupMoves: "L' U R U' R' L U R U' R'",
-      description:
-          'S-shape: uses both R and L moves — unusual for OLL. The L at the end is the key move that orients the last corner.',
-    ),
-
-    // ── Z-shape ───────────────────────────────────────────────────────────
-    // Two opposite edges oriented, corners on both sides — looks like a Z.
-    AlgCase(
-      id: 'oll29',
-      name: 'OLL 29',
-      category: AlgCategory.oll,
-      subcategory: 'Z-shape',
-      algorithm: "R U R' U' R U' R' F' U' F R U R'",
-      setupMoves: "R' U' R F' U F R U R' U R U' R'",
-      description:
-          'Z-shape: a 13-move algorithm. The F\' U\' F in the middle is a reverse trigger that flips two corners.',
-    ),
-    AlgCase(
-      id: 'oll30',
-      name: 'OLL 30',
-      category: AlgCategory.oll,
-      subcategory: 'Z-shape',
-      algorithm: "F U R U2 R' U' R U2 R' U' F'",
-      setupMoves: "F U R U2 R' U R U2 R' U' F'",
-      description:
-          'Z-shape: mirror of OLL 29. An 11-move algorithm. The U2 moves inside the F … F\' wrapper are the key rhythm.',
-    ),
-
-    // ── Knight Move ───────────────────────────────────────────────────────
-    // The yellow pattern resembles an L-shaped knight move in chess.
-    AlgCase(
-      id: 'oll13',
-      name: 'OLL 13',
-      category: AlgCategory.oll,
-      subcategory: 'Knight Move',
-      algorithm: "F U R U' R2 F' R U R U' R'",
-      setupMoves: "R U R' U R F R2 F' U' R U' R'",
-      description:
-          'Knight Move: an asymmetric pattern with one edge and one corner. The R2 in the middle is the distinguishing move.',
-    ),
-    AlgCase(
-      id: 'oll14',
-      name: 'OLL 14',
-      category: AlgCategory.oll,
-      subcategory: 'Knight Move',
-      algorithm: "R' F R U R' F' R F U' F'",
-      setupMoves: "F U F' R' F R U' R' F' R",
-      description:
-          'Knight Move: mirror of OLL 13. Uses alternating R and F triggers. 10 moves.',
-    ),
-    AlgCase(
-      id: 'oll15',
-      name: 'OLL 15',
-      category: AlgCategory.oll,
-      subcategory: 'Knight Move',
-      algorithm: "L' U' L U' L' U L U' L' U2 L",
-      setupMoves: "L' U2 L U' L' U L U' L' U L",
-      description:
-          'Knight Move: a left-hand 11-move algorithm. The repeated L\' U L pattern with decreasing U counts is the key.',
-    ),
-    AlgCase(
-      id: 'oll16',
-      name: 'OLL 16',
-      category: AlgCategory.oll,
-      subcategory: 'Knight Move',
-      algorithm: "R U R' U R U' R' U R U2 R'",
-      setupMoves: "R U2 R' U R U' R' U R U' R'",
-      description:
-          'Knight Move: mirror of OLL 15. Right-hand version. The U2 at the end distinguishes it from other R-move sequences.',
-    ),
-
-    // ── Fish ─────────────────────────────────────────────────────────────
-    // The yellow pattern resembles a fish shape on the top layer.
-    AlgCase(
-      id: 'oll9',
-      name: 'OLL 9',
-      category: AlgCategory.oll,
-      subcategory: 'Fish',
-      algorithm: "R U R' U' R' F R2 U R' U' F'",
-      setupMoves: "F U R U' R2 F' R U R U' R'",
-      description:
-          'Fish: one corner and one edge oriented. An 11-move algorithm. The R2 in the middle is the "fish tail" move.',
-    ),
-    AlgCase(
-      id: 'oll10',
-      name: 'OLL 10',
-      category: AlgCategory.oll,
-      subcategory: 'Fish',
-      algorithm: "R U R' U R' F R F' R U2 R'",
-      setupMoves: "R U2 R' F' R F R U' R' U' R",
-      description:
-          'Fish: mirror of OLL 9. An 11-move algorithm. The F R F\' in the middle is a sledgehammer variant.',
+      setupMoves: "F U R' U' R' F' R U R2 U' R'",
+      description: 'C-shape: 11-move efficient sequence.',
     ),
     AlgCase(
       id: 'oll35',
@@ -494,8 +379,16 @@ class AlgLibrary {
       subcategory: 'Fish',
       algorithm: "R U2 R2 F R F' R U2 R'",
       setupMoves: "R U2 R' F R' F' R2 U2 R'",
-      description:
-          'Fish: a symmetric fish case. Only 9 moves. The F R F\' trigger in the middle is sandwiched between R U2 moves.',
+      description: 'Fish: symmetric fish case. Only 9 moves.',
+    ),
+    AlgCase(
+      id: 'oll36',
+      name: 'OLL 36',
+      category: AlgCategory.oll,
+      subcategory: 'W-shape',
+      algorithm: "L' U' L U' L' U L U L F' L' F",
+      setupMoves: "F' L F L' U' L' U' L U L' U L",
+      description: 'W-shape: asymmetric pattern.',
     ),
     AlgCase(
       id: 'oll37',
@@ -504,180 +397,188 @@ class AlgLibrary {
       subcategory: 'Fish',
       algorithm: "F R' F' R U R U' R'",
       setupMoves: "R U R' U' R' F R F'",
-      description:
-          'Fish: only 8 moves. A reverse sledgehammer followed by a sexy move. Very finger-trick friendly.',
-    ),
-
-    // ── Lightning ─────────────────────────────────────────────────────────
-    // The yellow pattern resembles a lightning bolt across the top.
-    AlgCase(
-      id: 'oll7',
-      name: 'OLL 7',
-      category: AlgCategory.oll,
-      subcategory: 'Lightning',
-      algorithm: "L' U' L U' L' U2 L",
-      setupMoves: "L' U2 L U L' U L",
-      description:
-          'Lightning: only 7 moves — a left-hand Sune. One of the most efficient OLL algorithms. Great for beginners.',
+      description: 'Fish: very finger-trick friendly 8-move alg.',
     ),
     AlgCase(
-      id: 'oll8',
-      name: 'OLL 8',
+      id: 'oll38',
+      name: 'OLL 38',
       category: AlgCategory.oll,
-      subcategory: 'Lightning',
-      algorithm: "R U R' U R U2 R'",
-      setupMoves: "R U2 R' U' R U' R'",
-      description:
-          'Lightning: the right-hand Sune — same as OLL 26/27. Only 7 moves. Mirror of OLL 7.',
+      subcategory: 'W-shape',
+      algorithm: "R U R' U R U' R' U' R' F R F'",
+      setupMoves: "F R' F' R U R U R' U' R U' R'",
+      description: 'W-shape: mirror of OLL 36.',
     ),
-    AlgCase(
-      id: 'oll11',
-      name: 'OLL 11',
-      category: AlgCategory.oll,
-      subcategory: 'Lightning',
-      algorithm: "L' U' L U' L' U L U' L' U2 L",
-      setupMoves: "L' U2 L U' L' U L U' L' U L",
-      description:
-          'Lightning: an 11-move left-hand algorithm. The pattern of U\' moves decreasing by one each time makes it rhythmic.',
-    ),
-    AlgCase(
-      id: 'oll12',
-      name: 'OLL 12',
-      category: AlgCategory.oll,
-      subcategory: 'Lightning',
-      algorithm: "R U R' U R U' R' U R U2 R'",
-      setupMoves: "R U2 R' U R U' R' U R U' R'",
-      description:
-          'Lightning: mirror of OLL 11. Right-hand 11-move version. The U2 at the end is the key distinguishing move.',
-    ),
-
-    // ── Awkward ───────────────────────────────────────────────────────────
-    // Cases that don't fit neatly into other shapes — often require longer algorithms.
     AlgCase(
       id: 'oll39',
       name: 'OLL 39',
       category: AlgCategory.oll,
-      subcategory: 'Awkward',
-      algorithm: "R U R' F' U' F U R U2 R'",
-      setupMoves: "R U2 R' U' F' U F R U' R'",
-      description:
-          'Awkward: a tricky 10-move case. The F\' U\' F in the middle is a reverse trigger. Often confused with similar cases.',
+      subcategory: 'Awkward Shape',
+      algorithm: "L F' L' U' L U F U' L'",
+      setupMoves: "L U F' U' L' U L F L'",
+      description: 'Awkward Shape: 9-move efficient algorithm.',
     ),
     AlgCase(
       id: 'oll40',
       name: 'OLL 40',
       category: AlgCategory.oll,
-      subcategory: 'Awkward',
+      subcategory: 'Awkward Shape',
       algorithm: "R' F R U R' U' F' U R",
       setupMoves: "R' U' F U R U' R' F' R",
-      description:
-          'Awkward: mirror of OLL 39. Only 9 moves. The F … F\' wrapper around a sexy move is the key structure.',
+      description: 'Awkward Shape: mirror of OLL 39.',
     ),
-    AlgCase(
-      id: 'oll51',
-      name: 'OLL 51',
-      category: AlgCategory.oll,
-      subcategory: 'Awkward',
-      algorithm: "B U R U' R' U R U' R' B'",
-      setupMoves: "B U R U' R' U R U' R' B'",
-      description:
-          'Awkward: a double sexy move wrapped in B … B\'. 10 moves. The B-face wrapper is unusual and requires a grip change.',
-    ),
-    AlgCase(
-      id: 'oll52',
-      name: 'OLL 52',
-      category: AlgCategory.oll,
-      subcategory: 'Awkward',
-      algorithm: "R U R' U R U' B U' B' R'",
-      setupMoves: "R B U B' U' R' U' R U' R'",
-      description:
-          'Awkward: a 10-move algorithm mixing R and B triggers. The B U\' B\' at the end is a reverse B-trigger.',
-    ),
-    AlgCase(
-      id: 'oll55',
-      name: 'OLL 55',
-      category: AlgCategory.oll,
-      subcategory: 'Awkward',
-      algorithm: "R U2 R2 U' R U' R' U2 F R F'",
-      setupMoves: "F R' F' U2 R U R' U R2 U2 R'",
-      description:
-          'Awkward: an 11-move algorithm. The F R F\' sledgehammer at the end is the key — it orients the final corner.',
-    ),
-    AlgCase(
-      id: 'oll56',
-      name: 'OLL 56',
-      category: AlgCategory.oll,
-      subcategory: 'Awkward',
-      algorithm: "L' U' L U' L' U L U' L' U2 L U R U' R'",
-      setupMoves: "R U R' U' L' U2 L U' L' U L U' L' U L",
-      description:
-          'Awkward: one of the longest OLL algorithms at 15 moves. Combines a left-hand Sune with a right-hand trigger.',
-    ),
-
-    // ── I-shape ───────────────────────────────────────────────────────────
-    // Two opposite edges oriented, with a bar of yellow across the middle.
-    AlgCase(
-      id: 'oll17',
-      name: 'OLL 17',
-      category: AlgCategory.oll,
-      subcategory: 'I-shape',
-      algorithm: "R U R' U R' F R F' U2 R' F R F'",
-      setupMoves: "F R' F' R U2 F R' F' R U' R U' R'",
-      description:
-          'I-shape: two opposite edges oriented, corners on both sides. A 13-move algorithm with two F-triggers.',
-    ),
-    AlgCase(
-      id: 'oll18',
-      name: 'OLL 18',
-      category: AlgCategory.oll,
-      subcategory: 'I-shape',
-      algorithm: "L' U' L U' L' U2 L U R U' R' U R U2 R'",
-      setupMoves: "R U2 R' U R U' R' U' L' U2 L U L' U L",
-      description:
-          'I-shape: a 15-move algorithm combining left and right Sune variants. One of the most complex OLL cases.',
-    ),
-    AlgCase(
-      id: 'oll19',
-      name: 'OLL 19',
-      category: AlgCategory.oll,
-      subcategory: 'I-shape',
-      algorithm: "L' U' L U' L' U L U F' L' F L",
-      setupMoves: "L' F' L F U' L' U L U' L' U L",
-      description:
-          'I-shape: a 12-move algorithm. The F\' L\' F L at the end is a left-hand sledgehammer that orients the last piece.',
-    ),
-    AlgCase(
-      id: 'oll20',
-      name: 'OLL 20',
-      category: AlgCategory.oll,
-      subcategory: 'I-shape',
-      algorithm: "R U R' U' L' U R U' R' L",
-      setupMoves: "L' U R U' R' L U R U' R'",
-      description:
-          'I-shape: only 10 moves. Uses both R and L moves. The L at the end is the key move that completes the orientation.',
-    ),
-
-    // ── Corners Only ──────────────────────────────────────────────────────
-    // All 4 edges are already oriented — only corners need to be fixed.
     AlgCase(
       id: 'oll41',
       name: 'OLL 41',
       category: AlgCategory.oll,
       subcategory: 'Corners Only',
-      algorithm: "R U' R' U2 R U R' U2 R U' R' U R U' R'",
-      setupMoves: "R U R' U' R U R' U2 R U' R' U2 R U R'",
-      description:
-          'Corners Only: all edges oriented, 2 corners twisted. A 15-move algorithm — the longest standard OLL. Requires patience.',
+      algorithm: "R U R' U R U2 R' F R U R' U' F'",
+      setupMoves: "F U R U' R' F' R U2 R' U' R U' R'",
+      description: 'Corners Only: all edges oriented, 2 corners twisted.',
     ),
     AlgCase(
       id: 'oll42',
       name: 'OLL 42',
       category: AlgCategory.oll,
       subcategory: 'Corners Only',
-      algorithm: "R U R' U R U' R' U' R' F R F'",
-      setupMoves: "F R' F' R U R U' R' U R U' R'",
-      description:
-          'Corners Only: all edges oriented, 2 corners twisted. An 11-move algorithm ending in a sledgehammer.',
+      algorithm: "R' U' R U' R' U2 R F R U R' U' F'",
+      setupMoves: "F U R U' R' F' R' U2 R U R' U R",
+      description: 'Corners Only: mirror of OLL 41.',
+    ),
+    AlgCase(
+      id: 'oll43',
+      name: 'OLL 43',
+      category: AlgCategory.oll,
+      subcategory: 'P-shape',
+      algorithm: "F' U' L' U L F",
+      setupMoves: "F' L' U' L U F",
+      description: 'P-shape: one of the shortest OLL algorithms.',
+    ),
+    AlgCase(
+      id: 'oll44',
+      name: 'OLL 44',
+      category: AlgCategory.oll,
+      subcategory: 'P-shape',
+      algorithm: "f R U R' U' f'",
+      setupMoves: "f U R U' R' f'",
+      description: 'P-shape: mirror of OLL 43.',
+    ),
+    AlgCase(
+      id: 'oll45',
+      name: 'OLL 45',
+      category: AlgCategory.oll,
+      subcategory: 'T-shape',
+      algorithm: "F R U R' U' F'",
+      setupMoves: "F U R U' R' F'",
+      description: 'T-shape: most beginner-friendly OLL.',
+      isFree: true,
+    ),
+    AlgCase(
+      id: 'oll46',
+      name: 'OLL 46',
+      category: AlgCategory.oll,
+      subcategory: 'C-shape',
+      algorithm: "R' U' R' F R F' U R",
+      setupMoves: "R' U' F R' F' R U R",
+      description: 'C-shape: 8-move efficient sequence.',
+    ),
+    AlgCase(
+      id: 'oll47',
+      name: 'OLL 47',
+      category: AlgCategory.oll,
+      subcategory: 'L-shape',
+      algorithm: "R' U' R' F R F' R' F R F' U R",
+      setupMoves: "R' U' F R' F' R F R' F' R U R",
+      description: 'L-shape: rhythmic triple sledgehammer variant.',
+    ),
+    AlgCase(
+      id: 'oll48',
+      name: 'OLL 48',
+      category: AlgCategory.oll,
+      subcategory: 'L-shape',
+      algorithm: "F R U R' U' R U R' U' F'",
+      setupMoves: "F U R U' R' U R U' R' F'",
+      description: 'L-shape: double sexy move wrapped in F moves.',
+    ),
+    AlgCase(
+      id: 'oll49',
+      name: 'OLL 49',
+      category: AlgCategory.oll,
+      subcategory: 'L-shape',
+      algorithm: "R U B' U' R' U R B R'",
+      setupMoves: "R B' R' U' R U B U' R'",
+      description: 'L-shape: uses unusual wide-move R2s.',
+    ),
+    AlgCase(
+      id: 'oll50',
+      name: 'OLL 50',
+      category: AlgCategory.oll,
+      subcategory: 'L-shape',
+      algorithm: "r' U r2 U' r2 U' r2 U r'",
+      setupMoves: "Rw U' Rw2 U Rw2 U Rw2 U' Rw",
+      description: 'L-shape: mirror of OLL 49.',
+    ),
+    AlgCase(
+      id: 'oll51',
+      name: 'OLL 51',
+      category: AlgCategory.oll,
+      subcategory: 'I-shape',
+      algorithm: "f R U R' U' R U R' U' f'",
+      setupMoves: "f U R U' R' U R U' R' f'",
+      description: 'I-shape: double sexy move in f wrapper.',
+    ),
+    AlgCase(
+      id: 'oll52',
+      name: 'OLL 52',
+      category: AlgCategory.oll,
+      subcategory: 'I-shape',
+      algorithm: "R' U' R U' R' U2 R",
+      setupMoves: "R' U2 R U R' U R",
+      description: 'I-shape: Anti-Sune orientation.',
+    ),
+    AlgCase(
+      id: 'oll53',
+      name: 'OLL 53',
+      category: AlgCategory.oll,
+      subcategory: 'L-shape',
+      algorithm: "l' U2 L U L' U' L U L' U l",
+      setupMoves: "Lw' U' L U' L' U L U' L' U2 Lw",
+      description: 'L-shape: efficient left-hand wide-move alg.',
+    ),
+    AlgCase(
+      id: 'oll54',
+      name: 'OLL 54',
+      category: AlgCategory.oll,
+      subcategory: 'L-shape',
+      algorithm: "r U2 R' U' R U R' U' R U' r'",
+      setupMoves: "Rw U R' U R U' R' U R U2 Rw'",
+      description: 'L-shape: mirror of OLL 53.',
+    ),
+    AlgCase(
+      id: 'oll55',
+      name: 'OLL 55',
+      category: AlgCategory.oll,
+      subcategory: 'I-shape',
+      algorithm: "R' F R U R U' R2 F' R2 U' R' U R U R'",
+      setupMoves: "R U' R' U' R U R2 F R2 U R' U' R' F' R",
+      description: 'I-shape: complex 15-move sequence.',
+    ),
+    AlgCase(
+      id: 'oll56',
+      name: 'OLL 56',
+      category: AlgCategory.oll,
+      subcategory: 'I-shape',
+      algorithm: "r' U' r U' R' U R U' R' U R r' U r",
+      setupMoves: "Rw' U' Rw R' U' R U R' U' R U Rw' U Rw",
+      description: 'I-shape: another long rhythmic sequence.',
+    ),
+    AlgCase(
+      id: 'oll57',
+      name: 'OLL 57',
+      category: AlgCategory.oll,
+      subcategory: 'S-shape',
+      algorithm: "R U R' U' M' U R U' r'",
+      setupMoves: "Rw U R' U' M U R U' R'",
+      description: 'S-shape: also called Z-shape. Mirror of OLL 28.',
     ),
   ];
 
@@ -691,7 +592,7 @@ class AlgLibrary {
     // Only the 4 corners need to be permuted; edges are already solved.
     AlgCase(
       id: 'pll_aa',
-      name: 'Aa-perm',
+      name: 'Aa-perm\n(3 Corners CCW)',
       category: AlgCategory.pll,
       subcategory: 'Corners Only',
       algorithm: "R' F R' B2 R F' R' B2 R2",
@@ -702,7 +603,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_ab',
-      name: 'Ab-perm',
+      name: 'Ab-perm\n(3 Corners CW)',
       category: AlgCategory.pll,
       subcategory: 'Corners Only',
       algorithm: "R2 B2 R F R' B2 R F' R",
@@ -713,11 +614,11 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_e',
-      name: 'E-perm',
+      name: 'E-perm\n(Diagonal Corners)',
       category: AlgCategory.pll,
       subcategory: 'Corners Only',
       algorithm: "R B' R' F R B R' F' R B R' F R B' R' F'",
-      setupMoves: "F R B' R' F' R B R' F R B' R' F' R B R'",
+      setupMoves: "F R B R' F' R B' R' F R B' R' F' R B R'",
       description:
           'Corners Only: diagonal swap of all 4 corners. No corner stays in place. A 16-move algorithm — one of the hardest PLLs.',
     ),
@@ -726,7 +627,7 @@ class AlgLibrary {
     // Only the 4 edges need to be permuted; corners are already solved.
     AlgCase(
       id: 'pll_ua',
-      name: 'Ua-perm',
+      name: 'Ua-perm\n(3 Edges CCW)',
       category: AlgCategory.pll,
       subcategory: 'Edges Only',
       algorithm: "R U' R U R U R U' R' U' R2",
@@ -737,7 +638,7 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_ub',
-      name: 'Ub-perm',
+      name: 'Ub-perm\n(3 Edges CW)',
       category: AlgCategory.pll,
       subcategory: 'Edges Only',
       algorithm: "R2 U' R' U' R U R U R U' R",
@@ -748,17 +649,17 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_z',
-      name: 'Z-perm',
+      name: 'Z-perm\n(Adjacent Edges)',
       category: AlgCategory.pll,
       subcategory: 'Edges Only',
-      algorithm: "R' U' R U' R U R U' R' U R U R2 U' R'",
-      setupMoves: "R U R2 U R U' R' U' R U' R' U' R U R'",
+      algorithm: "R' U' R2 U R U R' U' R U R U' R U' R'",
+      setupMoves: "R U R' U R' U' R' U R U' R' U' R2 U R",
       description:
-          'Edges Only: swap two pairs of opposite edges. No corners move. A 14-move algorithm — recognizable by its symmetric pattern.',
+          'Edges Only: swap two pairs of adjacent productive edges. No corners move. Recognized by its checkerboard-like adjacent swaps.',
     ),
     AlgCase(
       id: 'pll_h',
-      name: 'H-perm',
+      name: 'H-perm\n(Opposite Edges)',
       category: AlgCategory.pll,
       subcategory: 'Edges Only',
       algorithm: "R2 U2 R U2 R2 U2 R2 U2 R U2 R2",
@@ -771,17 +672,17 @@ class AlgLibrary {
     // Two adjacent corners swap, plus some edges move.
     AlgCase(
       id: 'pll_ja',
-      name: 'Ja-perm',
+      name: 'Ja-perm\n(Adj. Swap L)',
       category: AlgCategory.pll,
       subcategory: 'Adjacent Corner Swap',
       algorithm: "L' U' L F L' U' L U L F' L2 U L",
-      setupMoves: "L' U' L2 F L' U L U' L' F' L U L'",
+      setupMoves: "L' U' L2 F L' U' L' U L F' L' U L",
       description:
           'Adjacent Corner Swap: two adjacent corners swap, plus two edges cycle. A 13-move left-hand algorithm.',
     ),
     AlgCase(
       id: 'pll_jb',
-      name: 'Jb-perm',
+      name: 'Jb-perm\n(Adj. Swap R)',
       category: AlgCategory.pll,
       subcategory: 'Adjacent Corner Swap',
       algorithm: "R U R' F' R U R' U' R' F R2 U' R'",
@@ -791,22 +692,22 @@ class AlgLibrary {
     ),
     AlgCase(
       id: 'pll_t',
-      name: 'T-perm',
+      name: 'T-perm\n(Adjacent Swap)',
       category: AlgCategory.pll,
       subcategory: 'Adjacent Corner Swap',
       algorithm: "R U R' U' R' F R2 U' R' U' R U R' F'",
-      setupMoves: "F R' F' R U R U' R' U R U' R' F R F'",
+      setupMoves: "F R U' R' U R U R2 F' R U R U' R'",
       description:
           'Adjacent Corner Swap: two adjacent corners swap AND two adjacent edges swap. One of the most common PLLs. 14 moves.',
       isFree: true,
     ),
     AlgCase(
       id: 'pll_f',
-      name: 'F-perm',
+      name: 'F-perm\n(Adj Swap, Opp Edge)',
       category: AlgCategory.pll,
       subcategory: 'Adjacent Corner Swap',
       algorithm: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R",
-      setupMoves: "R' U' R U' R U R2 F' R2 U R U R' F R U R'",
+      setupMoves: "R' U' R U' R' U R U R2 F' R U R U' R' F U R",
       description:
           'Adjacent Corner Swap: two adjacent corners swap, plus a 3-cycle of edges. One of the longest PLL algorithms at 18 moves.',
     ),
@@ -815,64 +716,64 @@ class AlgLibrary {
     // Two diagonally opposite corners swap.
     AlgCase(
       id: 'pll_y',
-      name: 'Y-perm',
+      name: 'Y-perm\n(Diagonal Swap)',
       category: AlgCategory.pll,
       subcategory: 'Diagonal Corner Swap',
       algorithm: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
-      setupMoves: "F R' F' R U R U' R' F R U' R' U' R U R' F'",
+      setupMoves: "F R' F' R U R U' R' F R U' R' U R U R' F'",
       description:
           'Diagonal Corner Swap: two diagonally opposite corners swap, plus two edges cycle. A 17-move algorithm. Very common.',
     ),
     AlgCase(
       id: 'pll_v',
-      name: 'V-perm',
+      name: 'V-perm\n(Diag. Swap, Adj Edges)',
       category: AlgCategory.pll,
       subcategory: 'Diagonal Corner Swap',
       algorithm: "R' U R' U' B' R' B2 U' B' U B' R B R",
-      setupMoves: "R' B' R B' U B R2 B' R U' R U R'",
+      setupMoves: "R' B' R' B U' B U B2 R B U R U' R",
       description:
-          'Diagonal Corner Swap: two diagonally opposite corners swap, plus two edges swap. A 14-move algorithm.',
+          'Diagonal Corner Swap: two diagonally opposite corners swap, plus two edges swap. A 17-move algorithm.',
     ),
 
     // ── G-perms ───────────────────────────────────────────────────────────
     // 4-cycle of corners + 3-cycle of edges. Named Ga, Gb, Gc, Gd.
     AlgCase(
       id: 'pll_ga',
-      name: 'Ga-perm',
+      name: 'Ga-perm\n(G-Cycle A)',
       category: AlgCategory.pll,
       subcategory: 'G-perms',
       algorithm: "R2 U R' U R' U' R U' R2 D U' R' U R D'",
-      setupMoves: "D R' U' R U D' R2 U R' U' R U R' U' R2",
+      setupMoves: "D R' U' R U D' R2 U R' U R U' R U' R2",
       description:
           'G-perm: 4-cycle of corners + 3-cycle of edges. Uses a D-move — unusual for PLL. One of 4 related G-perm cases.',
     ),
     AlgCase(
       id: 'pll_gb',
-      name: 'Gb-perm',
+      name: 'Gb-perm\n(G-Cycle B)',
       category: AlgCategory.pll,
       subcategory: 'G-perms',
       algorithm: "R' U' R U D' R2 U R' U R U' R U' R2 D",
-      setupMoves: "D' R2 U R' U R U' R U R2 D U R U' R'",
+      setupMoves: "D' R2 U R' U R' U' R U' R2 D U' R' U R",
       description:
           'G-perm: 4-cycle of corners + 3-cycle of edges (reverse direction). Mirror of Ga-perm in terms of corner cycle.',
     ),
     AlgCase(
       id: 'pll_gc',
-      name: 'Gc-perm',
+      name: 'Gc-perm\n(G-Cycle C)',
       category: AlgCategory.pll,
       subcategory: 'G-perms',
       algorithm: "R2 U' R U' R U R' U R2 D' U R U' R' D",
-      setupMoves: "D R' U R' U' R2 U' R U' R U R2 D' U' R2",
+      setupMoves: "D' R U R' U' D R2 U' R U' R' U R' U R2",
       description:
           'G-perm: 4-cycle of corners + 3-cycle of edges. Inverse of Ga-perm. The D\' instead of D is the key difference.',
     ),
     AlgCase(
       id: 'pll_gd',
-      name: 'Gd-perm',
+      name: 'Gd-perm\n(G-Cycle D)',
       category: AlgCategory.pll,
       subcategory: 'G-perms',
       algorithm: "R U R' U' D R2 U' R U' R' U R' U R2 D'",
-      setupMoves: "D' R2 U' R U R' U R U R2 D U' R' U R",
+      setupMoves: "D R2 U' R U' R U R' U R2 D' U R U' R'",
       description:
           'G-perm: 4-cycle of corners + 3-cycle of edges. Inverse of Gb-perm. The 4 G-perms are all related by rotation.',
     ),
@@ -881,21 +782,21 @@ class AlgLibrary {
     // 3-cycle of corners + 3-cycle of edges on the right side.
     AlgCase(
       id: 'pll_ra',
-      name: 'Ra-perm',
+      name: 'Ra-perm\n(R-Cycle A)',
       category: AlgCategory.pll,
       subcategory: 'R-perms',
       algorithm: "R U' R' U' R U R D R' U' R D' R' U2 R'",
-      setupMoves: "R U2 R' D R U R' D' R U R' U R U' R'",
+      setupMoves: "R U2 R D R' U R D' R' U' R' U R U R'",
       description:
           'R-perm: 3-cycle of corners + 3-cycle of edges. The D-move in the middle is the key. One of two R-perm cases.',
     ),
     AlgCase(
       id: 'pll_rb',
-      name: 'Rb-perm',
+      name: 'Rb-perm\n(R-Cycle B)',
       category: AlgCategory.pll,
       subcategory: 'R-perms',
       algorithm: "R' U2 R U2 R' F R U R' U' R' F' R2 U'",
-      setupMoves: "U R2 F R F' R U2 R' U2 R U' R' F R F'",
+      setupMoves: "U R2 F R U R U' R' F' R U2 R' U2 R",
       description:
           'R-perm: mirror of Ra-perm. 3-cycle of corners + 3-cycle of edges in the opposite direction.',
     ),
@@ -904,21 +805,21 @@ class AlgLibrary {
     // Double swap of non-adjacent pieces — the hardest PLL cases.
     AlgCase(
       id: 'pll_na',
-      name: 'Na-perm',
+      name: 'Na-perm\n(Diag. Swap A)',
       category: AlgCategory.pll,
       subcategory: 'N-perms',
       algorithm: "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'",
-      setupMoves: "R U R' U2 R U R2 F' R U R' U' R' F R U' R' U' R U' R'",
+      setupMoves: "R U R' U2 R U R2 F' R U R U' R' F R U' R' U' R U' R'",
       description:
           'N-perm: double diagonal swap of both corners AND edges. No piece stays in place. One of the longest PLLs at 22 moves.',
     ),
     AlgCase(
       id: 'pll_nb',
-      name: 'Nb-perm',
+      name: 'Nb-perm\n(Diag. Swap B)',
       category: AlgCategory.pll,
       subcategory: 'N-perms',
       algorithm: "R' U R U' R' F' U' F R U R' F R' F' R U' R",
-      setupMoves: "R' U R F' R U' R' F U R' U' R U R' U R",
+      setupMoves: "R' U R' F R F' R U' R' F' U F R U R' U' R",
       description:
           'N-perm: mirror of Na-perm. Double diagonal swap of corners and edges. Also one of the longest PLLs.',
     ),
@@ -927,44 +828,735 @@ class AlgLibrary {
   static const List<AlgCase> f2lCases = [
     AlgCase(
       id: 'f2l1',
-      name: 'F2L 1',
+      name: 'F2L 1 (Basic Insert)',
       category: AlgCategory.f2l,
       subcategory: 'Basic Insert',
       algorithm: "U R U' R'",
       setupMoves: "R U R' U'",
-      description:
-          'The most basic F2L insertion. Pair the corner and edge in the top layer and insert into the front-right slot.',
+      description: 'Corner and edge are in the U-layer, solved pair can be inserted directly into the Front-Right slot.',
       isFree: true,
     ),
     AlgCase(
       id: 'f2l2',
-      name: 'F2L 2',
+      name: 'F2L 2 (Basic Insert Left)',
       category: AlgCategory.f2l,
       subcategory: 'Basic Insert',
       algorithm: "U' L' U L",
       setupMoves: "L' U' L U",
-      description:
-          'Left-hand version of the basic F2L insertion. Inserts into the front-left slot.',
+      description: 'Left-hand version of the basic F2L insertion into the Front-Left slot.',
       isFree: true,
     ),
     AlgCase(
       id: 'f2l3',
-      name: 'F2L 3',
+      name: 'F2L 3 (Connected Pair)',
       category: AlgCategory.f2l,
       subcategory: 'Connected Pair',
       algorithm: "R U R'",
-      setupMoves: "R' U' R",
-      description: 'Inserting a pre-formed pair into the front-right slot.',
+      setupMoves: "R U' R'",
+      description: 'Inserting a pre-formed pair into the Front-Right slot.',
       isFree: true,
     ),
     AlgCase(
       id: 'f2l4',
-      name: 'F2L 4',
+      name: 'F2L 4 (Split Pair)',
       category: AlgCategory.f2l,
       subcategory: 'Split Pair',
       algorithm: "R U' R' U2 R U R'",
       setupMoves: "R U' R' U2 R U R'",
-      description: 'Positioning and inserting a split corner/edge pair.',
+      description: 'Positioning and inserting a split corner/edge pair into the Front-Right slot.',
+    ),
+    AlgCase(
+      id: 'f2l5',
+      name: 'F2L 5 (Edge in Slot)',
+      category: AlgCategory.f2l,
+      subcategory: 'Corner in U, Edge in Slot',
+      algorithm: "U' R U R' U R U R'",
+      setupMoves: "R U' R' U' R U' R' U",
+      description: 'Corner in U-layer, edge in Front-Right slot (misaligned).',
+    ),
+    AlgCase(
+      id: 'f2l6',
+      name: 'F2L 6 (Edge in Slot Left)',
+      category: AlgCategory.f2l,
+      subcategory: 'Corner in U, Edge in Slot',
+      algorithm: "U L' U' L U' L' U' L",
+      setupMoves: "L' U L U L' U L U'",
+      description: 'Corner in U-layer, edge in Front-Left slot (misaligned).',
+    ),
+    AlgCase(
+      id: 'f2l7',
+      name: 'F2L 7 (Corner in U, Edge in Slot)',
+      category: AlgCategory.f2l,
+      subcategory: 'Corner in U, Edge in Slot',
+      algorithm: "R U' R' U R U' R'",
+      setupMoves: "R U R' U' R U R'",
+      description: 'Corner in U-layer, edge in Front-Right slot (flipped).',
+    ),
+    AlgCase(
+      id: 'f2l8',
+      name: 'F2L 8 (Corner in U, Edge in Slot Left)',
+      category: AlgCategory.f2l,
+      subcategory: 'Corner in U, Edge in Slot',
+      algorithm: "L' U L U' L' U L",
+      setupMoves: "L' U' L U L' U' L",
+      description: 'Corner in U-layer, edge in Front-Left slot (flipped).',
+    ),
+    AlgCase(
+      id: 'f2l9',
+      name: 'F2L 9 (Corner Up)',
+      category: AlgCategory.f2l,
+      subcategory: 'Corner Pointing Up',
+      algorithm: "U R U2 R' U R U' R'",
+      setupMoves: "R U R' U' R U2 R' U'",
+      description: 'Corner pointing up, edge in U-layer. Target: Front-Right slot.',
+    ),
+    AlgCase(
+      id: 'f2l10',
+      name: 'F2L 10 (Corner Up, Separated)',
+      category: AlgCategory.f2l,
+      subcategory: 'Corner Pointing Up',
+      algorithm: "U' R U2 R' U R U R'",
+      setupMoves: "R U' R' U' R U2 R' U",
+      description: 'Corner pointing up, edge in U-layer (separated). Target: Front-Right slot.',
+    ),
+    AlgCase(
+      id: 'f2l11',
+      name: 'F2L 11 (Corner Up, Edge in Slot)',
+      category: AlgCategory.f2l,
+      subcategory: 'Corner Pointing Up',
+      algorithm: "R U2 R' U' R U R'",
+      setupMoves: "R U' R' U R U2 R'",
+      description: 'Corner pointing up, edge in Front-Right slot.',
+    ),
+    AlgCase(
+      id: 'f2l12',
+      name: 'F2L 12 (Corner Up, Edge in Slot Left)',
+      category: AlgCategory.f2l,
+      subcategory: 'Corner Pointing Up',
+      algorithm: "L' U2 L U L' U' L",
+      setupMoves: "L' U L U' L' U2 L",
+      description: 'Corner pointing up, edge in Front-Left slot.',
+    ),
+    AlgCase(
+      id: 'f2l13',
+      name: 'F2L 13 (Both in Slot)',
+      category: AlgCategory.f2l,
+      subcategory: 'Edge and Corner in Slot',
+      algorithm: "R U' R' U R U2 R' U R U' R'",
+      setupMoves: "R U R' U' R U2 R' U' R U R'",
+      description: 'Corner and edge both in Front-Right slot, misaligned.',
+    ),
+    AlgCase(
+      id: 'f2l14',
+      name: 'F2L 14 (Edge Flipped)',
+      category: AlgCategory.f2l,
+      subcategory: 'Edge and Corner in Slot',
+      algorithm: "R U R' U' R U2 R' U R U' R'",
+      setupMoves: "R U R' U' R U2 R' U R U' R'",
+      description: 'Corner and edge both in Front-Right slot, edge flipped.',
+    ),
+    AlgCase(
+      id: 'f2l15',
+      name: 'F2L 15 (Triple Sexy)',
+      category: AlgCategory.f2l,
+      subcategory: 'Edge and Corner in Slot',
+      algorithm: "R U R' U' R U R' U' R U R' U'",
+      setupMoves: "R U R' U' R U R' U' R U R' U'",
+      description: 'Three sexy moves to solve a flipped corner and edge in Front-Right slot.',
+    ),
+    AlgCase(
+      id: 'f2l16',
+      name: 'F2L 16 (Sledgehammer)',
+      category: AlgCategory.f2l,
+      subcategory: 'Special cases',
+      algorithm: "R' F R F'",
+      setupMoves: "F R' F' R",
+      description: 'Standard Sledgehammer insertion for Front-Right slot.',
+    ),
+  ];
+
+  static const List<AlgCase> cmllCases = [
+    // ── O Cases (Corners Oriented) ────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_o_adj',
+      name: 'CMLL O Adjacent',
+      category: AlgCategory.cmll,
+      subcategory: 'O (Oriented)',
+      algorithm: "R U R' F' R U R' U' R' F R2 U' R'",
+      setupMoves: "R U R' F' R U R' U' R' F R2 U' R'",
+      description: 'Oriented. Recognition: Two adjacent corners have matching side colors ("Headlights" or a "Bar").',
+    ),
+    AlgCase(
+      id: 'cmll_o_diag',
+      name: 'CMLL O Diagonal',
+      category: AlgCategory.cmll,
+      subcategory: 'O (Oriented)',
+      algorithm: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
+      setupMoves: "F R U' R' U' R U R' F' R U R' U' R' F R F'",
+      description: 'Oriented. Recognition: No matching side colors on any face (Diagonal swap).',
+    ),
+
+    // ── H Cases ───────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_h_cols',
+      name: 'CMLL H Columns',
+      category: AlgCategory.cmll,
+      subcategory: 'H',
+      algorithm: "R U R' U R U' R' U R U2 R'",
+      setupMoves: "R U2 R' U' R U R' U' R U' R'",
+      description: 'H-Orientation. Recognition: Side colors match vertically on the Left and Right faces ("Columns").',
+    ),
+    AlgCase(
+      id: 'cmll_h_rows',
+      name: 'CMLL H Rows',
+      category: AlgCategory.cmll,
+      subcategory: 'H',
+      algorithm: "F R U R' U' R U R' U' R U R' U' F'",
+      setupMoves: "F U R U' R' U R U' R' U R U' R' F'",
+      description: 'H-Orientation. Recognition: Side colors match horizontally on the Front and Back faces ("Rows").',
+    ),
+
+    // ── Pi Cases ──────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_pi_right',
+      name: 'CMLL Pi Right',
+      category: AlgCategory.cmll,
+      subcategory: 'Pi',
+      algorithm: "R U2 R2 U' R2 U' R2 U2 R",
+      setupMoves: "R' U2 R2 U R2 U R2 U2 R'",
+      description: 'Pi-Orientation. Recognition: Headlights on the Right face.',
+    ),
+
+    // ── Sune Cases ────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_sune_right',
+      name: 'CMLL Sune Right',
+      category: AlgCategory.cmll,
+      subcategory: 'Sune',
+      algorithm: "R U R' U R U2 R'",
+      setupMoves: "R U2 R' U' R U' R'",
+      description: 'Sune-Orientation. Recognition: Standard Sune, front-right sticker is yellow.',
+    ),
+    AlgCase(
+      id: 'cmll_antisune_left',
+      name: 'CMLL Anti-Sune Left',
+      category: AlgCategory.cmll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R U2 R' U' R U' R'",
+      setupMoves: "R U R' U R U2 R'",
+      description: 'Anti-Sune Orientation. Recognition: Standard Anti-Sune, front-left sticker is yellow.',
+    ),
+
+    // ── U Cases ───────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_u_front',
+      name: 'CMLL U Front',
+      category: AlgCategory.cmll,
+      subcategory: 'U',
+      algorithm: "R2 D R' U2 R D' R' U2 R'",
+      setupMoves: "R U2 R D R' U2 R D' R2",
+      description: 'U-Orientation. Recognition: Matching colors on the Front face ("Headlights").',
+    ),
+
+    // ── T Cases ───────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_t_left',
+      name: 'CMLL T Left',
+      category: AlgCategory.cmll,
+      subcategory: 'T',
+      algorithm: "L' U' L U R U' R' F",
+      setupMoves: "F' R U R' U' L' U L",
+      description: 'T-Orientation. Recognition: Side colors of unoriented corners match across the side.',
+    ),
+
+    // ── L Cases ───────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'cmll_l_bowtie',
+      name: 'CMLL L Bowtie',
+      category: AlgCategory.cmll,
+      subcategory: 'L',
+      algorithm: "R' F R B' R' F' R B",
+      setupMoves: "B' R' F R B R' F' R",
+      description: 'L-Orientation. Recognition: Two oriented corners are diagonal to each other.',
+    ),
+  ];
+
+  static const List<AlgCase> winterVariationCases = [
+    AlgCase(
+      id: 'wv1',
+      name: 'WV 1',
+      category: AlgCategory.winterVariation,
+      subcategory: '0 Corners Oriented',
+      algorithm: "U L' U2 R U R' U2 L",
+      setupMoves: "L' U2 R U' R' U2 L U'",
+      description: 'Zero corners oriented. Rectangle pattern.',
+    ),
+    AlgCase(
+      id: 'wv2',
+      name: 'WV 2',
+      category: AlgCategory.winterVariation,
+      subcategory: '0 Corners Oriented',
+      algorithm: "U R U' R'",
+      setupMoves: "R U R' U'",
+      description: 'Zero corners oriented. The simplest insertion.',
+    ),
+    AlgCase(
+      id: 'wv7',
+      name: 'WV 7',
+      category: AlgCategory.winterVariation,
+      subcategory: '1 Corner Oriented',
+      algorithm: "U R U R' U' R U' R'",
+      setupMoves: "R U R' U R U' R' U'",
+      description: 'One corner oriented. Pi pattern.',
+    ),
+    AlgCase(
+      id: 'wv12',
+      name: 'WV 12',
+      category: AlgCategory.winterVariation,
+      subcategory: '1 Corner Oriented',
+      algorithm: "R' F2 R F2 U L' U L",
+      setupMoves: "L' U' L U' F2 R' F2 R",
+      description: 'One corner oriented. Sune-like pattern.',
+    ),
+    AlgCase(
+      id: 'wv19',
+      name: 'WV 19',
+      category: AlgCategory.winterVariation,
+      subcategory: '2 Corners Oriented',
+      algorithm: "R' F2 R2 U' R' U' R U R' F2",
+      setupMoves: "F2 R U' R' U R U R2 F2 R",
+      description: 'Two corners oriented. Antisune-like pattern.',
+    ),
+    AlgCase(
+      id: 'wv22',
+      name: 'WV 22',
+      category: AlgCategory.winterVariation,
+      subcategory: '2 Corners Oriented',
+      algorithm: "U R2 D R' U R D' R' U2 R'",
+      setupMoves: "R2 D R' U2 R D' R' U' R' U'",
+      description: 'Two corners oriented. Blinkers pattern.',
+    ),
+    AlgCase(
+      id: 'wv27',
+      name: 'WV 27',
+      category: AlgCategory.winterVariation,
+      subcategory: '3 Corners Oriented',
+      algorithm: "U R U R' U' R U R' U' R U' R'",
+      setupMoves: "R U R' U R U' R' U R U' R' U'",
+      description: 'The "Solved" case: Simple insertion solves the OLL.',
+      isFree: true,
+    ),
+  ];
+
+  static const List<AlgCase> collCases = [
+    // ── Sune ─────────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'coll_sune1',
+      name: 'COLL S1',
+      category: AlgCategory.coll,
+      subcategory: 'Sune',
+      algorithm: "R U R' U R U2 R'",
+      setupMoves: "R U2 R' U' R U' R'",
+      description: 'Standard Sune. Corners already permuted.',
+      isFree: true,
+    ),
+    AlgCase(
+      id: 'coll_sune2',
+      name: 'COLL S2',
+      category: AlgCategory.coll,
+      subcategory: 'Sune',
+      algorithm: "R U R' U' R' D' R U' R' D R",
+      setupMoves: "R' D' R U R' D R U R U' R'",
+      description: 'Sune shape, adjacent corner swap.',
+    ),
+    AlgCase(
+      id: 'coll_sune3',
+      name: 'COLL S3',
+      category: AlgCategory.coll,
+      subcategory: 'Sune',
+      algorithm: "R U2 R' U2 R' F R F'",
+      setupMoves: "F R' F' R U2 R U2 R'",
+      description: 'Sune shape with L-R interplay.',
+    ),
+    AlgCase(
+      id: 'coll_sune4',
+      name: 'COLL S4',
+      category: AlgCategory.coll,
+      subcategory: 'Sune',
+      algorithm: "R U R' U R U' R D R' U' R D' R2",
+      setupMoves: "R2 D R' U R D' R' U R' U' R U' R'",
+      description: 'Sune shape, adjacent corner swap.',
+    ),
+    AlgCase(
+      id: 'coll_sune5',
+      name: 'COLL S5',
+      category: AlgCategory.coll,
+      subcategory: 'Sune',
+      algorithm: "R U R' U' R' D' R U R' D R",
+      setupMoves: "R' D' R U' R' D R U R U' R'",
+      description: 'Niklas.',
+    ),
+    AlgCase(
+      id: 'coll_sune6',
+      name: 'COLL S6',
+      category: AlgCategory.coll,
+      subcategory: 'Sune',
+      algorithm: "R' U2 R U R' U R",
+      setupMoves: "R' U' R U' R' U2 R",
+      description: 'Sune shape with wide moves.',
+    ),
+
+    // ── Anti-Sune ────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'coll_as1',
+      name: 'COLL AS1',
+      category: AlgCategory.coll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R U2 R' U' R U' R'",
+      setupMoves: "R U R' U R U2 R'",
+      description: 'Standard Anti-Sune. Skip case.',
+      isFree: true,
+    ),
+    AlgCase(
+      id: 'coll_as2',
+      name: 'COLL AS2',
+      category: AlgCategory.coll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R2 D R' U R D' R' U R' U' R U' R'",
+      setupMoves: "R U R' U R U' R D R' U' R D' R2",
+      description: 'Anti-Sune, adjacent corner swap.',
+    ),
+    AlgCase(
+      id: 'coll_as3',
+      name: 'COLL AS3',
+      category: AlgCategory.coll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R' U2 R U2 R' F R U R' U' F' R",
+      setupMoves: "R' F U R U' R' F' R U2 R' U2 R",
+      description: 'Anti-Sune, 11 moves.',
+    ),
+    AlgCase(
+      id: 'coll_as4',
+      name: 'COLL AS4',
+      category: AlgCategory.coll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R' U' R U' R2 D' R U2 R' D R2",
+      setupMoves: "R2 D' R U2 R' D R2 U R' U R",
+      description: 'Anti-Sune with D-layer work.',
+    ),
+    AlgCase(
+      id: 'coll_as5',
+      name: 'COLL AS5',
+      category: AlgCategory.coll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R' U L U' R U L'",
+      setupMoves: "L U' R' U L' U' R",
+      description: 'Anti-Sune, Niklas-style inverse.',
+    ),
+    AlgCase(
+      id: 'coll_as6',
+      name: 'COLL AS6',
+      category: AlgCategory.coll,
+      subcategory: 'Anti-Sune',
+      algorithm: "R' U' R U' R' U R' D' R U R' D R2",
+      setupMoves: "R2 D' R U' R' D R U' R U R' U R",
+      description: 'Anti-Sune, diagonal swap.',
+    ),
+
+    // ── H (All Corners Oriented) ─────────────────────────────────────────
+    AlgCase(
+      id: 'coll_h1',
+      name: 'COLL H1',
+      category: AlgCategory.coll,
+      subcategory: 'H',
+      algorithm: "R U R' U R U' R' U R U2 R'",
+      setupMoves: "R U2 R' U' R U R' U' R U' R'",
+      description: 'H orientation, adjacent corner swap.',
+    ),
+    AlgCase(
+      id: 'coll_h2',
+      name: 'COLL H2',
+      category: AlgCategory.coll,
+      subcategory: 'H',
+      algorithm: "F R U' R' U R U2 R' U' R U R' U' F'",
+      setupMoves: "F U R U' R' U R U2 R' U' R U R' F'",
+      description: 'H orientation. Triple sexy.',
+    ),
+    AlgCase(
+      id: 'coll_h3',
+      name: 'COLL H3',
+      category: AlgCategory.coll,
+      subcategory: 'H',
+      algorithm: "R U R' U R U L' U R' U' L",
+      setupMoves: "L' U R U' L U' R' U' R U' R'",
+      description: 'H orientation with L-R interplay.',
+    ),
+    AlgCase(
+      id: 'coll_h4',
+      name: 'COLL H4',
+      category: AlgCategory.coll,
+      subcategory: 'H',
+      algorithm: "F R U R' U' R U R' U' R U R' U' F'",
+      setupMoves: "F U R U' R' U R U' R' U R U' R' F'",
+      description: 'H orientation, diagonal swap.',
+    ),
+
+    // ── T ────────────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'coll_t1',
+      name: 'COLL T1',
+      category: AlgCategory.coll,
+      subcategory: 'T',
+      algorithm: "R U2 R' U' R U' R2 U2 R U R' U R",
+      setupMoves: "R' U' R U' R' U2 R2 U R' U R U2 R'",
+      description: 'T orientation, corners permuted.',
+    ),
+    AlgCase(
+      id: 'coll_t2',
+      name: 'COLL T2',
+      category: AlgCategory.coll,
+      subcategory: 'T',
+      algorithm: "R' U R U2 R' L' U R U' L",
+      setupMoves: "L' U R' U' L R U2 R' U' R",
+      description: 'T orientation with L-R transition.',
+    ),
+    AlgCase(
+      id: 'coll_t3',
+      name: 'COLL T3',
+      category: AlgCategory.coll,
+      subcategory: 'T',
+      algorithm: "r' U' R U l F' R' F",
+      setupMoves: "F' R F Lw' U' R' U Rw",
+      description: 'T orientation, left-hand trigger.',
+    ),
+    AlgCase(
+      id: 'coll_t4',
+      name: 'COLL T4',
+      category: AlgCategory.coll,
+      subcategory: 'T',
+      algorithm: "F R U R' U' R U' R' U' R U R' F'",
+      setupMoves: "F R U' R' U R U R' U R U' R' F'",
+      description: 'T orientation inside F wrapper.',
+    ),
+    AlgCase(
+      id: 'coll_t5',
+      name: 'COLL T5',
+      category: AlgCategory.coll,
+      subcategory: 'T',
+      algorithm: "r U R' U' r' F R F'",
+      setupMoves: "F R' F' Rw U R U' Rw'",
+      description: 'T orientation, diagonal swap.',
+    ),
+    AlgCase(
+      id: 'coll_t6',
+      name: 'COLL T6',
+      category: AlgCategory.coll,
+      subcategory: 'T',
+      algorithm: "R' U R2 D r' U2 r D' R2 U' R",
+      setupMoves: "R' U R2 D Rw' U2 Rw D' R2 U' R",
+      description: 'T orientation, T-perm variant.',
+    ),
+
+    // ── U ────────────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'coll_u1',
+      name: 'COLL U1',
+      category: AlgCategory.coll,
+      subcategory: 'U',
+      algorithm: "R' U' R U' R' U2 R2 U R' U R U2 R'",
+      setupMoves: "R U2 R' U' R U' R2 U2 R U R' U R",
+      description: 'U orientation, corners permuted.',
+    ),
+    AlgCase(
+      id: 'coll_u2',
+      name: 'COLL U2',
+      category: AlgCategory.coll,
+      subcategory: 'U',
+      algorithm: "R' F R U' R' U' R U R' F' R U R' U' R' F R F' R",
+      setupMoves: "R' F R' F' R U R U' R' F R U' R' U R U R' F' R",
+      description: 'U orientation with D-layer moves.',
+    ),
+    AlgCase(
+      id: 'coll_u3',
+      name: 'COLL U3',
+      category: AlgCategory.coll,
+      subcategory: 'U',
+      algorithm: "R2 D R' U2 R D' R' U2 R'",
+      setupMoves: "R U2 R D R' U2 R D' R2",
+      description: 'U orientation, 9-move case.',
+    ),
+    AlgCase(
+      id: 'coll_u4',
+      name: 'COLL U4',
+      category: AlgCategory.coll,
+      subcategory: 'U',
+      algorithm: "F R U' R' U R U R' U R U' R' F'",
+      setupMoves: "F R U R' U' R U' R' U' R U R' F'",
+      description: 'U orientation inside F wrapper.',
+    ),
+    AlgCase(
+      id: 'coll_u5',
+      name: 'COLL U5',
+      category: AlgCategory.coll,
+      subcategory: 'U',
+      algorithm: "R2 D' R U2 R' D R U2 R",
+      setupMoves: "R' U2 R' D' R U2 R' D R2",
+      description: 'U orientation, inverse of U3.',
+    ),
+    AlgCase(
+      id: 'coll_u6',
+      name: 'COLL U6',
+      category: AlgCategory.coll,
+      subcategory: 'U',
+      algorithm: "R2 D' R U R' D R U R U' R' U' R",
+      setupMoves: "R' U R U R' U' R' D' R U' R' D R2",
+      description: 'U orientation with F-trigger.',
+    ),
+
+    // ── Pi ───────────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'coll_pi1',
+      name: 'COLL Pi1',
+      category: AlgCategory.coll,
+      subcategory: 'Pi',
+      algorithm: "R U2 R2 U' R2 U' R2 U2 R",
+      setupMoves: "R' U2 R2 U R2 U R2 U2 R'",
+      description: 'Pi orientation, corners permuted.',
+      isFree: true,
+    ),
+    AlgCase(
+      id: 'coll_pi2',
+      name: 'COLL Pi2',
+      category: AlgCategory.coll,
+      subcategory: 'Pi',
+      algorithm: "R' F2 R U2 R U2 R' F2 U' R U' R'",
+      setupMoves: "R U R' U F2 R U2 R' U2 R' F2 R",
+      description: 'Pi orientation with F2 moves.',
+    ),
+    AlgCase(
+      id: 'coll_pi3',
+      name: 'COLL Pi3',
+      category: AlgCategory.coll,
+      subcategory: 'Pi',
+      algorithm: "R' U' F' R U R' U R' F R2 U2 R' U2 R",
+      setupMoves: "R' U2 R U2 R2 F' R U' R U' R' F U R",
+      description: 'Pi orientation, 14 moves.',
+    ),
+    AlgCase(
+      id: 'coll_pi4',
+      name: 'COLL Pi4',
+      category: AlgCategory.coll,
+      subcategory: 'Pi',
+      algorithm: "R U R' U' R' F R2 U R' U' R U R' U' F'",
+      setupMoves: "F U R U' R' U R U' R2 F' R U R U' R'",
+      description: 'Pi orientation, Jb-perm style.',
+    ),
+    AlgCase(
+      id: 'coll_pi5',
+      name: 'COLL Pi5',
+      category: AlgCategory.coll,
+      subcategory: 'Pi',
+      algorithm: "R U' L' U R' U L U L' U L",
+      setupMoves: "L' U' L U' L' U' R U' L U R'",
+      description: 'Pi orientation with L-R interplay.',
+    ),
+    AlgCase(
+      id: 'coll_pi6',
+      name: 'COLL Pi6',
+      category: AlgCategory.coll,
+      subcategory: 'Pi',
+      algorithm: "R2 D' R U R' D R U R U' R' U R U R' U R",
+      setupMoves: "R' U' R U' R' U' R U R' U' R' D' R U' R' D R2",
+      description: 'Pi orientation with D-layer.',
+    ),
+
+    // ── L ────────────────────────────────────────────────────────────────
+    AlgCase(
+      id: 'coll_l1',
+      name: 'COLL L1',
+      category: AlgCategory.coll,
+      subcategory: 'L',
+      algorithm: "R' U2 R U R' U' R U R' U' R U R' U R",
+      setupMoves: "R' U' R U' R' U R U' R' U R U' R' U2 R",
+      description: 'L orientation, corners permuted.',
+    ),
+    AlgCase(
+      id: 'coll_l2',
+      name: 'COLL L2',
+      category: AlgCategory.coll,
+      subcategory: 'L',
+      algorithm: "R' U2 R' D' R U2 R' D R2",
+      setupMoves: "R2 D' R U2 R' D R U2 R",
+      description: 'L orientation, 9-move case.',
+    ),
+    AlgCase(
+      id: 'coll_l3',
+      name: 'COLL L3',
+      category: AlgCategory.coll,
+      subcategory: 'L',
+      algorithm: "R U2 R D R' U2 R D' R2",
+      setupMoves: "R2 D R' U2 R D' R' U2 R'",
+      description: 'L orientation, mirror of L2.',
+    ),
+    AlgCase(
+      id: 'coll_l4',
+      name: 'COLL L4',
+      category: AlgCategory.coll,
+      subcategory: 'L',
+      algorithm: "F R' F' r U R U' r'",
+      setupMoves: "Rw U R' U' Rw' F R F'",
+      description: 'L orientation with F-trigger.',
+    ),
+    AlgCase(
+      id: 'coll_l5',
+      name: 'COLL L5',
+      category: AlgCategory.coll,
+      subcategory: 'L',
+      algorithm: "R' U R D' R' U' R D",
+      setupMoves: "D' R' U R D R' U' R",
+      description: 'L orientation, F-face wrapper.',
+    ),
+    AlgCase(
+      id: 'coll_l6',
+      name: 'COLL L6',
+      category: AlgCategory.coll,
+      subcategory: 'L',
+      algorithm: "R' U' R U R' F' R U R' U' R' F R2",
+      setupMoves: "R2 F' R U R U' R' F R U' R' U R",
+      description: 'L orientation, adjacent swap.',
+    ),
+  ];
+
+  static const List<AlgCase> commutatorCases = [
+    AlgCase(
+      id: 'comm_3_same',
+      name: '3 on Same Face',
+      category: AlgCategory.commutators,
+      subcategory: '3 Corners on Same Face',
+      algorithm: "R U' L' U R' U' L U",
+      setupMoves: "U' L' U R U' L U R'",
+      description: 'Cycles three corners on the U face (UFL, UBR, UFR). Also known as the Niklas algorithm.',
+      isFree: true,
+    ),
+    AlgCase(
+      id: 'comm_2_same',
+      name: '2 on Same Face',
+      category: AlgCategory.commutators,
+      subcategory: '2 Corners on Same Face',
+      algorithm: "R' D' R U R' D R U'",
+      setupMoves: "U R' D' R U' R' D R",
+      description: 'Cycles two corners on the U face and one on the D face (UFL, UFR, DFR). Uses a standard 8-move commutator.',
+      isFree: true,
+    ),
+    AlgCase(
+      id: 'comm_diff',
+      name: 'Scattered Corners',
+      category: AlgCategory.commutators,
+      subcategory: 'Each on a Different Face',
+      algorithm: "L2 R' D' R U R' D R U' L2",
+      setupMoves: "L2 U R' D' R U' R' D R L2",
+      description: 'Cycles visually scattered corners (UFL, DFR, DBL). Uses L2 setup moves before a standard 8-move commutator.',
+      isFree: true,
     ),
   ];
 }

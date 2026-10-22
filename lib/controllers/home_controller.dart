@@ -8,10 +8,11 @@ import '../controllers/analysis_controller.dart';
 import '../utils/premium_manager.dart';
 import '../utils/haptic_service.dart';
 import '../services/solver_service.dart';
-
-enum SolveMethod { kociemba, lbl }
+import '../models/solve_method.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController extends ChangeNotifier {
+  static const String _kSolveMethodKey = 'selected_solve_method';
   final TickerProvider vsync;
 
   CubeState _cubeState = CubeState.solved();
@@ -24,6 +25,8 @@ class HomeController extends ChangeNotifier {
   bool _isScanned = false;
 
   List<CubeMove> _moveHistory = [];
+  List<MapEntry<CubeFace, int>>? _highlightedStickers;
+  bool _dimNonHighlighted = false;
   int _moveIndex = 0;
   int _solutionStartIndex = 0;
   bool _showingSolution = false;
@@ -32,10 +35,12 @@ class HomeController extends ChangeNotifier {
 
   bool _isScrambling = false;
   bool _isSolving = false;
+  String? _solveStatus;
   int? _activeDemoStepIndex;
   String? _activeDemoType;
   Map<CubeFace, Map<int, String>>? _stickerLabels;
   Map<CubeFace, Map<int, String>>? _initialStickerLabels;
+  Map<int, String>? _moveLabels;
   CubeState? _initialCubeState;
 
   // Callback for when a demo finishes (used by main.dart to show guide)
@@ -45,19 +50,24 @@ class HomeController extends ChangeNotifier {
   final List<bool> _moveDirectionQueue = [];
   int _solvesCompleted = 0;
   VoidCallback? onReviewPromptRequested;
+  VoidCallback? onPremiumUpsellRequested;
+  SolveMethod _selectedSolveMethod = SolveMethod.kociemba;
 
-  // Learn Mode (Interactive) State
-  List<CubeMove>? _path;
-  set path(List<CubeMove>? value) {
-    _path = value;
-    notifyListeners();
-  }
-
-  double? _pathStartRotationX;
-  double? _pathTargetRotationX;
-  double? _pathStartRotationY;
-  double? _pathTargetRotationY;
-  int _playGeneration = 0;
+  // Tutorial Progress Persistence
+  int? _lastCfopStepIndex;
+  double? _lastCfopScrollOffset;
+  int? _lastLblStepIndex;
+  int? _lastOllSubTabIndex;
+  int? _lastPllSubTabIndex;
+  int? _lastF2lSubTabIndex;
+  int? _lastRouxStepIndex;
+  double? _lastRouxScrollOffset;
+  int? _lastCmllSubTabIndex;
+  int? _lastLseSubTabIndex;
+  int? _lastZzStepIndex;
+  double? _lastZzScrollOffset;
+  int? _lastHeiseStepIndex;
+  double? _lastHeiseScrollOffset;
 
   HomeController({required this.vsync}) {
     _animationController = CubeAnimationController(
@@ -97,16 +107,22 @@ class HomeController extends ChangeNotifier {
 
   // Getters
   CubeState get cubeState => _cubeState;
+
+  /// The scrambled/scanned starting position, before any solution moves.
+  CubeState? get savedState => _savedState;
   CubeAnimationController get animationController => _animationController;
   AnalysisController get analysisController => _analysisController;
   double get rotationX => _rotationX;
   double get rotationY => _rotationY;
   List<CubeMove> get moveHistory => _moveHistory;
   int get solvesCompleted => _solvesCompleted;
+  List<MapEntry<CubeFace, int>>? get highlightedStickers => _highlightedStickers;
+  bool get dimNonHighlighted => _dimNonHighlighted;
   int get moveIndex => _moveIndex;
   int get solutionStartIndex => _solutionStartIndex;
   bool get showingSolution => _showingSolution;
   bool get isSolving => _isSolving;
+  String? get solveStatus => _solveStatus;
   bool get isScrambling => _isScrambling;
   int? get activeDemoStepIndex => _activeDemoStepIndex;
   bool get isDemo => _activeDemoStepIndex != null && _showingSolution;
@@ -116,6 +132,22 @@ class HomeController extends ChangeNotifier {
   bool get showExplanations => _showExplanations;
   Map<CubeFace, Map<int, String>>? get stickerLabels => _stickerLabels;
   bool get isScanned => _isScanned;
+  int? get lastCfopStepIndex => _lastCfopStepIndex;
+  double? get lastCfopScrollOffset => _lastCfopScrollOffset;
+  int? get lastLblStepIndex => _lastLblStepIndex;
+  int? get lastOllSubTabIndex => _lastOllSubTabIndex;
+  int? get lastPllSubTabIndex => _lastPllSubTabIndex;
+  int? get lastF2lSubTabIndex => _lastF2lSubTabIndex;
+  int? get lastRouxStepIndex => _lastRouxStepIndex;
+  double? get lastRouxScrollOffset => _lastRouxScrollOffset;
+  int? get lastCmllSubTabIndex => _lastCmllSubTabIndex;
+  int? get lastLseSubTabIndex => _lastLseSubTabIndex;
+  int? get lastZzStepIndex => _lastZzStepIndex;
+  double? get lastZzScrollOffset => _lastZzScrollOffset;
+  int? get lastHeiseStepIndex => _lastHeiseStepIndex;
+  double? get lastHeiseScrollOffset => _lastHeiseScrollOffset;
+  Map<int, String>? get moveLabels => _moveLabels;
+  SolveMethod get selectedSolveMethod => _selectedSolveMethod;
 
   // Setters
   set rotationX(double value) {
@@ -129,7 +161,7 @@ class HomeController extends ChangeNotifier {
   }
 
   set scrambleLength(int value) {
-    _scrambleLength = value;
+    _scrambleLength = value.clamp(5, 20);
     notifyListeners();
   }
 
@@ -141,6 +173,61 @@ class HomeController extends ChangeNotifier {
   set showExplanations(bool value) {
     _showExplanations = value;
     notifyListeners();
+  }
+
+  void updateCfopProgress(int stepIndex, double scrollOffset, {int? ollSubIndex, int? pllSubIndex, int? f2lSubIndex}) {
+    _lastCfopStepIndex = stepIndex;
+    _lastCfopScrollOffset = scrollOffset;
+    if (ollSubIndex != null) _lastOllSubTabIndex = ollSubIndex;
+    if (pllSubIndex != null) _lastPllSubTabIndex = pllSubIndex;
+    if (f2lSubIndex != null) _lastF2lSubTabIndex = f2lSubIndex;
+    notifyListeners();
+  }
+
+  void updateLblProgress(int stepIndex) {
+    _lastLblStepIndex = stepIndex;
+    notifyListeners();
+  }
+
+  void updateRouxProgress(int stepIndex, double scrollOffset, {int? cmllSubIndex, int? lseSubIndex}) {
+    _lastRouxStepIndex = stepIndex;
+    _lastRouxScrollOffset = scrollOffset;
+    if (cmllSubIndex != null) _lastCmllSubTabIndex = cmllSubIndex;
+    if (lseSubIndex != null) _lastLseSubTabIndex = lseSubIndex;
+    notifyListeners();
+  }
+
+  void updateZzProgress(int stepIndex, double scrollOffset) {
+    _lastZzStepIndex = stepIndex;
+    _lastZzScrollOffset = scrollOffset;
+    notifyListeners();
+  }
+
+  void updateHeiseProgress(int stepIndex, double scrollOffset) {
+    _lastHeiseStepIndex = stepIndex;
+    _lastHeiseScrollOffset = scrollOffset;
+    notifyListeners();
+  }
+
+  Future<void> initSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedMethod = prefs.getString(_kSolveMethodKey);
+    if (savedMethod != null) {
+      try {
+        _selectedSolveMethod = SolveMethod.values.firstWhere((e) => e.name == savedMethod);
+      } catch (_) {
+        _selectedSolveMethod = SolveMethod.kociemba;
+      }
+    }
+    notifyListeners();
+  }
+
+  Future<void> setSelectedSolveMethod(SolveMethod method) async {
+    if (_selectedSolveMethod == method) return;
+    _selectedSolveMethod = method;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kSolveMethodKey, method.name);
   }
 
   void _onMoveComplete() {
@@ -182,6 +269,7 @@ class HomeController extends ChangeNotifier {
         HapticService.impactLight();
 
         // Always update analysis state to keep UI in sync
+        _analysisController.setAnimatingIndexInternal(null);
         _analysisController.updateIndexInternal(vizIndex);
 
         if (_guideSeekTarget != null) {
@@ -290,9 +378,6 @@ class HomeController extends ChangeNotifier {
   }
 
   void _onPremiumChanged() {
-    if (!PremiumManager().isPremium && _scrambleLength > 20) {
-      _scrambleLength = 20;
-    }
     notifyListeners();
   }
 
@@ -315,14 +400,24 @@ class HomeController extends ChangeNotifier {
   void handleAnalysisNext({Duration? overrideDuration}) {
     if (!_showingSolution || !_analysisController.hasNext) return;
 
-    final move = _analysisController.solution[_analysisController.currentIndex];
+    final int baseIndex =
+        _analysisController.animatingIndex ?? _analysisController.currentIndex;
+    if (baseIndex >= _analysisController.solution.length) return;
+
+    final move = _analysisController.solution[baseIndex];
+    _analysisController.setAnimatingIndexInternal(baseIndex + 1);
     _queueAnalysisMove(move, false, overrideDuration: overrideDuration);
   }
 
   void handleAnalysisPrevious({Duration? overrideDuration}) {
     if (!_showingSolution || !_analysisController.hasPrevious) return;
 
-    final prevMoveIndex = _analysisController.currentIndex - 1;
+    final int baseIndex =
+        _analysisController.animatingIndex ?? _analysisController.currentIndex;
+    if (baseIndex <= 0) return;
+
+    final prevMoveIndex = baseIndex - 1;
+    _analysisController.setAnimatingIndexInternal(baseIndex - 1);
     final move = _analysisController.solution[prevMoveIndex];
     final inverseMove = move.inverse;
 
@@ -434,13 +529,50 @@ class HomeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void randomize() {
+    if (_animationController.isAnimating) {
+      _animationController.clearQueue();
+    }
+    
+    if (!PremiumManager().isPremium) {
+      onPremiumUpsellRequested?.call();
+      return;
+    }
+
+    // Generate a full, high-entropy scramble (25 moves)
+    final newMoves = CubeState.generateScramble(25);
+    final finalState = CubeState.solved().applyMoves(newMoves);
+    
+    // Apply instantly
+    _cubeState = finalState;
+    _baseCubeState = finalState;
+    _savedState = finalState;
+    
+    _moveHistory = [];
+    _moveIndex = 0;
+    _solutionStartIndex = 0;
+    _showingSolution = false;
+    _activeDemoStepIndex = null;
+    _isScrambling = false;
+    _isScanned = false; // It's a fresh random state, not scanned from AR
+
+    _analysisController.pause();
+    _animationController.clearQueue();
+    _moveDirectionQueue.clear();
+    
+    HapticService.selection(); // Subtle feedback for the "teleport"
+    notifyListeners();
+  }
+
   Future<void> solve({
-    SolveMethod method = SolveMethod.kociemba,
+    SolveMethod? method,
     bool? showExplanations,
+    SolveResult? precomputed,
   }) async {
+    final solveMethod = method ?? _selectedSolveMethod;
     if (_animationController.isAnimating) return;
 
-    if (method == SolveMethod.lbl &&
+    if (solveMethod != SolveMethod.kociemba &&
         !PremiumManager().canAccessFeature('lbl_solver')) {
       return;
     }
@@ -460,6 +592,7 @@ class HomeController extends ChangeNotifier {
         : _cubeState;
 
     _isSolving = true;
+    _solveStatus = "Solving...";
     _cubeState = solveState;
     if (!_showingSolution) {
       _baseCubeState = solveState;
@@ -468,10 +601,26 @@ class HomeController extends ChangeNotifier {
     }
     notifyListeners();
 
-    final solveResult = await SolverService.solve(
-      state: solveState,
-      useLBL: method == SolveMethod.lbl,
-    );
+    SolveResult solveResult;
+    try {
+      // A result from the method comparison was solved from this same state.
+      solveResult = precomputed != null && !_showingSolution
+          ? precomputed
+          : await SolverService.solve(
+              state: solveState,
+              method: solveMethod,
+              onProgress: (status) {
+                _solveStatus = status;
+                notifyListeners();
+              },
+            );
+    } catch (e) {
+      debugPrint("Solver failed: $e");
+      _isSolving = false;
+      _solveStatus = null;
+      notifyListeners();
+      return;
+    }
 
     if (solveResult.moves.isNotEmpty) {
       if (_showingSolution) {
@@ -486,6 +635,7 @@ class HomeController extends ChangeNotifier {
 
       // Stop "solving" (computing) and show interactive playback controls
       _isSolving = false;
+      _solveStatus = null;
       _showingSolution = true;
 
       _analysisController.loadSolution(
@@ -504,6 +654,8 @@ class HomeController extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  // Removed startARGuidedSolve
 
   void performMove(CubeMove move) {
     if (_animationController.isAnimating) return;
@@ -558,83 +710,55 @@ class HomeController extends ChangeNotifier {
     String? demoType,
     Map<CubeFace, Map<int, String>>? stickerLabels,
     List<int>? targetPieces,
+    List<MapEntry<CubeFace, int>>? highlightedStickers,
+    bool dimNonHighlighted = false,
+    List<String?>? moveDescriptions,
+    Map<int, String>? moveLabels,
   }) async {
     _cubeState = initialState;
     _activeDemoStepIndex = stepIndex;
     _activeDemoType = demoType;
     _stickerLabels = stickerLabels;
+    _highlightedStickers = highlightedStickers;
+    _dimNonHighlighted = dimNonHighlighted;
+    _moveLabels = moveLabels;
     _initialStickerLabels =
         stickerLabels?.map((face, labels) => MapEntry(face, Map.from(labels)));
     _initialCubeState = initialState;
 
     if (moves == null) {
-      _path = null;
       _showingSolution = false;
+      _moveIndex = 0;
+      _solutionStartIndex = 0;
     } else {
-      _pathStartRotationX = initialRotationX;
-      _pathTargetRotationX = targetRotationX;
-      _pathStartRotationY = initialRotationY;
-      _pathTargetRotationY = targetRotationY;
-      _path = moves;
+      // Initialize camera orientation for the demo
+      _rotationX = initialRotationX ?? 0.5;
+      _rotationY = initialRotationY ?? 0.75;
 
       // Update Move History and Analysis Controller to list moves in UI
       _moveHistory = List.from(moves);
-      _analysisController.loadSolution(moves, initialState, moves.length);
+      _moveIndex = 0;
+      _solutionStartIndex = 0;
+      _analysisController.loadSolution(
+        moves,
+        initialState,
+        moves.length,
+        moveStageDescriptions: moveDescriptions,
+      );
       _showingSolution = true;
-
-      _playGeneration++;
-      _playPath();
+      _showExplanations = true;
     }
     notifyListeners();
-  }
-
-  Future<void> _playPath() async {
-    if (_path == null) return;
-    _playGeneration++;
-    final myGeneration = _playGeneration;
-
-    _rotationX = _pathStartRotationX ?? 0.5;
-    _rotationY = _pathStartRotationY ?? 0.75;
-    notifyListeners();
-
-    await Future.delayed(const Duration(milliseconds: 1000));
-
-    final targetRotationX = _pathTargetRotationX ?? 0.5;
-    final targetRotationY = _pathTargetRotationY ?? 0.75;
-
-    if (_rotationX != targetRotationX || _rotationY != targetRotationY) {
-      // For now, simpler rotation jump till we move camera tilt controller too
-      _rotationX = targetRotationX;
-      _rotationY = targetRotationY;
-      notifyListeners();
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
-
-    _animationController.setSpeed(const Duration(milliseconds: 800));
-
-    for (int i = 0; i < _path!.length; i++) {
-      final move = _path![i];
-      if (_playGeneration != myGeneration) break;
-      performMove(move);
-      // Update analysis controller to highlight current move
-      _analysisController.updateIndexInternal(i + 1);
-      await Future.delayed(const Duration(milliseconds: 1000));
-    }
-
-    if (_playGeneration == myGeneration) {
-      _animationController.setSpeed(const Duration(milliseconds: 400));
-    }
   }
 
   void cancelDemo() {
     final capturedStepIndex = _activeDemoStepIndex;
     final capturedDemoType = _activeDemoType;
-    _playGeneration++;
-    _path = null;
     _showingSolution = false;
     _activeDemoStepIndex = null;
     _activeDemoType = null;
     _stickerLabels = null;
+    _moveLabels = null;
     _animationController.setSpeed(const Duration(milliseconds: 400));
     _animationController.clearQueue();
     _moveDirectionQueue.clear();

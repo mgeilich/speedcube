@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import '../utils/app_layout.dart';
 import '../utils/premium_manager.dart';
 import 'premium_upsell_sheet.dart';
-import 'alg_library_screen.dart';
 
 class HomeHeader extends StatelessWidget {
   final VoidCallback onScanPressed;
   final VoidCallback onLearnPressed;
+  final VoidCallback onLibraryPressed;
+  final VoidCallback onSettingsPressed;
 
   const HomeHeader({
     super.key,
     required this.onScanPressed,
     required this.onLearnPressed,
+    required this.onLibraryPressed,
+    required this.onSettingsPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isShort = MediaQuery.of(context).size.height < 750;
+    final isShort = AppLayout.isShort(context);
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: isShort ? 8 : 12),
       child: Row(
@@ -33,15 +37,22 @@ class HomeHeader extends StatelessWidget {
             child: const Icon(Icons.view_in_ar, color: Colors.white, size: 20),
           ),
           const SizedBox(width: 8),
-          const Text(
-            "SpeedCube AR",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+          // Shrinks to fit on narrow screens (e.g. iPhone Duo outer display)
+          const Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "SpeedCube AR",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
-          const Spacer(),
+          const SizedBox(width: 8),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -98,20 +109,58 @@ class HomeHeader extends StatelessWidget {
                 tooltip: 'Learn Mode',
               ),
               const SizedBox(width: 2),
-              // Algorithm Library button
+              // Library button
+              Stack(
+                children: [
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: const Icon(Icons.menu_book,
+                        color: Colors.white70, size: 24),
+                    onPressed: () {
+                      if (!kIsWeb && !PremiumManager().isPremium) {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          isScrollControlled: true,
+                          builder: (context) => const PremiumUpsellSheet(),
+                        );
+                        return;
+                      }
+                      onLibraryPressed();
+                    },
+                    tooltip: 'Algorithm Library',
+                  ),
+                  if (!kIsWeb && !PremiumManager().isPremium)
+                    Positioned(
+                      right: -2,
+                      bottom: -2,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF0F0F1A),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.lock,
+                          color: Color(0xFFF59E0B),
+                          size: 10,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(width: 2),
+              // Settings button
               IconButton(
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: const Icon(Icons.menu_book_rounded,
-                    color: Colors.white70, size: 24),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const AlgLibraryScreen(),
-                  ),
-                ),
-                tooltip: 'Algorithm Library',
+                icon:
+                    const Icon(Icons.settings, color: Colors.white70, size: 24),
+                onPressed: onSettingsPressed,
+                tooltip: 'Settings',
               ),
             ],
           ),

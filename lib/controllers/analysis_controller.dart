@@ -11,6 +11,7 @@ class AnalysisController extends ChangeNotifier {
   List<String?> _moveStageDescriptions = [];
   List<String?> _moveAlgorithmNames = [];
   int _currentIndex = 0;
+  int? _animatingIndex;
   String? _stageName;
   int _phase1MoveCount = 0;
   bool _isPlaying = false;
@@ -45,6 +46,7 @@ class AnalysisController extends ChangeNotifier {
   List<String?> get moveStageDescriptions => _moveStageDescriptions;
   List<String?> get moveAlgorithmNames => _moveAlgorithmNames;
   int get currentIndex => _currentIndex;
+  int? get animatingIndex => _animatingIndex;
   bool get isPlaying => _isPlaying;
   bool get isRewinding => _isRewinding;
   bool get isFastForwarding => _isFastForwarding;
@@ -53,14 +55,70 @@ class AnalysisController extends ChangeNotifier {
       (_currentIndex > 0 && _currentIndex <= _solution.length)
           ? _solution[_currentIndex - 1]
           : null;
-  bool get hasNext => _currentIndex < _solution.length;
-  bool get hasPrevious => _currentIndex > 0;
+  bool get hasNext => (_animatingIndex ?? _currentIndex) < _solution.length;
+  bool get hasPrevious => (_animatingIndex ?? _currentIndex) > 0;
   bool get isComplete => _currentIndex >= _solution.length;
   int get phase1MoveCount => _phase1MoveCount;
   String? get stageName => _stageName;
 
   /// Returns 1 if current move is in Phase 1, 2 if in Phase 2
   int get currentPhase => _currentIndex <= _phase1MoveCount ? 1 : 2;
+
+  /// Per-stage move count breakdown, ordered by first appearance in the solution.
+  /// For Kociemba solves (no stage names), returns Phase 1 / Phase 2 breakdown.
+  List<({String name, int count})> get stageBreakdown {
+    final result = <({String name, int count})>[];
+    final seen = <String>{};
+
+    if (_moveStageNames.isEmpty) return result;
+
+    // Check if this is a pure Kociemba solve (all null stage names)
+    final allNull = _moveStageNames.every((s) => s == null);
+    if (allNull && _solution.isNotEmpty) {
+      if (_phase1MoveCount > 0) {
+        result.add((name: 'Phase 1', count: _phase1MoveCount));
+      }
+      final phase2 = _solution.length - _phase1MoveCount;
+      if (phase2 > 0) {
+        result.add((name: 'Phase 2', count: phase2));
+      }
+      return result;
+    }
+
+    // Group consecutive moves by stage name
+    for (int i = 0; i < _moveStageNames.length; i++) {
+      final name = _moveStageNames[i] ?? 'Kociemba';
+      // Normalize: strip method prefix for display (e.g. "CFOP F2L" -> "F2L")
+      final displayName = normalizeStage(name);
+
+      if (!seen.contains(displayName)) {
+        seen.add(displayName);
+        final count = _moveStageNames.where((s) => normalizeStage(s ?? 'Kociemba') == displayName).length;
+        result.add((name: displayName, count: count));
+      }
+    }
+    return result;
+  }
+
+  /// Strips common method prefixes for cleaner display.
+  static String normalizeStage(String raw) {
+    // Remove method prefixes like "CFOP ", "Roux ", etc.
+    var name = raw;
+    final prefixes = ['CFOP ', 'Roux ', 'ZZ ', 'Petrus ', 'Heise '];
+    for (final p in prefixes) {
+      if (name.startsWith(p)) {
+        name = name.substring(p.length);
+        break;
+      }
+    }
+    // Roux records each block piece separately ("FB DL", "SB DFR")
+    if (name.startsWith('FB ')) return 'First Block';
+    if (name.startsWith('SB ')) return 'Second Block';
+    // Also strip " (Fallback)" suffixes and "Stage 1a: " numbering (ZZ)
+    return name
+        .replaceAll(RegExp(r'\s*\(Fallback\)'), '')
+        .replaceFirst(RegExp(r'^Stage \d+[a-z]?:\s*'), '');
+  }
 
   /// Load a new solution and calculate states
   void loadSolution(
@@ -106,12 +164,20 @@ class AnalysisController extends ChangeNotifier {
   }
 
   /// Set playing state internally
+  /// Set playing state internally
   void setPlayingInternal(bool playing) {
     _isPlaying = playing;
     if (!playing) {
       _isRewinding = false;
       _isFastForwarding = false;
     }
+    notifyListeners();
+  }
+
+  /// Set animating index internally (used by main state while move is in progress)
+  void setAnimatingIndexInternal(int? index) {
+    if (index != null && (index < 0 || index > _solution.length)) return;
+    _animatingIndex = index;
     notifyListeners();
   }
 
@@ -181,12 +247,14 @@ class AnalysisController extends ChangeNotifier {
   /// Request next move
   void nextMove() {
     if (!hasNext) return;
+    pause();
     onNextRequest?.call();
   }
 
   /// Request previous move
   void previousMove() {
     if (!hasPrevious) return;
+    pause();
     onPreviousRequest?.call();
   }
 

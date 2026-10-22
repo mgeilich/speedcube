@@ -1,9 +1,9 @@
 // ignore_for_file: avoid_print
-import 'package:speedcube_ar/models/cube_state.dart';
-import 'package:speedcube_ar/models/cube_move.dart';
-import 'package:speedcube_ar/solver/lbl_solver.dart';
+import 'lib/models/cube_state.dart';
+import 'lib/models/cube_move.dart';
+import 'lib/solver/lbl_solver.dart';
 
-void main() {
+void main() async {
   final scrambleStr = "L U' B L R' L' U R' B D' B' R U F L' B L' D' L' R";
   final scrambleMoves =
       scrambleStr.split(' ').map((s) => CubeMove.parse(s)!).toList();
@@ -12,7 +12,7 @@ void main() {
   print('Scrambled State:');
   _dumpState(scrambled);
 
-  final result = LblSolver.solve(scrambled);
+  final result = await LblSolver.solve(scrambled);
   if (result == null) {
     print('Solver returned null');
     return;

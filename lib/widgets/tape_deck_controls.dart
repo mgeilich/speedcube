@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/app_layout.dart';
 import '../utils/haptic_service.dart';
 
 class TapeDeckControls extends StatelessWidget {
@@ -10,8 +11,11 @@ class TapeDeckControls extends StatelessWidget {
   final VoidCallback onPlayPause;
   final VoidCallback onRewind;
   final VoidCallback onFastForward;
+  final VoidCallback onStepForward;
+  final VoidCallback onStepBackward;
   final VoidCallback onJumpToStart;
   final VoidCallback onJumpToEnd;
+// final VoidCallback? onARMode; // Removed
   final Color activeColor;
 
   const TapeDeckControls({
@@ -24,14 +28,20 @@ class TapeDeckControls extends StatelessWidget {
     required this.onPlayPause,
     required this.onRewind,
     required this.onFastForward,
+    required this.onStepForward,
+    required this.onStepBackward,
     required this.onJumpToStart,
     required this.onJumpToEnd,
+// this.onARMode, // Removed
     required this.activeColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isShort = MediaQuery.of(context).size.height < 750;
+    final isShort = AppLayout.isShort(context);
+    final smallButtonSize = isShort ? 38.0 : 42.0;
+    final spacing = isShort ? 4.0 : 8.0;
+
     return Container(
       padding: EdgeInsets.symmetric(vertical: isShort ? 8 : 16),
       child: Row(
@@ -40,16 +50,25 @@ class TapeDeckControls extends StatelessWidget {
           _buildControlButton(
             icon: Icons.first_page,
             onPressed: hasPrevious ? onJumpToStart : null,
+            size: smallButtonSize,
             tooltip: "Jump to Start",
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: spacing),
+          _buildControlButton(
+            icon: Icons.skip_previous_rounded,
+            onPressed: hasPrevious ? onStepBackward : null,
+            size: smallButtonSize,
+            tooltip: "Step Back",
+          ),
+          SizedBox(width: spacing),
           _buildControlButton(
             icon: Icons.fast_rewind,
             onPressed: hasPrevious ? onRewind : null,
             isActive: isRewinding,
+            size: smallButtonSize,
             tooltip: "Rewind (2x)",
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: spacing * 2),
           _buildControlButton(
             icon: isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
             onPressed: (hasNext || isPlaying) ? onPlayPause : null,
@@ -58,19 +77,29 @@ class TapeDeckControls extends StatelessWidget {
             color: activeColor,
             tooltip: isPlaying ? "Pause" : "Play",
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: spacing * 2),
           _buildControlButton(
             icon: Icons.fast_forward,
             onPressed: hasNext ? onFastForward : null,
             isActive: isFastForwarding,
+            size: smallButtonSize,
             tooltip: "Fast Forward (2x)",
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: spacing),
+          _buildControlButton(
+            icon: Icons.skip_next_rounded,
+            onPressed: hasNext ? onStepForward : null,
+            size: smallButtonSize,
+            tooltip: "Step Forward",
+          ),
+          SizedBox(width: spacing),
           _buildControlButton(
             icon: Icons.last_page,
             onPressed: hasNext ? onJumpToEnd : null,
+            size: smallButtonSize,
             tooltip: "Jump to End",
           ),
+// Removed AR Mode button
         ],
       ),
     );
@@ -80,10 +109,12 @@ class TapeDeckControls extends StatelessWidget {
     required IconData icon,
     required VoidCallback? onPressed,
     bool isLarge = false,
+    double? size,
     bool isActive = false,
     Color? color,
     String? tooltip,
   }) {
+    final double buttonSize = size ?? (isLarge ? 64 : 48);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -93,10 +124,10 @@ class TapeDeckControls extends StatelessWidget {
                 onPressed();
               }
             : null,
-        borderRadius: BorderRadius.circular(isLarge ? 32 : 24),
+        borderRadius: BorderRadius.circular(buttonSize / 2),
         child: Container(
-          width: isLarge ? 64 : 48,
-          height: isLarge ? 64 : 48,
+          width: buttonSize,
+          height: buttonSize,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: isActive
@@ -116,7 +147,7 @@ class TapeDeckControls extends StatelessWidget {
                 : (isActive
                     ? (color ?? const Color(0xFF818CF8))
                     : Colors.white),
-            size: isLarge ? 32 : 24,
+            size: isLarge ? 32 : (buttonSize * 0.5),
           ),
         ),
       ),

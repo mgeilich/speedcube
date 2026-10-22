@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import '../utils/premium_manager.dart';
-import 'premium_upsell_sheet.dart';
 
 class LearnOptionsSheet extends StatelessWidget {
   final VoidCallback onSelectIntroduction;
   final VoidCallback onSelectLayerByLayerMethod;
-
+  final VoidCallback onSelectCfopMethod;
+  final VoidCallback onSelectRouxMethod;
+  final VoidCallback onSelectZzMethod;
+  final VoidCallback onSelectPetrusMethod;
+  final VoidCallback onSelectHeiseMethod;
+ 
   const LearnOptionsSheet({
     super.key,
     required this.onSelectIntroduction,
     required this.onSelectLayerByLayerMethod,
+    required this.onSelectCfopMethod,
+    required this.onSelectRouxMethod,
+    required this.onSelectZzMethod,
+    required this.onSelectPetrusMethod,
+    required this.onSelectHeiseMethod,
   });
 
   @override
@@ -68,10 +77,11 @@ class LearnOptionsSheet extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             // Options list
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
                   _buildOptionCard(
                     icon: Icons.info_outline,
                     title: 'Introduction to the Cube',
@@ -89,22 +99,74 @@ class LearnOptionsSheet extends StatelessWidget {
                     description: 'Learn to solve your first cube step-by-step.',
                     onTap: () {
                       Navigator.pop(context);
-                      if (!kIsWeb && !PremiumManager().isPremium) {
-                        showModalBottomSheet(
-                          context: context,
-                          backgroundColor: Colors.transparent,
-                          isScrollControlled: true,
-                          builder: (_) => const PremiumUpsellSheet(),
-                        );
-                        return;
-                      }
                       onSelectLayerByLayerMethod();
                     },
-                    isPremium: true,
                   ),
+                  const SizedBox(height: 16),
+                  _buildOptionCard(
+                    icon: Icons.bolt,
+                    isAdvanced: true,
+                    isPremium: true,
+                    title: 'CFOP Tutorial',
+                    description: 'The next step to a faster solution',
+                    onTap: () {
+                      Navigator.pop(context);
+                      onSelectCfopMethod();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildOptionCard(
+                    icon: Icons.extension,
+                    isAdvanced: true,
+                    isPremium: true,
+                    title: 'Roux Method',
+                    description: 'Innovative block building and low move counts',
+                    onTap: () {
+                      Navigator.pop(context);
+                      onSelectRouxMethod();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildOptionCard(
+                    icon: Icons.architecture,
+                    isAdvanced: true,
+                    isPremium: true,
+                    title: 'ZZ Method',
+                    description: 'The efficiency master: No rotations, fewer moves',
+                    onTap: () {
+                      Navigator.pop(context);
+                      onSelectZzMethod();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildOptionCard(
+                    icon: Icons.view_in_ar_rounded,
+                    isAdvanced: true,
+                    isPremium: true,
+                    title: 'Petrus Method',
+                    description: 'Build blocks, orient edges, and solve efficiently',
+                    onTap: () {
+                      Navigator.pop(context);
+                      onSelectPetrusMethod();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildOptionCard(
+                    icon: Icons.auto_awesome_mosaic_rounded,
+                    isAdvanced: true,
+                    isPremium: true,
+                    title: 'Heise Method',
+                    description: 'The intuitive challenge: No algorithms, just blocks and commutators',
+                    onTap: () {
+                      Navigator.pop(context);
+                      onSelectHeiseMethod();
+                    },
+                  ),
+
                   const SizedBox(height: 40),
                 ],
               ),
+            ),
             ),
           ],
         ),
@@ -119,7 +181,11 @@ class LearnOptionsSheet extends StatelessWidget {
     required VoidCallback onTap,
     bool isAdvanced = false,
     bool isPremium = false,
+    Color? color,
   }) {
+    final cardColor = color ?? (isAdvanced
+        ? const Color(0xFFF59E0B)
+        : const Color(0xFF10B981));
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -135,19 +201,16 @@ class LearnOptionsSheet extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isAdvanced
-                    ? const Color(0xFFF59E0B).withValues(alpha: 0.1)
-                    : const Color(0xFF10B981).withValues(alpha: 0.1),
+                color: cardColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                color: isAdvanced
-                    ? const Color(0xFFF59E0B)
-                    : const Color(0xFF10B981),
+                color: cardColor,
                 size: 24,
               ),
             ),
+
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -166,11 +229,25 @@ class LearnOptionsSheet extends StatelessWidget {
                       if (isPremium &&
                           !kIsWeb &&
                           !PremiumManager().isPremium) ...[
-                        const SizedBox(width: 8),
-                        const Icon(
-                          Icons.lock,
-                          color: Color(0xFFF59E0B),
-                          size: 14,
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                                color: const Color(0xFFF59E0B)
+                                    .withValues(alpha: 0.5)),
+                          ),
+                          child: const Text(
+                            'PRO',
+                            style: TextStyle(
+                              color: Color(0xFFF59E0B),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
                         ),
                       ],
                     ],

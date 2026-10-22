@@ -3,7 +3,7 @@ import 'package:speedcube_ar/models/cube_state.dart';
 import 'package:speedcube_ar/models/cube_move.dart';
 import 'package:speedcube_ar/solver/lbl_solver.dart';
 
-void main() {
+void main() async {
   // Use a failed scramble from Step 2 run
   final scrambleStr = "U R L' R' D' F L D' U B F D' R U' B' D' U L' F R";
   final scrambleMoves =
@@ -13,7 +13,7 @@ void main() {
   print('Scrambled State:');
   _dumpState(scrambled);
 
-  final result = LblSolver.solve(scrambled);
+  final result = await LblSolver.solve(scrambled);
   if (result == null) {
     print('Solver returned null');
     return;

@@ -1,7 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
-import 'kociemba_tables_data.dart';
 
 class KociembaTableData {
   final List<List<int>> twistMove;
@@ -36,26 +35,27 @@ class KociembaTables {
   static const int nPerm = 40320; // 8!
   static const int nSlicePerm = 24; // 4!
 
-  static KociembaTableData? _data;
+  static KociembaTableData? data;
+  
   static Future<void>? _initFuture;
 
-  static List<List<int>> get twistMove => _data!.twistMove;
-  static List<List<int>> get flipMove => _data!.flipMove;
-  static List<List<int>> get sliceMove => _data!.sliceMove;
-  static List<List<int>> get cpMove => _data!.cpMove;
-  static List<List<int>> get epMove => _data!.epMove;
-  static List<List<int>> get uspMove => _data!.uspMove;
-  static List<int> get twistSlicePrun => _data!.twistSlicePrun;
-  static List<int> get flipSlicePrun => _data!.flipSlicePrun;
-  static List<int> get cpUspPrun => _data!.cpUspPrun;
-  static List<int> get epUspPrun => _data!.epUspPrun;
+  static List<List<int>> get twistMove => data!.twistMove;
+  static List<List<int>> get flipMove => data!.flipMove;
+  static List<List<int>> get sliceMove => data!.sliceMove;
+  static List<List<int>> get cpMove => data!.cpMove;
+  static List<List<int>> get epMove => data!.epMove;
+  static List<List<int>> get uspMove => data!.uspMove;
+  static List<int> get twistSlicePrun => data!.twistSlicePrun;
+  static List<int> get flipSlicePrun => data!.flipSlicePrun;
+  static List<int> get cpUspPrun => data!.cpUspPrun;
+  static List<int> get epUspPrun => data!.epUspPrun;
 
   static final _log = Logger('KociembaTables');
   static bool _initialized = false;
   static bool get initialized => _initialized;
 
   static Future<void> init() async {
-    if (_data != null) return;
+    if (data != null) return;
     if (_initFuture != null) return _initFuture;
 
     _log.info('Starting KociembaTables initialization (via isolate)');
@@ -65,18 +65,23 @@ class KociembaTables {
 
   static Future<void> _doInit() async {
     try {
-      // Use compute to run the heavy decoding in a background isolate (Web Worker on web)
-      _data = await compute(_decodeTables, kociembaTablesBase64);
+      final ByteData data = await rootBundle.load('assets/kociemba_tables.bin');
+      final Uint8List binary = data.buffer.asUint8List();
+
+      // Use compute to run the heavy decoding in a background isolate
+      KociembaTables.data = await compute(_decodeTables, binary);
       _log.info('KociembaTables initialized in background');
       _initialized = true;
       _verifyPruning();
     } catch (e, stack) {
-      _log.severe('Failed to load static data', e, stack);
+      _log.severe('Failed to load asset tables: $e', e, stack);
+      _initFuture = null; // Allow retry
+      throw Exception('Rubik Solver Error: Missing or corrupt search tables. Please restart the app or reinstall. Details: $e');
     }
   }
 
   static void _verifyPruning() {
-    if (_data == null) return;
+    if (data == null) return;
     int tsUnreachable = twistSlicePrun.where((v) => v == -1).length;
     int fsUnreachable = flipSlicePrun.where((v) => v == -1).length;
     int cuUnreachable = cpUspPrun.where((v) => v == -1).length;
@@ -108,8 +113,7 @@ class KociembaTables {
 }
 
 /// Heavy decoding logic moved out of class for compute() compatibility
-KociembaTableData _decodeTables(String base64Data) {
-  final Uint8List binary = base64Decode(base64Data);
+KociembaTableData _decodeTables(Uint8List binary) {
   final reader = _ByteReader(binary);
 
   List<List<int>> readMoveTable(int rows, int cols) {

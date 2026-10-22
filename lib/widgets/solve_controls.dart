@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
+import '../utils/app_layout.dart';
 import '../models/cube_state.dart';
 import '../models/cube_move.dart';
 import '../controllers/analysis_controller.dart';
-import '../controllers/home_controller.dart';
+import '../models/solve_method.dart';
 import '../utils/premium_manager.dart';
 import '../utils/move_explainer.dart';
 import '../utils/solve_theme.dart';
 import '../utils/haptic_service.dart';
 import 'analysis_timeline.dart';
 import 'premium_upsell_sheet.dart';
+import 'solve_stats_sheet.dart';
 import 'tape_deck_controls.dart';
 import 'scramble_settings_panel.dart';
 
+/// Which part of the controls to show. The split (iPhone Duo unfolded)
+/// layout puts [scramble] and [solve] in separate panes.
+enum SolveControlsSection { all, scramble, solve }
+
 class SolveControls extends StatelessWidget {
+  final SolveControlsSection section;
   final bool showingSolution;
   final bool showExplanations;
   final int moveIndex;
@@ -21,12 +28,16 @@ class SolveControls extends StatelessWidget {
   final AnalysisController analysisController;
   final bool isScrambling;
   final bool isSolving;
+  final String? solveStatus;
   final bool isAnimating;
   final CubeState cubeState;
   final int scrambleLength;
   final Function(int) onScrambleLengthChanged;
   final VoidCallback onScramble;
-  final Function({SolveMethod method, bool showExplanations}) onSolve;
+  final VoidCallback onRandomize;
+  final Function({SolveMethod? method, bool showExplanations}) onSolve;
+  final Function(SolveMethod) onMethodChanged;
+  final SolveMethod selectedMethod;
   final Function(int, {bool immediate}) onSeek;
   final VoidCallback onSeekStart;
   final VoidCallback onShowWebDemo;
@@ -35,9 +46,11 @@ class SolveControls extends StatelessWidget {
   final VoidCallback? onReset;
   final bool canReset;
   final bool isScanned;
+// final VoidCallback? onARMode; // Removed
 
   const SolveControls({
     super.key,
+    this.section = SolveControlsSection.all,
     required this.showingSolution,
     required this.showExplanations,
     required this.moveIndex,
@@ -46,11 +59,13 @@ class SolveControls extends StatelessWidget {
     required this.analysisController,
     required this.isScrambling,
     required this.isSolving,
+    this.solveStatus,
     required this.isAnimating,
     required this.cubeState,
     required this.scrambleLength,
     required this.onScrambleLengthChanged,
     required this.onScramble,
+    required this.onRandomize,
     required this.onSolve,
     required this.onSeek,
     required this.onSeekStart,
@@ -60,19 +75,36 @@ class SolveControls extends StatelessWidget {
     this.onReset,
     this.canReset = false,
     required this.isScanned,
+    required this.onMethodChanged,
+    required this.selectedMethod,
+    this.moveLabels,
+    this.onCompare,
   });
+
+  final Map<int, String>? moveLabels;
+
+  /// Opens the method comparison for the current scramble.
+  final VoidCallback? onCompare;
+
 
   @override
   Widget build(BuildContext context) {
+    if (section == SolveControlsSection.scramble) {
+      return _buildActionArea(_buildScramblePane());
+    }
+    if (section == SolveControlsSection.solve && !showingSolution) {
+      return _buildActionArea(_buildSolvePane());
+    }
     if (showingSolution) {
-      return Expanded(
-        child: Stack(
-          children: [
-            Column(
+      return AnimatedBuilder(
+        animation: analysisController,
+        builder: (context, child) {
+          return Expanded(
+            child: Column(
               children: [
-                if (MediaQuery.of(context).size.height >= 700) ...[
+                // 1. Move Counter / Scrubber
+                if (!AppLayout.isShort(context, 700)) ...[
                   const SizedBox(height: 12),
-                  // Progress scrubber
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Row(
@@ -120,13 +152,55 @@ class SolveControls extends StatelessWidget {
                             ),
                           ),
                         ),
+                        const SizedBox(width: 12),
                         Text(
-                          '${moveIndex - solutionStartIndex}/${moveHistory.length - solutionStartIndex}',
+                          moveLabels != null && moveLabels!.containsKey(moveIndex - solutionStartIndex)
+                              ? moveLabels![moveIndex - solutionStartIndex]!
+                              : '${moveIndex - solutionStartIndex}/${moveHistory.length - solutionStartIndex}',
                           style: const TextStyle(
                             color: Colors.white54,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'monospace',
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () {
+                            HapticService.impactLight();
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              isScrollControlled: true,
+                              builder: (_) => SolveStatsSheet(controller: analysisController),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                width: 1,
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.bar_chart_rounded, color: Colors.white70, size: 14),
+                                SizedBox(width: 4),
+                                Text(
+                                  'STATS',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -135,7 +209,7 @@ class SolveControls extends StatelessWidget {
                   const SizedBox(height: 12),
                 ],
 
-                // Tape Deck Controls
+                // 2. Play Controls (Tape Deck)
                 TapeDeckControls(
                   isPlaying: analysisController.isPlaying,
                   isRewinding: analysisController.isRewinding,
@@ -147,6 +221,8 @@ class SolveControls extends StatelessWidget {
                       : analysisController.play,
                   onRewind: analysisController.rewind,
                   onFastForward: () => analysisController.play(fast: true),
+                  onStepForward: analysisController.nextMove,
+                  onStepBackward: analysisController.previousMove,
                   onJumpToStart: () => onSeek(0, immediate: true),
                   onJumpToEnd: () =>
                       onSeek(analysisController.solution.length, immediate: true),
@@ -155,371 +231,351 @@ class SolveControls extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
 
-                // Analysis buttons (timeline) - GATED
-                if (showExplanations && PremiumManager().isPremium) ...[
+                // 3. Move Buttons (Timeline)
+                if (showExplanations || isDemo) ...[
                   AnalysisTimeline(
                     controller: analysisController,
                   ),
                   const SizedBox(height: 12),
                 ],
 
-                const SizedBox(height: 16),
-
-                // Move Explanation Area
-                if (!isDemo && showExplanations)
+                // 4. Explanation Box
+                if (showExplanations)
                   Expanded(
-                    child: AnimatedBuilder(
-                      animation: analysisController,
-                      builder: (context, child) {
-                        final move = analysisController.currentMove;
-                        final index = analysisController.currentIndex;
-
-                        final bool isPremium = PremiumManager().isPremium;
-
-                        if (!isPremium && move != null) {
-                          // PRO Teaser for non-premium users
-                          return Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 20),
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF6366F1)
-                                  .withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: const Color(0xFF6366F1)
-                                    .withValues(alpha: 0.3),
-                                width: 2,
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.workspace_premium,
-                                    color: Color(0xFFF59E0B), size: 40),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  "UNLOC PRO EXPLANATIONS",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  "Upgrade to see the rationale and objective behind every move.",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      backgroundColor: Colors.transparent,
-                                      isScrollControlled: true,
-                                      builder: (_) =>
-                                          const PremiumUpsellSheet(),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFF59E0B),
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  child: const Text("SEE ALL FEATURES"),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-
-                        if (move == null) {
-                          // Initial "Start" state
-                          final isCurrent = index == 0;
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 4),
-                            child: GestureDetector(
-                              onTap: () => onSeek(0, immediate: true),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: isCurrent
-                                      ? Colors.white.withValues(alpha: 0.1)
-                                      : Colors.white.withValues(alpha: 0.05),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: isCurrent
-                                        ? const Color(0xFF6366F1)
-                                        : Colors.white12,
-                                    width: isCurrent ? 1.5 : 1,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    if (index < analysisController.currentIndex)
-                                      const Padding(
-                                        padding: EdgeInsets.only(right: 12),
-                                        child: Icon(
-                                          Icons.check_circle,
-                                          color: Color(0xFF10B981),
-                                          size: 18,
-                                        ),
-                                      )
-                                    else
-                                      const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            "START",
-                                            style: TextStyle(
-                                              color: Color(0xFF818CF8),
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 0.5,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            "Scrambled state",
-                                            style: TextStyle(
-                                              color: isCurrent
-                                                  ? Colors.white
-                                                  : Colors.white70,
-                                              fontSize: 13,
-                                              fontWeight: isCurrent
-                                                  ? FontWeight.w600
-                                                  : FontWeight.normal,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }
-
-                        // Compact tappable summary row - ONLY FOR PREMIUM
-                        final stageColor = SolveTheme.getStageColor(
-                            analysisController.moveStageNames[index - 1]);
-                        final phaseColor = stageColor;
-                        final objective = MoveExplainer.getObjective(
-                          move,
-                          analysisController.currentPhase,
-                          analysisController.states[index - 1],
-                          analysisController.states[index],
-                        );
-
-                        final isCompleted =
-                            index < analysisController.currentIndex;
-                        final isCurrent =
-                            index == analysisController.currentIndex;
-
-                        final stageName =
-                            analysisController.moveStageNames[index - 1];
-                        final stageDesc =
-                            analysisController.moveStageDescriptions[index - 1];
-                        final algorithmName =
-                            analysisController.moveAlgorithmNames[index - 1];
-                        final stageGoal = stageName != null
-                            ? MoveExplainer.getStageGoal(stageName)
-                            : null;
-
-                        final isKociemba = stageName == null;
-
-                        // Refine objective: prioritized high-level desc, drop piece movements if desc exists
-                        final fullObjective =
-                            (stageDesc != null && stageDesc.isNotEmpty)
-                                ? stageDesc
-                                : objective;
-
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 4),
-                          child: GestureDetector(
-                            onTap: () {
-                              if (analysisController.isPlaying) {
-                                onSeekStart();
-                                onSeek(index);
-                              } else {
-                                onSeek(index);
-                              }
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12),
-                              decoration: BoxDecoration(
-                                color: isCurrent
-                                    ? Colors.white.withValues(alpha: 0.1)
-                                    : Colors.white.withValues(alpha: 0.05),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color:
-                                      isCurrent ? phaseColor : Colors.white12,
-                                  width: isCurrent ? 1.5 : 1,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  if (isCompleted)
-                                    const Padding(
-                                      padding: EdgeInsets.only(right: 12),
-                                      child: Icon(
-                                        Icons.check_circle,
-                                        color: Color(0xFF10B981),
-                                        size: 18,
-                                      ),
-                                    )
-                                  else
-                                    const SizedBox(width: 4),
-                                  // Move info
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(bottom: 2),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                (isKociemba
-                                                    ? "PHASE ${index <= analysisController.phase1MoveCount ? 1 : 2}"
-                                                    : stageName.toUpperCase()),
-                                                style: TextStyle(
-                                                  color: isCompleted
-                                                      ? Colors.white38
-                                                      : stageColor,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  letterSpacing: 0.5,
-                                                ),
-                                              ),
-                                              if (algorithmName != null) ...[
-                                                const SizedBox(width: 8),
-                                                Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 5,
-                                                      vertical: 1),
-                                                  decoration: BoxDecoration(
-                                                    color: (isCompleted
-                                                            ? Colors.white12
-                                                            : const Color(
-                                                                0xFFFACC15))
-                                                        .withValues(
-                                                            alpha: 0.15),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            4),
-                                                    border: Border.all(
-                                                      color: (isCompleted
-                                                              ? Colors.white12
-                                                              : const Color(
-                                                                  0xFFFACC15))
-                                                          .withValues(
-                                                              alpha: 0.3),
-                                                      width: 0.5,
-                                                    ),
-                                                  ),
-                                                  child: Text(
-                                                    algorithmName.toUpperCase(),
-                                                    style: TextStyle(
-                                                      color: isCompleted
-                                                          ? Colors.white38
-                                                          : const Color(
-                                                              0xFFFACC15),
-                                                      fontSize: 8,
-                                                      fontWeight:
-                                                          FontWeight.w900,
-                                                      letterSpacing: 0.5,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ],
-                                          ),
-                                        ),
-                                        if (stageGoal != null)
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 6),
-                                            child: Text(
-                                              stageGoal,
-                                              style: TextStyle(
-                                                color: isCompleted
-                                                    ? Colors.white24
-                                                    : Colors.white70,
-                                                fontSize: 11,
-                                                fontStyle: FontStyle.italic,
-                                                height: 1.2,
-                                              ),
-                                            ),
-                                          ),
-                                        Text(
-                                          fullObjective,
-                                          style: TextStyle(
-                                            color: isCompleted
-                                                ? Colors.white38
-                                                : Colors.white,
-                                            fontSize: 13,
-                                            fontWeight: isCurrent
-                                                ? FontWeight.w600
-                                                : FontWeight.normal,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                    child: _buildExplanationBox(context),
                   )
                 else
                   const Spacer(),
                 const SizedBox(height: 12),
               ],
             ),
+          );
+        },
+      );
+    } else {
+      return _buildActionArea(_buildMainActionButton(context));
+    }
+  }
+
+  Widget _buildActionArea(Widget child) {
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Center(child: child),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Left pane of the split layout: scramble settings only.
+  Widget _buildScramblePane() {
+    if (isScrambling) {
+      return _buildButton(
+        icon: Icons.shuffle,
+        label: 'Scrambling...',
+        onPressed: null,
+        color: const Color(0xFFF59E0B),
+        width: 280,
+      );
+    }
+    return _buildScramblePanel();
+  }
+
+  /// Right pane of the split layout before a solution is showing.
+  Widget _buildSolvePane() {
+    if (isDemo) {
+      return _buildButton(
+        icon: Icons.close,
+        label: 'CANCEL',
+        onPressed: onCancelDemo,
+        color: const Color(0xFFEF4444),
+        width: 280,
+      );
+    } else if (isSolving) {
+      return _buildButton(
+        icon: Icons.auto_fix_high,
+        label: solveStatus ?? 'Solving...',
+        onPressed: null,
+        color: const Color(0xFF22C55E),
+        width: 280,
+      );
+    } else if (cubeState.isSolved || isScrambling) {
+      return const Text(
+        'Scramble or scan a cube, then choose a method to solve it step by step.',
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.white54, fontSize: 14, height: 1.4),
+      );
+    }
+    return _buildSolverButton();
+  }
+
+  Widget _buildScramblePanel() {
+    return ScrambleSettingsPanel(
+      scrambleLength: scrambleLength,
+      onLengthChanged: onScrambleLengthChanged,
+      onScramble: onScramble,
+      onRandomize: onRandomize,
+      isScrambling: isScrambling,
+      isAnimating: isAnimating,
+    );
+  }
+
+  Widget _buildSolverButton() {
+    if (onCompare == null) return _buildSolveSelector();
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildSolveSelector(),
+        const SizedBox(height: 8),
+        TextButton.icon(
+          onPressed: isAnimating ? null : onCompare,
+          icon: const Icon(Icons.compare_arrows, size: 18),
+          label: const Text('Compare all methods'),
+          style: TextButton.styleFrom(
+            foregroundColor: const Color(0xFF818CF8),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSolveSelector() {
+    if (PremiumManager().isPremium) {
+      return PremiumSolverSelector(
+        isAnimating: isAnimating,
+        isSolving: isSolving,
+        solveStatus: solveStatus,
+        onSolve: onSolve,
+        selectedMethod: selectedMethod,
+        onMethodChanged: onMethodChanged,
+      );
+    }
+    return _buildButton(
+      icon: Icons.auto_fix_high,
+      label: 'Solve',
+      onPressed:
+          isAnimating ? null : () => onSolve(method: SolveMethod.kociemba),
+      color: const Color(0xFF6366F1),
+      width: 280,
+    );
+  }
+
+  Widget _buildExplanationBox(BuildContext context) {
+    final move = analysisController.currentMove;
+    final index = analysisController.currentIndex;
+    final bool isPremium = PremiumManager().isPremium;
+
+    if (!isPremium && move != null && !isDemo) {
+      return Container(
+        margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFF6366F1).withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: const Color(0xFF6366F1).withValues(alpha: 0.3),
+            width: 2,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.workspace_premium, color: Color(0xFFF59E0B), size: 32),
+            const SizedBox(height: 12),
+            const Text(
+              "UNLOCK PRO EXPLANATIONS",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "Upgrade to see the rationale and objective behind every move.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  isScrollControlled: true,
+                  builder: (_) => const PremiumUpsellSheet(),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFF59E0B),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text("SEE ALL FEATURES", style: TextStyle(fontSize: 12)),
+            ),
           ],
         ),
       );
-    } else {
-      return Expanded(
-        child: SingleChildScrollView(
-          child: Column(
+    }
+
+    if (move == null) {
+      final isCurrent = index == 0;
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isCurrent ? const Color(0xFF6366F1) : Colors.white12,
+              width: isCurrent ? 1.5 : 1,
+            ),
+          ),
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Center(
-                  child: _buildMainActionButton(context),
+              Text(
+                "START",
+                style: TextStyle(
+                  color: Color(0xFF818CF8),
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 8),
+              Text(
+                "The cube is in its initial scrambled state. Use the controls above to navigate the solution.",
+                style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+              ),
             ],
           ),
         ),
       );
     }
+
+    final stageColor = SolveTheme.getStageColor(
+        analysisController.moveStageNames[index - 1]);
+    final objective = MoveExplainer.getObjective(
+      move,
+      analysisController.currentPhase,
+      analysisController.states[index - 1],
+      analysisController.states[index],
+    );
+
+    final stageName = analysisController.moveStageNames[index - 1];
+    final stageDesc = analysisController.moveStageDescriptions[index - 1];
+    final algorithmName = analysisController.moveAlgorithmNames[index - 1];
+    final stageGoal = stageName != null ? MoveExplainer.getStageGoal(stageName) : null;
+    final isKociemba = stageName == null;
+
+    final fullObjective = (stageDesc != null && stageDesc.isNotEmpty) ? stageDesc : objective;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: stageColor.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: stageColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    (isKociemba
+                            ? "PHASE ${index <= analysisController.phase1MoveCount ? 1 : 2}"
+                            : stageName.toUpperCase()),
+                    style: TextStyle(
+                      color: stageColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                if (algorithmName != null) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFACC15).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      algorithmName.toUpperCase(),
+                      style: const TextStyle(
+                        color: Color(0xFFFACC15),
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (stageGoal != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(
+                  stageGoal,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    fontSize: 12,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            Text(
+              isKociemba
+                  ? MoveExplainer.getRationale(
+                      move,
+                      index - 1,
+                      analysisController.solution.length,
+                      analysisController.states[index - 1],
+                      analysisController.states[index],
+                      phase: index <= analysisController.phase1MoveCount ? 1 : 2,
+                    )
+                  : fullObjective,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildMainActionButton(BuildContext context) {
@@ -542,7 +598,7 @@ class SolveControls extends StatelessWidget {
     } else if (isSolving) {
       return _buildButton(
         icon: Icons.auto_fix_high,
-        label: 'Solving...',
+        label: solveStatus ?? 'Solving...',
         onPressed: null,
         color: const Color(0xFF22C55E),
         width: 280,
@@ -550,57 +606,14 @@ class SolveControls extends StatelessWidget {
     } else if (showingSolution) {
       return const SizedBox.shrink();
     } else if (cubeState.isSolved && !isScrambling && !isSolving) {
-      return ScrambleSettingsPanel(
-        scrambleLength: scrambleLength,
-        onLengthChanged: onScrambleLengthChanged,
-        onScramble: onScramble,
-        isScrambling: isScrambling,
-        isAnimating: isAnimating,
-      );
+      return _buildScramblePanel();
     } else {
-      final bool isPremium = PremiumManager().isPremium;
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ScrambleSettingsPanel(
-            scrambleLength: scrambleLength,
-            onLengthChanged: onScrambleLengthChanged,
-            onScramble: onScramble,
-            isScrambling: isScrambling,
-            isAnimating: isAnimating,
-          ),
+          _buildScramblePanel(),
           const SizedBox(height: 16),
-          _buildButton(
-            icon: Icons.auto_fix_high,
-            label: isPremium ? 'Solve Kociemba' : 'Solve',
-            onPressed: isAnimating
-                ? null
-                : () => onSolve(method: SolveMethod.kociemba),
-            color: const Color(0xFF6366F1),
-            width: 280,
-          ),
-          const SizedBox(height: 12),
-          _buildButton(
-            icon: Icons.layers,
-            label: 'Solve Layer-by-Layer',
-            onPressed: isAnimating
-                ? null
-                : () {
-                    if (isPremium) {
-                      onSolve(method: SolveMethod.lbl);
-                    } else {
-                      showModalBottomSheet(
-                        context: context,
-                        backgroundColor: Colors.transparent,
-                        isScrollControlled: true,
-                        builder: (_) => const PremiumUpsellSheet(),
-                      );
-                    }
-                  },
-            color: const Color(0xFF6366F1),
-            width: 280,
-            isPremiumGated: !isPremium,
-          ),
+          _buildSolverButton(),
         ],
       );
     }
@@ -684,4 +697,178 @@ class SolveControls extends StatelessWidget {
       ),
     );
   }
+}
+
+class PremiumSolverSelector extends StatefulWidget {
+  final bool isAnimating;
+  final bool isSolving;
+  final String? solveStatus;
+  final Function({SolveMethod? method, bool showExplanations}) onSolve;
+  final SolveMethod selectedMethod;
+  final Function(SolveMethod) onMethodChanged;
+
+  const PremiumSolverSelector({
+    super.key,
+    required this.isAnimating,
+    required this.isSolving,
+    this.solveStatus,
+    required this.onSolve,
+    required this.selectedMethod,
+    required this.onMethodChanged,
+  });
+
+  @override
+  State<PremiumSolverSelector> createState() => _PremiumSolverSelectorState();
+}
+
+class _PremiumSolverSelectorState extends State<PremiumSolverSelector> {
+  String _getMethodDisplayName(SolveMethod method) {
+    switch (method) {
+      case SolveMethod.lbl:
+        return 'Layer-by-Layer';
+      case SolveMethod.cfop:
+        return 'CFOP (Advanced)';
+      case SolveMethod.roux:
+        return 'Roux Method';
+      case SolveMethod.zz:
+        return 'ZZ (Speedcube)';
+      case SolveMethod.kociemba:
+        return 'Kociemba (Optimal)';
+      case SolveMethod.petrus:
+        return 'Petrus Method';
+      case SolveMethod.heise:
+        return 'Heise Method';
+    }
+  }
+
+  String _getSolveButtonLabel(SolveMethod method) {
+    switch (method) {
+      case SolveMethod.lbl:
+        return 'SOLVE LBL';
+      case SolveMethod.cfop:
+        return 'SOLVE CFOP';
+      case SolveMethod.roux:
+        return 'SOLVE ROUX';
+      case SolveMethod.zz:
+        return 'SOLVE ZZ';
+      case SolveMethod.petrus:
+        return 'SOLVE PETRUS';
+      case SolveMethod.kociemba:
+        return 'SOLVE OPTIMAL';
+      case SolveMethod.heise:
+        return 'SOLVE HEISE';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedMethod = widget.selectedMethod;
+    final isSolving = widget.isSolving;
+    final isDisabled = widget.isAnimating || isSolving;
+    
+    const primaryColor = Color(0xFF6366F1);
+    final activeColor = isSolving ? const Color(0xFF10B981) : primaryColor;
+    final buttonColor = isDisabled && !isSolving ? primaryColor.withValues(alpha: 0.3) : activeColor;
+
+    return Container(
+      width: 300,
+      height: 54,
+      decoration: BoxDecoration(
+        gradient: isDisabled
+            ? null
+            : LinearGradient(
+                colors: [buttonColor, buttonColor.withValues(alpha: 0.8)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+        color: isDisabled ? buttonColor : null,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: isDisabled
+            ? null
+            : [
+                BoxShadow(
+                  color: buttonColor.withValues(alpha: 0.4),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+      ),
+      child: Row(
+        children: [
+          // Primary Solve Action
+          Expanded(
+            child: InkWell(
+              onTap: isDisabled ? null : () {
+                HapticService.impactMedium();
+                widget.onSolve(method: selectedMethod);
+              },
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                bottomLeft: Radius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.auto_fix_high, color: Colors.white, size: 20),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Text(
+                        isSolving ? (widget.solveStatus ?? 'Solving...') : _getSolveButtonLabel(selectedMethod),
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          
+          // Divider
+          Container(
+            width: 1,
+            height: 30,
+            color: Colors.white24,
+          ),
+          
+          // Method Selector (Chevron)
+          Theme(
+            data: Theme.of(context).copyWith(
+              cardColor: const Color(0xFF1E293B),
+            ),
+            child: PopupMenuButton<SolveMethod>(
+              initialValue: selectedMethod,
+              enabled: !isDisabled,
+              onSelected: (method) {
+                HapticService.selection();
+                widget.onMethodChanged(method);
+              },
+              padding: EdgeInsets.zero,
+              icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
+              itemBuilder: (context) => SolveMethod.values.map((method) {
+                return PopupMenuItem<SolveMethod>(
+                  value: method,
+                  child: Text(
+                    _getMethodDisplayName(method),
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
+
 }
