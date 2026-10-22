@@ -9,6 +9,7 @@ import 'package:speedcube_ar/models/cube_state.dart';
 import 'package:speedcube_ar/models/cube_move.dart';
 import 'package:speedcube_ar/solver/zz_solver.dart';
 import 'package:speedcube_ar/solver/petrus_solver.dart';
+import 'package:speedcube_ar/solver/roux_solver.dart';
 
 void main() {
   Logger.root.level = Level.ALL;
@@ -19,7 +20,7 @@ void main() {
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('Stress test ZZ, Petrus, and Heise solvers', () async {
+  test('Stress test ZZ, Petrus, Roux, and Heise solvers', () async {
     log.info("Initializing Kociemba tables...");
     await KociembaSearch().solve(CubeState.solved());
     log.info("Initialization complete.");
@@ -32,6 +33,9 @@ void main() {
 
     log.info("--- Testing Petrus Solver ---");
     await testSolver("Petrus", (s) => PetrusSolver.solve(s), iterations, random, log);
+
+    log.info("--- Testing Roux Solver ---");
+    await testSolver("Roux", (s) => RouxSolver.solve(s), iterations, random, log);
 
     log.info("--- Testing Heise Solver ---");
     await testSolver("Heise", (s) => HeiseSolver.solve(s), iterations, random, log);
